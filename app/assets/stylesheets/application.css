@@ -13,3 +13,29 @@
  *= require_tree .
  *= require_self
  */
+
+ @import "bootstrap";
+@font-face {
+  font-family: 'Tai Hertiage Pro';
+  src: url('/assets/Tai_Heritage_pro.TaiHeritagePro-Regular.tff')
+}
+
+
+
+
+
+ body {
+   background-color: rgb(255, 237, 219);
+ }
+
+
+#page-container {
+   position: relative;
+   min-height: 100vh;
+   text-align: center;
+ }
+
+ #content-wrap {
+   padding-bottom: 5rem;
+   /* Footer height */
+ }
