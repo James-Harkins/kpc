@@ -1,24 +1,3 @@
-# README
+Database Schema
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+<img width="819" alt="image" src="https://github.com/user-attachments/assets/e750002f-8c8d-4cbd-91bb-19439f06808a">
