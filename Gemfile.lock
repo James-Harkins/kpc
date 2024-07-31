@@ -47,6 +47,7 @@ GEM
     arel (9.0.0)
     ast (2.4.2)
     base64 (0.2.0)
+    bcrypt (3.1.18)
     bindex (0.8.1)
     bootsnap (1.18.3)
       msgpack (~> 1.2)
@@ -263,6 +264,7 @@ PLATFORMS
   x86_64-darwin-22
 
 DEPENDENCIES
+  bcrypt (~> 3.1.7)
   bootsnap (>= 1.1.0)
   byebug
   coffee-rails (~> 4.2)
