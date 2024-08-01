@@ -1,0 +1,104 @@
+<style>
+    
+body {
+    display: flex;
+    background: url(<%= asset_path 'course_2.jpeg' %>);
+    display: flex;
+    height: 90vh;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-form-container, .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem 0;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+    color: white;
+  }
+  
+label {
+    text-align: left;
+    padding: 0.25rem 0;
+}
+
+input {
+    margin: 0.25rem 0;
+    padding: .5rem;
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.redirect-link {
+    cursor: pointer;
+    margin: 0.5rem 0;
+    color: #fff;
+}
+
+.auth-form-container > h1 {
+    color: #fff;
+    font-size: 100px;
+    margin-top: -50px;
+    text-align: center;
+  }
+</style>
+
+
+    <div class="auth-form-container">
+        <h1>REGISTER</h1>    
+        <div class="login-form">
+            <%= form_with url: "/golfers", method: :post, local: true do |form| %>
+                <div class="label">
+                    <%= form.label :first_name %>
+                </div>
+                <div class="input">
+                    <%= form.text_field :first_name %><br>
+                </div>
+
+                <div class="label">
+                    <%= form.label :last_name %>
+                </div>
+                <div class="input">
+                    <%= form.text_field :last_name %><br>
+                </div>
+                
+                <div class="label">
+                    <%= form.label :email %>
+                </div>
+                <div class="input">
+                    <%= form.text_field :email %><br>
+                </div>
+
+                <div class="label">
+                    <%= form.label :password %>
+                </div>
+                
+                <div class="input">
+                    <%= form.password_field :password %><br>
+                </div>
+
+                <div class="label">
+                    <%= form.label :password_confirmation %>
+                </div>
+                
+                <div class="input">
+                    <%= form.password_field :password_confirmation %><br>
+                </div>
+
+                <div class="button">
+                    <%= form.submit "Register" %>
+                </div>
+            <% end %>
+        </div>
+    </div>
