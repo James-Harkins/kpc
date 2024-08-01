@@ -1,0 +1,103 @@
+<style>
+h1 {
+  font-size: 9em;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+  color: white;
+  display: inline-block;
+  width: 100%;
+  margin: 50px;
+  text-align: center;
+  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+h3 {
+  font-size: 4em;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+  color: white;
+  display: inline-block;
+  height: 100%;
+  margin: 50px;
+  text-align: center;
+  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
+.inner{
+      align-items: center;
+      display: inline-block;
+}
+
+.btn-outline-primary{
+  margin: 20px;
+  background-color: white;
+  padding: 20px;
+  font-size: 3em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+  border-radius: 25px;
+
+}
+.btn-outline-primary:hover {
+    background-color: gray !important;
+}
+
+.btn-outline-primary:focus, .btn-outline-primary:active:focus, .btn.active-outline-primary:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.btn-outline-danger{
+  margin: 1px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+
+  font-size: 1.2em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  background-color: rgb(222, 74, 72);
+  font-color: black !important;
+}
+
+.btn-outline-danger:hover {
+    background-color: rgb(191, 146, 112) !important;
+} 
+
+</style>
+
+<div class="home-video-wrapper d-flex align-items-center justify-content-center">
+    <%= video_tag "golf_course_1.mp4", autoplay: :autoplay, loop: :loop, mute: :mute, class: "home_video" %>
+    <h1>KPC</h1>
+    
+    <div class="inner">
+        <% if current_user %>
+            <form action="/dashboard">
+                <button id="dashboard_header" type="submit" class="btn btn-outline-primary">DASHBOARD</button>
+            </form>
+        <% else %>
+            <form action="/login">
+                <button id="dashboard_header" type="submit" class="btn btn-outline-primary">LOG IN</button>
+            </form>
+        <% end %>
+    </div>
+
+    <div class="inner">
+         <% if current_user %>
+            <form action="/logout">
+                <button id="dashboard_header" type="submit" class="btn btn-outline-primary">LOG OUT</button>
+            </form>
+        <% else %>
+            <form action="/register">
+                <button id="dashboard_header" type="submit" class="btn btn-outline-primary">REGISTER</button>
+            </form>
+        <% end %>
+    </div>
+
+    <h3>It's the most wonderful time of the year...</p>
+</div>
