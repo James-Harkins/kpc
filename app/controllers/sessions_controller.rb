@@ -9,11 +9,11 @@ class SessionsController < ApplicationController
         session[:golfer_id] = golfer.id
         redirect_to "/dashboard"
       else
-        flash[:invalid_password] = "Try again, fucko!"
+        flash[:error] = "Try again, fucko!"
         redirect_to "/login"
       end
     else
-      flash[:invalid_email] = "Sign up first, fucko!"
+      flash[:error] = "Sign up first, fucko!"
       redirect_to "/login"
     end
   end

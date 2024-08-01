@@ -1,7 +1,7 @@
 class GolfersController < ApplicationController
   def show
   end
-  
+
   def new
   end
 
@@ -11,7 +11,7 @@ class GolfersController < ApplicationController
       redirect_to "/login"
     else
       redirect_to "/register"
-      flash[:notice] = golfer.errors.full_messages.to_sentence + ", fucko!"
+      flash[:error] = golfer.errors.full_messages.to_sentence + ", fucko!"
     end
   end
 
