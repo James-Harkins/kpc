@@ -1,5 +1,6 @@
 class GolfersController < ApplicationController
   def show
+    @golfer = current_user
   end
 
   def new

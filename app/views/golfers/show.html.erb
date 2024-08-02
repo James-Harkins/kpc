@@ -1,1 +1,6 @@
 <h1>welcome to the dashboard</h1>
+
+<h2>Previous Trips:</h2>
+<% @golfer.trips.each do |trip| %>
+    <h3>KPC <%= trip.number %></h3>
+<% end%>
