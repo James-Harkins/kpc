@@ -50,64 +50,64 @@ RSpec.describe Golfer, type: :model do
       @trip_4 = Trip.create!(year: 2016, number: 'XVI', location: 'VA Beach')
 
       @night_1_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-21'), cost: 70.0)
-      @night_2_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-22'), cost: 70.0)
-      @night_3_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-23'), cost: 70.0)
-      @night_4_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-24'), cost: 70.0)
-      @night_5_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-25'), cost: 70.0)
-      @night_6_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-26'), cost: 70.0)
-      @night_7_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-27'), cost: 70.0)
+      @night_2_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-22'), cost: 75.0)
+      @night_3_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-23'), cost: 80.0)
+      @night_4_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-24'), cost: 85.0)
+      @night_5_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-25'), cost: 90.0)
+      @night_6_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-26'), cost: 95.0)
+      @night_7_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-27'), cost: 100.0)
 
       @night_1_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-20'), cost: 80.0)
-      @night_2_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-21'), cost: 80.0)
-      @night_3_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-22'), cost: 80.0)
-      @night_4_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-23'), cost: 80.0)
-      @night_5_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-24'), cost: 80.0)
-      @night_6_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-25'), cost: 80.0)
-      @night_7_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-26'), cost: 80.0)
+      @night_2_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-21'), cost: 85.0)
+      @night_3_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-22'), cost: 90.0)
+      @night_4_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-23'), cost: 95.0)
+      @night_5_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-24'), cost: 100.0)
+      @night_6_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-25'), cost: 105.0)
+      @night_7_trip_2 = @trip_2.nights.create!(date: Date.parse('2014-04-26'), cost: 110.0)
 
       @night_1_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-19'), cost: 90.0)
-      @night_2_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-20'), cost: 90.0)
-      @night_3_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-21'), cost: 90.0)
-      @night_4_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-22'), cost: 90.0)
-      @night_5_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-23'), cost: 90.0)
-      @night_6_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-24'), cost: 90.0)
-      @night_7_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-25'), cost: 90.0)
+      @night_2_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-20'), cost: 95.0)
+      @night_3_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-21'), cost: 100.0)
+      @night_4_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-22'), cost: 105.0)
+      @night_5_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-23'), cost: 110.0)
+      @night_6_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-24'), cost: 115.0)
+      @night_7_trip_3 = @trip_3.nights.create!(date: Date.parse('2015-04-25'), cost: 120.0)
 
       @night_1_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-18'), cost: 100.0)
-      @night_2_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-19'), cost: 100.0)
-      @night_3_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-20'), cost: 100.0)
-      @night_4_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-21'), cost: 100.0)
-      @night_5_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-22'), cost: 100.0)
-      @night_6_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-23'), cost: 100.0)
-      @night_7_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-24'), cost: 100.0)
+      @night_2_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-19'), cost: 105.0)
+      @night_3_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-20'), cost: 110.0)
+      @night_4_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-21'), cost: 115.0)
+      @night_5_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-22'), cost: 120.0)
+      @night_6_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-23'), cost: 125.0)
+      @night_7_trip_4 = @trip_4.nights.create!(date: Date.parse('2016-04-24'), cost: 130.0)
 
       @trip_1_course_1 = @trip_1.rounds.create!(date: Date.parse('2013-04-22'), cost: 65)
-      @trip_1_course_2 = @trip_1.rounds.create!(date: Date.parse('2013-04-23'), cost: 65)
-      @trip_1_course_3 = @trip_1.rounds.create!(date: Date.parse('2013-04-24'), cost: 65)
+      @trip_1_course_2 = @trip_1.rounds.create!(date: Date.parse('2013-04-23'), cost: 55)
+      @trip_1_course_3 = @trip_1.rounds.create!(date: Date.parse('2013-04-24'), cost: 75)
       @trip_1_course_4 = @trip_1.rounds.create!(date: Date.parse('2013-04-25'), cost: 65)
-      @trip_1_course_5 = @trip_1.rounds.create!(date: Date.parse('2013-04-26'), cost: 65)
+      @trip_1_course_5 = @trip_1.rounds.create!(date: Date.parse('2013-04-26'), cost: 60)
       @trip_1_course_6 = @trip_1.rounds.create!(date: Date.parse('2013-04-27'), cost: 65)
 
       @trip_2_course_1 = @trip_2.rounds.create!(date: Date.parse('2013-04-21'), cost: 70)
-      @trip_2_course_2 = @trip_2.rounds.create!(date: Date.parse('2013-04-22'), cost: 70)
-      @trip_2_course_3 = @trip_2.rounds.create!(date: Date.parse('2013-04-23'), cost: 70)
-      @trip_2_course_4 = @trip_2.rounds.create!(date: Date.parse('2013-04-24'), cost: 70)
-      @trip_2_course_5 = @trip_2.rounds.create!(date: Date.parse('2013-04-25'), cost: 70)
-      @trip_2_course_6 = @trip_2.rounds.create!(date: Date.parse('2013-04-26'), cost: 70)
+      @trip_2_course_2 = @trip_2.rounds.create!(date: Date.parse('2013-04-22'), cost: 75)
+      @trip_2_course_3 = @trip_2.rounds.create!(date: Date.parse('2013-04-23'), cost: 75)
+      @trip_2_course_4 = @trip_2.rounds.create!(date: Date.parse('2013-04-24'), cost: 60)
+      @trip_2_course_5 = @trip_2.rounds.create!(date: Date.parse('2013-04-25'), cost: 60)
+      @trip_2_course_6 = @trip_2.rounds.create!(date: Date.parse('2013-04-26'), cost: 75)
 
       @trip_3_course_2 = @trip_3.rounds.create!(date: Date.parse('2013-04-20'), cost: 50)
-      @trip_3_course_1 = @trip_3.rounds.create!(date: Date.parse('2013-04-21'), cost: 50)
-      @trip_3_course_3 = @trip_3.rounds.create!(date: Date.parse('2013-04-22'), cost: 50)
-      @trip_3_course_4 = @trip_3.rounds.create!(date: Date.parse('2013-04-23'), cost: 50)
-      @trip_3_course_5 = @trip_3.rounds.create!(date: Date.parse('2013-04-24'), cost: 50)
-      @trip_3_course_6 = @trip_3.rounds.create!(date: Date.parse('2013-04-25'), cost: 50)
+      @trip_3_course_1 = @trip_3.rounds.create!(date: Date.parse('2013-04-21'), cost: 55)
+      @trip_3_course_3 = @trip_3.rounds.create!(date: Date.parse('2013-04-22'), cost: 55)
+      @trip_3_course_4 = @trip_3.rounds.create!(date: Date.parse('2013-04-23'), cost: 70)
+      @trip_3_course_5 = @trip_3.rounds.create!(date: Date.parse('2013-04-24'), cost: 55)
+      @trip_3_course_6 = @trip_3.rounds.create!(date: Date.parse('2013-04-25'), cost: 85)
 
       @trip_4_course_2 = @trip_4.rounds.create!(date: Date.parse('2013-04-19'), cost: 60)
-      @trip_4_course_1 = @trip_4.rounds.create!(date: Date.parse('2013-04-20'), cost: 60)
-      @trip_4_course_3 = @trip_4.rounds.create!(date: Date.parse('2013-04-21'), cost: 60)
+      @trip_4_course_1 = @trip_4.rounds.create!(date: Date.parse('2013-04-20'), cost: 65)
+      @trip_4_course_3 = @trip_4.rounds.create!(date: Date.parse('2013-04-21'), cost: 70)
       @trip_4_course_4 = @trip_4.rounds.create!(date: Date.parse('2013-04-22'), cost: 60)
-      @trip_4_course_5 = @trip_4.rounds.create!(date: Date.parse('2013-04-23'), cost: 60)
-      @trip_4_course_6 = @trip_4.rounds.create!(date: Date.parse('2013-04-24'), cost: 60)
+      @trip_4_course_5 = @trip_4.rounds.create!(date: Date.parse('2013-04-23'), cost: 65)
+      @trip_4_course_6 = @trip_4.rounds.create!(date: Date.parse('2013-04-24'), cost: 65)
 
       @golfer_1_trip_1 = @golfer_1.golfer_trips.create!(trip: @trip_1)
       @golfer_1_trip_1_night_1 = @golfer_1.golfer_nights.create!(night: @night_3_trip_1)
@@ -116,7 +116,7 @@ RSpec.describe Golfer, type: :model do
       @golfer_1_trip_1_golfer_trip_course_2 = @golfer_1.golfer_rounds.create!(round: @trip_1_course_4)
       @golfer_1_trip_1_night_3 = @golfer_1.golfer_nights.create!(night: @night_5_trip_1)
       @golfer_1_trip_1_golfer_trip_course_3 = @golfer_1.golfer_rounds.create!(round: @trip_1_course_5)
-      @golfer_1_trip_1_night_4 = @golfer_1.golfer_nights.create!(night: @night_5_trip_1)
+      @golfer_1_trip_1_night_4 = @golfer_1.golfer_nights.create!(night: @night_6_trip_1)
       @golfer_1_trip_1_golfer_trip_course_4 = @golfer_1.golfer_rounds.create!(round: @trip_1_course_6)
       @golfer_1_trip_1_night_5 = @golfer_1.golfer_nights.create!(night: @night_7_trip_1)
      
@@ -145,31 +145,29 @@ RSpec.describe Golfer, type: :model do
       @golfer_1_trip_3_night_6 = @golfer_1.golfer_nights.create!(night: @night_6_trip_4)
       @golfer_1_trip_3_golfer_trip_course_6 = @golfer_1.golfer_rounds.create!(round: @trip_4_course_6)
       @golfer_1_trip_3_night_7 = @golfer_1.golfer_nights.create!(night: @night_7_trip_4)
-    
-      @golfer_1_trip_4 = @golfer_1.golfer_trips.create!(trip: @trip_3, is_full_trip: true)
     end
 
     describe '.trip_nights_total_cost' do
       it 'should return the total cost of all nights for a given trip' do
-        expect(@golfer_1.trip_nights_total_cost(@trip_1.id)).to eq(350.0)
-        expect(@golfer_1.trip_nights_total_cost(@trip_2.id)).to eq(320.0)
-        expect(@golfer_1.trip_nights_total_cost(@trip_4.id)).to eq(600.0)
+        expect(@golfer_1.trip_nights_total_cost(@trip_1.id)).to eq(450.0)
+        expect(@golfer_1.trip_nights_total_cost(@trip_2.id)).to eq(410.0)
+        expect(@golfer_1.trip_nights_total_cost(@trip_4.id)).to eq(805.0)
       end
     end
 
     describe '.trip_rounds_total_cost' do
       it 'should return the total cost of all courses for a given trip' do
-        expect(@golfer_1.trip_rounds_total_cost(@trip_1.id)).to eq(260.0)
-        expect(@golfer_1.trip_rounds_total_cost(@trip_2.id)).to eq(210.0)
-        expect(@golfer_1.trip_rounds_total_cost(@trip_4.id)).to eq(360.0)
+        expect(@golfer_1.trip_rounds_total_cost(@trip_1.id)).to eq(265.0)
+        expect(@golfer_1.trip_rounds_total_cost(@trip_2.id)).to eq(195.0)
+        expect(@golfer_1.trip_rounds_total_cost(@trip_4.id)).to eq(385.0)
       end
     end
 
     describe '.trip_total_cost' do
       it 'should return the total cost for a given trip' do
-        expect(@golfer_1.trip_total_cost(@trip_1.id)).to eq(660.0)
-        expect(@golfer_1.trip_total_cost(@trip_2.id)).to eq(570.0)
-        expect(@golfer_1.trip_total_cost(@trip_4.id)).to eq(1025.0)
+        expect(@golfer_1.trip_net_total_cost(@trip_1.id)).to eq(715.0)
+        expect(@golfer_1.trip_net_total_cost(@trip_2.id)).to eq(605.0)
+        expect(@golfer_1.trip_net_total_cost(@trip_4.id)).to eq(1190.0)
       end
     end
   end
