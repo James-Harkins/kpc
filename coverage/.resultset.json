@@ -42,23 +42,17 @@
           1,
           1,
           null,
+          1,
+          4,
+          null,
+          null,
+          1,
+          4,
           null,
           null,
           null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
+          1,
+          1,
           null,
           null,
           null
@@ -100,8 +94,81 @@
           null
         ]
       },
+      "/Users/jimbo/kpc/kpc_monolith/kpc/app/controllers/golfers_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {
+        }
+      },
       "/Users/jimbo/kpc/kpc_monolith/kpc/app/controllers/application_controller.rb": {
         "lines": [
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {
+        }
+      },
+      "/Users/jimbo/kpc/kpc_monolith/kpc/app/controllers/sessions_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {
+        }
+      },
+      "/Users/jimbo/kpc/kpc_monolith/kpc/app/controllers/welcome_controller.rb": {
+        "lines": [
+          0,
+          0,
           0,
           0
         ],
@@ -109,6 +176,6 @@
         }
       }
     },
-    "timestamp": 1722441481
+    "timestamp": 1722557307
   }
 }

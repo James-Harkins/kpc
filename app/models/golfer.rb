@@ -15,23 +15,17 @@ class Golfer < ApplicationRecord
   has_secure_password
   enum role: [:default, :admin]
 
-#   def trip_meals_total_cost(trip_id)
-#     meals.where(trip_id: trip_id).sum(:cost)
-#   end
+  def trip_nights_total_cost(trip_id)
+    nights.where(trip_id: trip_id).sum(:cost)
+  end
 
-#   def trip_nights_total_cost(trip_id)
-#     nights.where(trip_id: trip_id).sum(:cost)
-#   end
+  def trip_rounds_total_cost(trip_id)
+    rounds.where(trip_id: trip_id)
+    .sum(:cost)
+  end
 
-#   def trip_courses_total_cost(trip_id)
-#     golfer_trip_courses.joins(:trip_course)
-#     .where(trip_courses: {trip_id: trip_id})
-#     .sum(:cost)
-#   end
-
-#   def trip_total_cost(trip_id)
-#     trip_meals_total_cost(trip_id) +
-#     trip_nights_total_cost(trip_id) +
-#     trip_courses_total_cost(trip_id)
-#   end
+  def trip_total_cost(trip_id)
+    trip_nights_total_cost(trip_id) +
+    trip_rounds_total_cost(trip_id)
+  end
 end
