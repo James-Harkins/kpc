@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 2024_08_02_000603) do
 
   create_table "nights", force: :cascade do |t|
     t.date "date"
-    t.float "cost"
+    t.integer "cost"
     t.bigint "trip_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -64,7 +64,7 @@ ActiveRecord::Schema.define(version: 2024_08_02_000603) do
 
   create_table "rounds", force: :cascade do |t|
     t.date "date"
-    t.float "cost"
+    t.integer "cost"
     t.bigint "trip_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

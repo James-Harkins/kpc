@@ -1,0 +1,81 @@
+<style>
+body {
+    display: flex;
+    background: url(<%= asset_path 'course_8.jpeg' %>);
+    display: flex;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+}
+
+.trip-register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px;
+    padding: 50px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    color: black;
+    background-color: white;
+    opacity: 0.8;
+    border-radius: 25px;
+  }
+
+.date-boxes {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    
+    label {
+        text-align: left;
+        padding: 0.25rem 0;
+    }
+
+    input {
+        margin: 0.25rem 0;
+        padding: .5rem;
+    }
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+</style>
+
+<div class='trip-register-container'>
+    <h1>REGISTER FOR KPC <%= @next_trip.number %></h1>
+    <h3>Check off each night and round that you will attend, then click the submit button.</h3>
+    <h3>If you will attend the whole trip, just check "Give me the whole enchilada."</h3>
+    <%= form_with url: "/login", method: :post, local: true do |form| %>
+        <div class='full-trip-box'>
+            <%= check_box_tag 'full_trip', true %>
+            <%= "Give me the whole enchilada, bitch!" %><br>
+        </div>
+        <div class='date-boxes'>
+            <% @trip.each do |date| %>
+                <h4><%= date[:date]%></h4>
+                <%= check_box_tag 'nights[]', date[:night][:id] %>
+                <%= "Night at House: $#{date[:night][:cost]}" %><br>
+
+                <% if date[:round].values.any? %>
+                    <%= check_box_tag 'rounds[]', date[:round][:id] %>
+                    <%= "Round: $#{date[:round][:cost]}" %><br>
+                <% end %>
+            <% end %>
+        </div>
+        <div class='button'>
+            <br><%= form.submit "Sign me up, motherfucker!" %>
+        </div>
+    <% end %>
+</div>
