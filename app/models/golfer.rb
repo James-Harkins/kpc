@@ -15,23 +15,43 @@ class Golfer < ApplicationRecord
   has_secure_password
   enum role: [:default, :admin]
 
-#   def trip_meals_total_cost(trip_id)
-#     meals.where(trip_id: trip_id).sum(:cost)
-#   end
+  def trip_nights_total_cost(trip_id)
+    nights.where(trip_id: trip_id).sum(:cost)
+  end
 
-#   def trip_nights_total_cost(trip_id)
-#     nights.where(trip_id: trip_id).sum(:cost)
-#   end
+  def trip_rounds_total_cost(trip_id)
+    rounds.where(trip_id: trip_id)
+    .sum(:cost)
+  end
 
-#   def trip_courses_total_cost(trip_id)
-#     golfer_trip_courses.joins(:trip_course)
-#     .where(trip_courses: {trip_id: trip_id})
-#     .sum(:cost)
-#   end
+  def trip_net_total_cost(trip_id)
+    golfer_trip = golfer_trips.where(trip_id: trip_id).first
+    if golfer_trip.is_full_trip
+      trip_gross_total_cost(trip_id) - 
+      trip_first_night_cost(golfer_trip)
+    else 
+      trip_gross_total_cost(trip_id)
+    end
+  end
 
-#   def trip_total_cost(trip_id)
-#     trip_meals_total_cost(trip_id) +
-#     trip_nights_total_cost(trip_id) +
-#     trip_courses_total_cost(trip_id)
-#   end
+  def trip_gross_total_cost(trip_id)
+    trip_nights_total_cost(trip_id) +
+    trip_rounds_total_cost(trip_id)
+  end
+
+  def trip_first_night_cost(golfer_trip)
+    golfer_trip.trip.nights.first.cost
+  end
+
+  def is_registered_for_next_trip(next_trip)
+    registered = false
+    
+    trips.each do |trip|
+      if trip.id == next_trip.id
+        registered = true
+      end
+    end
+    
+    registered
+  end
 end

@@ -1,5 +1,12 @@
 class GolfersController < ApplicationController
   def show
+    if current_user
+      @golfer = current_user
+      @next_trip = Trip.where('start_date > ?', Date.today).first
+    else
+      redirect_to "/login"
+      flash[:login] = "Log in first, fucko!"
+    end
   end
 
   def new
