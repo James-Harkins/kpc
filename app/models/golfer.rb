@@ -42,4 +42,16 @@ class Golfer < ApplicationRecord
   def trip_first_night_cost(golfer_trip)
     golfer_trip.trip.nights.first.cost
   end
+
+  def is_registered_for_next_trip(next_trip)
+    registered = false
+    
+    trips.each do |trip|
+      if trip.id == next_trip.id
+        registered = true
+      end
+    end
+    
+    registered
+  end
 end

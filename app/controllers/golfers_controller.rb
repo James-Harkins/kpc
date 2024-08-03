@@ -1,6 +1,7 @@
 class GolfersController < ApplicationController
   def show
     @golfer = current_user
+    @next_trip = Trip.where('start_date > ?', Date.today).first
   end
 
   def new
