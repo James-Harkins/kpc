@@ -218,7 +218,7 @@ body {
         <% if @golfer.is_registered_for_next_trip(@next_trip) %>
             <h3>See you at KPC <%= @next_trip.number %>!</h3>
         <% else %>
-            <form action="/trip_register">
+            <form action="/register_trip">
                 <button id="dashboard_header" type="submit" class="btn btn-outline-primary">Sign up for KPC <%= @next_trip.number %></button>
             </form>
         <% end %>
