@@ -59,6 +59,11 @@ button {
 </style>
     <div class="auth-form-container">
         <h1>LOG IN</h1>    
+        <% flash.each do |name, msg| %>
+            <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+            </div>
+      <% end %>
         <div class="login-form">
             <%= form_with url: "/login", method: :post, local: true do |form| %>
                 <div class="label">
