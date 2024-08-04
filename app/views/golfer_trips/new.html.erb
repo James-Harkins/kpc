@@ -100,15 +100,15 @@ button {
 
 <div class='trip-register-container'>
     <h1>REGISTER FOR KPC <%= @next_trip.number %></h1>
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+        </div>
+    <% end %>
     <h3>Check off each night and round that you will attend, then click the submit button.</h3>
     <h3>If you will attend the whole trip, just click "Give me the whole enchilada."</h3>
-    <%# <form method="post" action="/register_trip">
-        <button type="submit" class="btn btn-outline-primary">
-            Give me the whole enchilada, bud!
-        </button>
-    </form> %>
-    <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true} %>
-    <%= form_with url: "/register_trip", method: :post, local: true do |form| %>
+    <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id} %>
+    <%= form_with url: "/register_trip", method: :post, params: {trip_id: @next_trip.id}, local: true do |form| %>
         <div class='date-boxes'>
             <% @trip.each do |date| %>
                 <div class='check-boxes'>
