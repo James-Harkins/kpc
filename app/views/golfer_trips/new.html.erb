@@ -1,0 +1,130 @@
+<style>
+body {
+    display: flex;
+    background: url(<%= asset_path 'course_8.jpeg' %>);
+    display: flex;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+}
+
+.trip-register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+    padding: 50px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    color: black;
+    background-color: white;
+    opacity: 0.8;
+    border-radius: 25px;
+  }
+
+.check-boxes {
+    text-align: left;
+    padding-left: 40px;
+}
+
+label {
+    text-align: left;
+    padding: 0.25rem 0;
+}
+
+input {
+    margin: 0.25rem 0;
+    text-align: left;
+    padding: .5rem;
+    font-size: 1.5em;
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.btn-outline-primary{
+  margin: 20px;
+  background-color: white;
+  opacity: 0.6;
+  padding: 20px;
+  font-size: 1.5em;
+  color: black;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+  border-radius: 25px;
+
+}
+.btn-outline-primary:hover {
+    background-color: gray !important;
+}
+
+.btn-outline-primary:focus, .btn-outline-primary:active:focus, .btn.active-outline-primary:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.btn-outline-danger{
+  margin: 1px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+
+  font-size: 1.2em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  background-color: rgb(222, 74, 72);
+  font-color: black !important;
+}
+
+.btn-outline-danger:hover {
+    background-color: rgb(191, 146, 112) !important;
+} 
+
+</style>
+
+<div class='trip-register-container'>
+    <h1>REGISTER FOR KPC <%= @next_trip.number %></h1>
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+        </div>
+    <% end %>
+    <h3>Check off each night and round that you will attend, then click the submit button.</h3>
+    <h3>If you will attend the whole trip, just click "Give me the whole enchilada."</h3>
+    <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id} %>
+    <%= form_with url: "/register_trip", method: :post, params: {trip_id: @next_trip.id}, local: true do |form| %>
+        <div class='date-boxes'>
+            <% @trip.each do |date| %>
+                <div class='check-boxes'>
+                    <h3><%= date[:date]%></h3>
+                    <%= check_box_tag 'nights[]', date[:night][:id] %>
+                    <%= "Night at House: $#{date[:night][:cost]}" %><br>
+
+                    <% if date[:round].values.any? %>
+                        <%= check_box_tag 'rounds[]', date[:round][:id] %>
+                        <%= "Round: $#{date[:round][:cost]}" %><br>
+                    <% end %>
+                </div>
+            <% end %>
+        </div>
+        <div class='button'>
+            <br><%= form.submit "Sign me up, motherfucker!" %>
+        </div>
+    <% end %>
+</div>

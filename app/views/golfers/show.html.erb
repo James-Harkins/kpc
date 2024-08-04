@@ -51,6 +51,21 @@ body {
     align-items: center;
   }
 
+   .next-trip-cost {
+    background-color: #fff;
+    opacity: 0.6;
+    padding: 5px;
+    margin: 5px;
+    color: black;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+    border-radius: 25px;
+    font-size: 40px;
+  }
+
   .next-trip-link {
     background: white;
     width: 50%;
@@ -216,9 +231,12 @@ body {
     <br>
     <div class='next_trip'>
         <% if @golfer.is_registered_for_next_trip(@next_trip) %>
-            <h3>See you at KPC <%= @next_trip.number %>!</h3>
+            <div class='next-trip-cost'>
+              <h3>See you at KPC <%= @next_trip.number %>!</h3>
+              <h4>You owe Joe Copeland $<%= @golfer_next_trip.cost %>!</h4>
+            </div>
         <% else %>
-            <form action="/trip_register">
+            <form action="/register_trip">
                 <button id="dashboard_header" type="submit" class="btn btn-outline-primary">Sign up for KPC <%= @next_trip.number %></button>
             </form>
         <% end %>

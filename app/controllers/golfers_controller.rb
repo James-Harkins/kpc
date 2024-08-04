@@ -3,6 +3,7 @@ class GolfersController < ApplicationController
     if current_user
       @golfer = current_user
       @next_trip = Trip.where('start_date > ?', Date.today).first
+      @golfer_next_trip = @golfer.golfer_trips.where(trip_id: @next_trip.id).first
     else
       redirect_to "/login"
       flash[:login] = "Log in first, fucko!"
