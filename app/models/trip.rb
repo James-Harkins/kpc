@@ -24,4 +24,12 @@ class Trip < ApplicationRecord
   
     calendar
   end
+
+  def paid_golfer_trips
+    golfer_trips.where(is_paid: true)
+  end
+
+  def unpaid_golfer_trips
+    golfer_trips.where(is_paid: false)
+  end
 end
