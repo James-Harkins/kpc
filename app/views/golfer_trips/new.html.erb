@@ -26,17 +26,21 @@ body {
     background-color: white;
     opacity: 0.8;
     border-radius: 25px;
-    text-align: left;
   }
 
+.check-boxes {
+    text-align: left;
+    padding-left: 40px;
+}
+
 label {
-    text-align: center;
+    text-align: left;
     padding: 0.25rem 0;
 }
 
 input {
     margin: 0.25rem 0;
-    text-align: center;
+    text-align: left;
     padding: .5rem;
     font-size: 1.5em;
 }
@@ -98,22 +102,25 @@ button {
     <h1>REGISTER FOR KPC <%= @next_trip.number %></h1>
     <h3>Check off each night and round that you will attend, then click the submit button.</h3>
     <h3>If you will attend the whole trip, just click "Give me the whole enchilada."</h3>
-    <form method="post" action="/register_trip">
+    <%# <form method="post" action="/register_trip">
         <button type="submit" class="btn btn-outline-primary">
             Give me the whole enchilada, bud!
         </button>
-    </form>
+    </form> %>
+    <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true} %>
     <%= form_with url: "/register_trip", method: :post, local: true do |form| %>
         <div class='date-boxes'>
             <% @trip.each do |date| %>
-                <h3><%= date[:date]%></h3>
-                <%= check_box_tag 'nights[]', date[:night][:id] %>
-                <%= "Night at House: $#{date[:night][:cost]}" %><br>
+                <div class='check-boxes'>
+                    <h3><%= date[:date]%></h3>
+                    <%= check_box_tag 'nights[]', date[:night][:id] %>
+                    <%= "Night at House: $#{date[:night][:cost]}" %><br>
 
-                <% if date[:round].values.any? %>
-                    <%= check_box_tag 'rounds[]', date[:round][:id] %>
-                    <%= "Round: $#{date[:round][:cost]}" %><br>
-                <% end %>
+                    <% if date[:round].values.any? %>
+                        <%= check_box_tag 'rounds[]', date[:round][:id] %>
+                        <%= "Round: $#{date[:round][:cost]}" %><br>
+                    <% end %>
+                </div>
             <% end %>
         </div>
         <div class='button'>

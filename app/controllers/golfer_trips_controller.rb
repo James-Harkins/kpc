@@ -8,4 +8,8 @@ class GolferTripsController < ApplicationController
       flash[:login] = "Log in first, fucko!"
     end
   end
+
+  def create 
+    binding.pry
+  end
 end
