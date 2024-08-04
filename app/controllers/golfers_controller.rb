@@ -6,7 +6,7 @@ class GolfersController < ApplicationController
       @golfer_next_trip = @golfer.golfer_trips.where(trip_id: @next_trip.id).first
     else
       redirect_to "/login"
-      flash[:login] = "Log in first, fucko!"
+      flash[:login] = "Log in first, Fucko!"
     end
   end
 
@@ -19,7 +19,7 @@ class GolfersController < ApplicationController
       redirect_to "/login"
     else
       redirect_to "/register"
-      flash[:error] = golfer.errors.full_messages.to_sentence + ", fucko!"
+      flash[:error] = golfer.errors.full_messages.to_sentence + ", Fucko!"
     end
   end
 
