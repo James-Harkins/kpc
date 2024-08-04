@@ -10,5 +10,5 @@ Rails.application.routes.draw do
   get "/logout", to: "sessions#destroy"
 
   get "/register_trip", to: "golfer_trips#new"
-  post "/golfer_trips", to: "golfer_trips#create"
+  post "/register_trip", to: "golfer_trips#create"
 end
