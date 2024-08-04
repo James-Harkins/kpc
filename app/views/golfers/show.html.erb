@@ -297,7 +297,7 @@ body {
           <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
             <% golfer = golfer_trip.golfer %>
             <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %>: $<%= golfer_trip.cost %></h4>
-            <%= button_to "Mark as Unpaid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_id: golfer.id, trip_id: @next_trip.id, paid: false} %>
+            <%= button_to "Mark as Unpaid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: false} %>
             <hr class="line-thin">
           <% end %>
         <hr class="line">
@@ -306,7 +306,7 @@ body {
             <% golfer = golfer_trip.golfer %>
             <div class=unpaid-golfer>
               <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %>: $<%= golfer_trip.cost %></h4>
-              <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_id: golfer.id, trip_id: @next_trip.id, paid: true} %>
+              <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
               <hr class="line-thin">
             </div>
           <% end %>
