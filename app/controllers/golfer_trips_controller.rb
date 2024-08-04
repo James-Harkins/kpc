@@ -5,7 +5,7 @@ class GolferTripsController < ApplicationController
       @trip = @next_trip.sort_by_calendar
     else
       redirect_to "/login"
-      flash[:login] = "Log in first, fucko!"
+      flash[:login] = "Log in first, Fucko!"
     end
   end
 
@@ -20,7 +20,7 @@ class GolferTripsController < ApplicationController
       redirect_to "/dashboard"
     else 
       redirect_to "/register_trip"
-      flash[:error] = golfer.errors.full_messages.to_sentence + ", fucko!"
+      flash[:error] = golfer.errors.full_messages.to_sentence + ", Fucko!"
     end
   end
 
