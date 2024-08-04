@@ -32,4 +32,16 @@ class Trip < ApplicationRecord
   def unpaid_golfer_trips
     golfer_trips.where(is_paid: false)
   end
+  
+  def total_projected_revenue
+    golfer_trips.sum(:cost)
+  end
+
+  def total_collected_revenue
+    golfer_trips.where(is_paid: true).sum(:cost)
+  end
+
+  def total_uncollected_revenue
+    golfer_trips.where(is_paid: false).sum(:cost)
+  end
 end

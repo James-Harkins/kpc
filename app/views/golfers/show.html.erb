@@ -220,6 +220,10 @@ body {
 .btn-outline-danger:hover {
     background-color: rgb(191, 146, 112) !important;
 } 
+
+.line {
+  border-top: 5px solid black;
+}
 </style>
 
 <div class='trips'>
@@ -229,12 +233,17 @@ body {
     <br>
     <% if @golfer.admin? %>
       <div class=next-trip-cost>
-        <h3>KPC <%= @next_trip.number %> Golfers</h3>
+        <h3>KPC <%= @next_trip.number %></h3>
+        <h4>Total Projected Revenue: $<%= @next_trip.total_projected_revenue %></h4>
+        <h4>Total Collected Revenue: $<%= @next_trip.total_collected_revenue %></h4>
+        <h4>Total Uncollected Revenue: $<%= @next_trip.total_uncollected_revenue %></h4>
+        <hr class="line">
         <h3>Paid:</h3>
           <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
             <% golfer = golfer_trip.golfer %>
             <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %>: $<%= golfer_trip.cost %></h4>
           <% end %>
+        <hr class="line">
         <h3>Unpaid:</h3>
           <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
             <% golfer = golfer_trip.golfer %>
