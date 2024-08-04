@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_04_193339) do
+ActiveRecord::Schema.define(version: 2024_08_04_200344) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 2024_08_04_193339) do
     t.datetime "updated_at", null: false
     t.boolean "is_full_trip"
     t.integer "cost"
+    t.boolean "is_paid", default: false
     t.index ["golfer_id"], name: "index_golfer_trips_on_golfer_id"
     t.index ["trip_id"], name: "index_golfer_trips_on_trip_id"
   end

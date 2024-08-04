@@ -23,4 +23,18 @@ class GolferTripsController < ApplicationController
       flash[:error] = golfer.errors.full_messages.to_sentence + ", fucko!"
     end
   end
+
+  def update 
+    if params[:paid] == "true"
+      golfer_trip = GolferTrip.find(params[:golfer_trip_id])
+      golfer_trip.is_paid = true
+      golfer_trip.save
+      redirect_to "/dashboard"
+    elsif params[:paid] == "false"
+      golfer_trip = GolferTrip.find(params[:golfer_trip_id])
+      golfer_trip.is_paid = false
+      golfer_trip.save
+      redirect_to "/dashboard"
+    end
+  end
 end

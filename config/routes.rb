@@ -11,4 +11,6 @@ Rails.application.routes.draw do
 
   get "/register_trip", to: "golfer_trips#new"
   post "/register_trip", to: "golfer_trips#create"
+
+  put "/update_golfer_payment", to: "golfer_trips#update"
 end
