@@ -1,6 +1,6 @@
-@golfer_1 = Golfer.create!(first_name: 'Tony', last_name: 'Soprano', email: 't@badabing.com', password: 'test', password_confirmation: 'test')
-@golfer_2 = Golfer.create!(first_name: 'Paulie', last_name: 'Gaultieri', email: 'walnuts@badabing.com', password: 'test', password_confirmation: 'test')
-@golfer_3 = Golfer.create!(first_name: 'Christopher', last_name: 'Moltisanti', email: 'chrissie@badabing.com', password: 'test', password_confirmation: 'test')
+@golfer_1 = Golfer.create!(first_name: 'Tony', last_name: 'Soprano', nickname: 'T', email: 't@badabing.com', password: 'test', password_confirmation: 'test')
+@golfer_2 = Golfer.create!(first_name: 'Peter', last_name: 'Gaultieri', nickname: 'Paulie', email: 'walnuts@badabing.com', password: 'test', password_confirmation: 'test')
+@golfer_3 = Golfer.create!(first_name: 'Christopher', last_name: 'Moltisanti', nickname: 'Chrissie', email: 'chrissie@badabing.com', password: 'test', password_confirmation: 'test')
 
 @trip_1 = Trip.create!(year: 2013, number: 'XIII', location: 'Dewey Beach')
 @trip_2 = Trip.create!(year: 2014, number: 'XIV', location: 'Rehoboth Beach')

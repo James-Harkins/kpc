@@ -24,6 +24,6 @@ class GolfersController < ApplicationController
   end
 
   def golfer_params
-    params.permit(:first_name, :last_name, :email, :password, :password_confirmation)
+    params.permit(:first_name, :last_name, :nickname, :email, :password, :password_confirmation)
   end
 end
