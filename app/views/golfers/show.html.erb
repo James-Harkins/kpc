@@ -360,7 +360,11 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% if @golfer.is_registered_for_next_trip(@next_trip) %>
               <div class='next-trip-cost'>
                 <h3>See you at KPC <%= @next_trip.number %>!</h3>
-                <h4>You owe Joe Copeland $<%= @golfer_next_trip.cost %>!</h4>
+                <% if @golfer_next_trip.balance > 0 %>
+                  <h4>You owe Joe Copeland $<%= @golfer_next_trip.balance %>!</h4>
+                <% else %>
+                  <h4>You're all paid up. Thanks!</h4>
+                <% end %>
               </div>
           <% else %>
               <form action="/register_trip">
