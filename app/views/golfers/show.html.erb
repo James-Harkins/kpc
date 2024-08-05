@@ -31,7 +31,7 @@ body {
 
   .title {
     background-color: #fff;
-    opacity: 0.6;
+    opacity: .8;
     padding: 5px;
     margin: 5px;
     color: black;
@@ -51,7 +51,7 @@ body {
 
    .next-trip-cost {
     background-color: #fff;
-    opacity: 0.6;
+    opacity: .8;
     padding: 5px;
     margin: 5px;
     color: black;
@@ -182,7 +182,7 @@ body {
 .btn-outline-primary{
   margin: 20px;
   background-color: white;
-  opacity: 0.7;
+  opacity: .8;
   padding: 20px;
   font-size: 1.5em;
   color: black !important;
@@ -195,18 +195,18 @@ body {
 }
 
 .btn-outline-primary-paid{
-  margin: 5px;
+  margin: 1rem 0;
   background-color: white;
-  opacity: 0.7;
-  padding: 5px;
-  font-size: .5em;
+  opacity: .8;
+  padding: 20px;
+  font-size: 1em;
   color: black !important;
   outline: 0 none !important;
   box-shadow: none !important;
   border-color: black !important;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;;
-  border-radius: 25px;
+  border-radius: 10px;
 }
 
 .btn-outline-primary-paid:hover {
@@ -271,13 +271,35 @@ body {
   border-top: 1px solid black;
 }
 
-.button {
+button {
     margin: 1rem 0;
     background-color: #fff;
     padding: 20px;
     cursor: pointer;
     border-radius: 10px;
-    font-size: 15px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+    font-size: .5em;
+}
+
+label {
+    text-align: left;
+    padding: 0.25rem 0;
+}
+
+input {
+    margin: 0.25rem 0;
+    padding: .5rem;
+}
+
+button:hover {
+    background-color: gray !important;
+}
+
+button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 </style>
 
@@ -297,7 +319,6 @@ body {
           <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
             <% golfer = golfer_trip.golfer %>
             <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %>: $<%= golfer_trip.cost %></h4>
-            <%= button_to "Mark as Unpaid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: false} %>
             <hr class="line-thin">
           <% end %>
         <hr class="line">
@@ -305,8 +326,21 @@ body {
           <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
             <% golfer = golfer_trip.golfer %>
             <div class=unpaid-golfer>
-              <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %>: $<%= golfer_trip.cost %></h4>
+              <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
+              <h5>Outstanding Balance $<%= golfer_trip.balance %></h5>
               <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
+              <br>
+              <%= form_with url: "/payments", method: :post, local: true do |form| %>
+                  <div class="label">
+                      <%= form.label :amount, 'Add a Payment' %>
+                  </div>
+                  <div class="input">
+                      <%= form.number_field :amount %><br>
+                  </div>
+                  <div class="button">
+                      <%= form.button "Add Payment", name: :golfer_trip_id, value: golfer_trip.id %>
+                  </div>
+              <% end %>
               <hr class="line-thin">
             </div>
           <% end %>

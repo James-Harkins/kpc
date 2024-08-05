@@ -15,7 +15,9 @@ class GolferTripsController < ApplicationController
     golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
 
     if golfer_trip.save   
-      golfer_trip.cost = golfer.trip_net_total_cost(trip.id)  
+      cost = golfer.trip_net_total_cost(trip.id)
+      golfer_trip.cost = cost
+      golfer_trip.balance = cost
       golfer_trip.save
       redirect_to "/dashboard"
     else 
@@ -27,12 +29,9 @@ class GolferTripsController < ApplicationController
   def update 
     if params[:paid] == "true"
       golfer_trip = GolferTrip.find(params[:golfer_trip_id])
+      golfer_trip.payments.create!(amount: golfer_trip.balance)
+      golfer_trip.balance = 0
       golfer_trip.is_paid = true
-      golfer_trip.save
-      redirect_to "/dashboard"
-    elsif params[:paid] == "false"
-      golfer_trip = GolferTrip.find(params[:golfer_trip_id])
-      golfer_trip.is_paid = false
       golfer_trip.save
       redirect_to "/dashboard"
     end
