@@ -33,7 +33,7 @@ class GolferTripsController < ApplicationController
       golfer_trip.balance = 0
       golfer_trip.is_paid = true
       golfer_trip.save
-      redirect_to "/dashboard"
+      redirect_to "/finances?trip_id=#{golfer_trip.trip_id}"
     end
   end
 end
