@@ -329,6 +329,11 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
 </style>
 
 <div class='trips'>
+    <% flash.each do |name, msg| %>
+            <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+            </div>
+        <% end %>
     <div class='title'>
         <h1>Welcome back, <%= @golfer.nickname %>, you fuck!</h1>
     </div>

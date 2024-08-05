@@ -2,7 +2,13 @@ class GolferTripsController < ApplicationController
   def new
     if current_user
       @next_trip = Trip.where('start_date > ?', Date.today).first
-      @trip = @next_trip.sort_by_calendar
+
+      if current_user.is_registered_for_next_trip(@next_trip)
+        redirect_to "/dashboard"
+        flash[:login] = "You're already signed up, Fucko!"  
+      else 
+        @trip = @next_trip.sort_by_calendar
+      end
     else
       redirect_to "/login"
       flash[:login] = "Log in first, Fucko!"
