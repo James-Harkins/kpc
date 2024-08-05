@@ -38,10 +38,12 @@ class Trip < ApplicationRecord
   end
 
   def total_collected_revenue
-    golfer_trips.where(is_paid: true).sum(:cost)
+    revenue = 0
+    golfer_trips.each {|golfer_trip| revenue += golfer_trip.payments.sum(:amount)}
+    revenue
   end
 
   def total_uncollected_revenue
-    golfer_trips.where(is_paid: false).sum(:cost)
+    golfer_trips.sum(:balance)
   end
 end

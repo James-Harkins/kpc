@@ -29,12 +29,9 @@ class GolferTripsController < ApplicationController
   def update 
     if params[:paid] == "true"
       golfer_trip = GolferTrip.find(params[:golfer_trip_id])
+      golfer_trip.payments.create!(amount: golfer_trip.balance)
+      golfer_trip.balance = 0
       golfer_trip.is_paid = true
-      golfer_trip.save
-      redirect_to "/dashboard"
-    elsif params[:paid] == "false"
-      golfer_trip = GolferTrip.find(params[:golfer_trip_id])
-      golfer_trip.is_paid = false
       golfer_trip.save
       redirect_to "/dashboard"
     end
