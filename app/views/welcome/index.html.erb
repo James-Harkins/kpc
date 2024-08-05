@@ -1,4 +1,14 @@
 <style>
+
+body {
+    display: flex;
+    height: 90vh;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    justify-content: center;
+}
+
 h1 {
   font-size: 9em;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
@@ -20,11 +30,6 @@ h3 {
   margin: 50px;
   text-align: center;
   text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
-}
-
-.inner{
-      align-items: center;
-      display: inline-block;
 }
 
 .btn-outline-primary{
@@ -70,10 +75,20 @@ h3 {
     background-color: rgb(191, 146, 112) !important;
 } 
 
+#myVideo {
+    object-fit: cover;
+    width: 100%;
+    position: fixed;
+    z-index: -1;
+}
+
 </style>
 
 <div class="home-video-wrapper d-flex align-items-center justify-content-center">
-    <%= video_tag "golf_course_1.mp4", autoplay: :autoplay, loop: :loop, mute: :mute, class: "home_video" %>
+    <%# <%= video_tag "golf_course_1.mp4", autoplay: :autoplay, loop: :loop, mute: :mute, class: "home_video" %>
+    <video autoplay muted loop id="myVideo">
+          <source src="<%= asset_path 'golf_course_1.mp4' %>" type="video/mp4">
+    </video>
     <h1>KPC</h1>
     
     <div class="inner">
