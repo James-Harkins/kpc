@@ -31,7 +31,7 @@ body {
 
   .title {
     background-color: #fff;
-    opacity: 0.6;
+    opacity: 0.7;
     padding: 5px;
     margin: 5px;
     color: black;
@@ -51,7 +51,7 @@ body {
 
    .next-trip-cost {
     background-color: #fff;
-    opacity: 0.6;
+    opacity: 0.7;
     padding: 5px;
     margin: 5px;
     color: black;
@@ -199,7 +199,7 @@ body {
   background-color: white;
   opacity: 0.7;
   padding: 5px;
-  font-size: .5em;
+  font-size: 1em;
   color: black !important;
   outline: 0 none !important;
   box-shadow: none !important;
@@ -305,8 +305,22 @@ body {
           <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
             <% golfer = golfer_trip.golfer %>
             <div class=unpaid-golfer>
-              <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %>: $<%= golfer_trip.cost %></h4>
+              <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
+              <h5>Outstanding Balance $<%= golfer_trip.cost %></h5>
               <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
+              <br>
+              <%= form_with url: "/payments", method: :post, local: true, params: {golfer_trip_id: golfer_trip.id} do |form| %>
+                  <div class="label">
+                      <%= form.label :add_a_payment %>
+                  </div>
+                  <div class="input">
+                      <%= form.number_field :add_a_payment %><br>
+                  </div>
+
+                  <div class="button">
+                      <%= form.submit "Add Payment" %>
+                  </div>
+              <% end %>
               <hr class="line-thin">
             </div>
           <% end %>

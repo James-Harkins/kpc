@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_05_143617) do
+ActiveRecord::Schema.define(version: 2024_08_05_145637) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,6 +70,8 @@ ActiveRecord::Schema.define(version: 2024_08_05_143617) do
     t.integer "amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "golfer_trip_id"
+    t.index ["golfer_trip_id"], name: "index_payments_on_golfer_trip_id"
   end
 
   create_table "rounds", force: :cascade do |t|
@@ -97,5 +99,6 @@ ActiveRecord::Schema.define(version: 2024_08_05_143617) do
   add_foreign_key "golfer_trips", "golfers"
   add_foreign_key "golfer_trips", "trips"
   add_foreign_key "nights", "trips"
+  add_foreign_key "payments", "golfer_trips"
   add_foreign_key "rounds", "trips"
 end
