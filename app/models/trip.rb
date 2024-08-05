@@ -25,6 +25,23 @@ class Trip < ApplicationRecord
     calendar
   end
 
+  def sort_by_calendar_admin
+    calendar = []
+    nights.each do |night|
+      calendar_date = Hash.new
+      calendar_date[:date] = night.date.strftime('%A %B %d, %Y') 
+      calendar_date[:house_attendance] = night.golfer_nights.length
+      
+      rounds.where(date: night.date).each do |round|
+        calendar_date[:round_attendance] = round.golfer_rounds.length
+      end
+
+      calendar << calendar_date
+    end
+  
+    calendar
+  end
+
   def paid_golfer_trips
     golfer_trips.where(is_paid: true)
   end
