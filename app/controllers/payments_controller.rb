@@ -10,9 +10,9 @@ class PaymentsController < ApplicationController
         golfer_trip.is_paid = true 
         golfer_trip.save
       end
-      redirect_to "/dashboard"
+      redirect_to "/finances?trip_id=#{golfer_trip.trip_id}"
     else
-      redirect_to "/dashboard"
+      redirect_to "/finances?trip_id=#{golfer_trip.trip_id}"
       flash[:error] = "Payment cannot be greater than outstanding balance."
     end
   end

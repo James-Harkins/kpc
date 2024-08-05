@@ -1,7 +1,7 @@
 <style>
 body {
     display: flex;
-    background: url(<%= asset_path 'course_1.jpeg' %>);
+    background: url(<%= asset_path 'course_6.jpeg' %>);
     display: flex;
     background-position: center;
     background-size: cover;
@@ -52,8 +52,8 @@ body {
    .next-trip-cost {
     background-color: #fff;
     opacity: .8;
-    padding: 5px;
-    margin: 5px;
+    padding: 20px;
+    margin: 20px;
     color: black;
     outline: 0 none !important;
     box-shadow: none !important;
@@ -328,51 +328,50 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
 }
 </style>
 
-<div class='trips'>
+<div class="next-trip-cost">
     <% flash.each do |name, msg| %>
-            <div class="alert" role="alert">
+        <div class="alert" role="alert">
             <%= content_tag :div, msg, class: name %>
+        </div>
+    <% end %>
+    <h2>Total Projected Revenue: $<%= @next_trip.total_projected_revenue %></h2>
+    <h2>Total Collected Revenue: $<%= @next_trip.total_collected_revenue %></h2>
+    <h2>Total Uncollected Revenue: $<%= @next_trip.total_uncollected_revenue %></h2>
+    <hr class="line">
+    <h3><u>Paid:</u></h3>
+    <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
+        <% golfer = golfer_trip.golfer %>
+        <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %>: $<%= golfer_trip.cost %></h4>
+        <hr class="line-thin">
+    <% end %>
+    <hr class="line">
+    <h3><u>Unpaid:</u></h3>
+    <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
+        <% golfer = golfer_trip.golfer %>
+        <div class=unpaid-golfer>
+        <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
+        <h5>Outstanding Balance $<%= golfer_trip.balance %></h5>
+        <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
+        <br>
+        <%= form_with url: "/payments", method: :post, local: true do |form| %>
+            <div class="label">
+                <%= form.label :amount, 'Add a Payment' %>
+            </div>
+            <div class="input">
+                <%= form.number_field :amount %><br>
+            </div>
+            <div class="button">
+                <%= form.button "Add Payment", name: :golfer_trip_id, value: golfer_trip.id %>
             </div>
         <% end %>
-    <div class='title'>
-        <h1>Welcome back, <%= @golfer.nickname %>, you fuck!</h1>
-    </div>
-    <br>
-    <% if @golfer.admin? %>
-      <div class=next-trip-cost>
-        <h2>KPC <%= @next_trip.number %></h2>
-        <%= button_to "Finances", "/finances", :method => :get, :class => 'btn btn-outline-primary-finances', params: {trip_id: @next_trip.id} %>
-        <h3>Attendance:</h3>
         <hr class="line-thin">
-        <% @next_trip.sort_by_calendar_admin.each do |date| %>
-          <h4><%= date[:date] %></h4>
-          <h5>House Attendance: <%= date[:house_attendance] %></h5>
-          <% if !date[:round_attendance].nil? %>
-            <h5>Round Attendance: <%= date[:round_attendance] %></h5>
-          <% end %>
-          <hr class="line-thin">
-        <% end %>
-      </div>
-    <% else %>
-      <div class='next_trip'>
-          <% if @golfer.is_registered_for_next_trip(@next_trip) %>
-              <div class='next-trip-cost'>
-                <h3>See you at KPC <%= @next_trip.number %>!</h3>
-                <% if @golfer_next_trip.balance > 0 %>
-                  <h4>You owe Joe Copeland $<%= @golfer_next_trip.balance %>!</h4>
-                <% else %>
-                  <h4>You're all paid up. Thanks!</h4>
-                <% end %>
-              </div>
-          <% else %>
-              <form action="/register_trip">
-                  <button id="dashboard_header" type="submit" class="btn btn-outline-primary">Sign up for KPC <%= @next_trip.number %></button>
-              </form>
-          <% end %>
-      </div>
+        </div>
     <% end %>
-    <br>
-    <br>
+    <hr class="line">
+
+    <form action="/dashboard">
+        <button id="dashboard_header" type="submit" class="btn btn-outline-primary">DASHBOARD</button>
+    </form>
     <form action="/logout">
         <button id="dashboard_header" type="submit" class="btn btn-outline-primary">LOG OUT</button>
     </form>
