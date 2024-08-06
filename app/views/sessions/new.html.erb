@@ -52,18 +52,22 @@ button {
 }
 
 .auth-form-container > h1 {
-    font-size: 100px;
+    font-size:  ;
     text-align: center;
   }
   
 </style>
     <div class="auth-form-container">
-        <h1>LOG IN</h1>    
+        <br>
+        <br>
+        <br>
         <% flash.each do |name, msg| %>
             <div class="alert" role="alert">
-            <%= content_tag :div, msg, class: name %>
+                <%= content_tag :div, msg, class: name %>
             </div>
-      <% end %>
+        <% end %>
+        <br>
+        <h1>LOG IN</h1>    
         <div class="login-form">
             <%= form_with url: "/login", method: :post, local: true do |form| %>
                 <div class="label">
