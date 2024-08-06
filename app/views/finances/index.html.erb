@@ -215,11 +215,11 @@ body {
 }
 
 .btn-outline-primary-paid{
-  margin: 1rem 0;
+  margin: 20px;
   background-color: white;
   opacity: .8;
   padding: 20px;
-  font-size: 1em;
+  font-size: .5em;
   color: black !important;
   outline: 0 none !important;
   box-shadow: none !important;
@@ -329,12 +329,12 @@ button {
 
 label {
     text-align: left;
-    padding: 0.25rem 0;
+    padding: 0.05rem 0;
 }
 
 input {
-    margin: 0.25rem 0;
-    padding: .5rem;
+    margin: 0.05rem 0;
+    padding: .2rem;
 }
 
 button:hover {
@@ -369,8 +369,8 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <h3><u>Unpaid:</u></h3>
     <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
-        <h3><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
-        <h4>Outstanding Balance $<%= golfer_trip.balance %></h5>
+        <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
+        <h5>Outstanding Balance $<%= golfer_trip.balance %></h5>
         <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
         <br>
         <%= form_with url: "/payments", method: :post, local: true do |form| %>
