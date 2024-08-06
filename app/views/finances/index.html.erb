@@ -355,9 +355,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         </div>
     <% end %>
     <h1>Finances</h1>
-    <h2><u>Total Projected Revenue:</u> $<%= @next_trip.total_projected_revenue %></h2>
-    <h2><u>Total Collected Revenue:</u> $<%= @next_trip.total_collected_revenue %></h2>
-    <h2><u>Total Uncollected Revenue:</u> $<%= @next_trip.total_uncollected_revenue %></h2>
+    <h3>Total Projected Revenue: $<%= @next_trip.total_projected_revenue %></h3>
+    <h3>Total Collected Revenue: $<%= @next_trip.total_collected_revenue %></h3>
+    <h3>Total Uncollected Revenue: $<%= @next_trip.total_uncollected_revenue %></h3>
     <hr class="line">
     <h3><u>Paid:</u></h3>
     <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
@@ -369,7 +369,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <h3><u>Unpaid:</u></h3>
     <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
-        <div class=unpaid-golfer>
         <h3><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
         <h4>Outstanding Balance $<%= golfer_trip.balance %></h5>
         <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
@@ -386,7 +385,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             </div>
         <% end %>
         <hr class="line-thin">
-        </div>
     <% end %>
     <hr class="line">
 
