@@ -368,9 +368,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               <div class='next-trip-cost'>
                 <h3>See you at KPC <%= @next_trip.number %>!</h3>
                 <% if @golfer_next_trip.balance > 0 %>
-                  <h4>You owe Joe Copeland $<%= @golfer_next_trip.balance %>!</h4>
+                  <h3>You owe Joe Copeland $<%= @golfer_next_trip.balance %>!</h3>
                 <% else %>
-                  <h4>You're all paid up. Thanks!</h4>
+                  <h3>You're all paid up. Thanks!</h3>
                 <% end %>
               </div>
           <% else %>
