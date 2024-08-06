@@ -64,6 +64,26 @@ body {
     font-size: 40px;
   }
 
+.next-trip-cost > h1 {
+    font-size: 80px;
+  }
+
+  .next-trip-cost > h2 {
+    font-size: 60px;
+  }
+
+  .next-trip-cost > h3 {
+    font-size: 50px;
+  }
+
+  .next-trip-cost > h4 {
+    font-size: 40px;
+  }
+
+  .next-trip-cost > h5 {
+    font-size: 30px;
+  }
+
   .next-trip-link {
     background: white;
     width: 50%;
@@ -334,6 +354,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <%= content_tag :div, msg, class: name %>
         </div>
     <% end %>
+    <h1>Finances</h1>
     <h2>Total Projected Revenue: $<%= @next_trip.total_projected_revenue %></h2>
     <h2>Total Collected Revenue: $<%= @next_trip.total_collected_revenue %></h2>
     <h2>Total Uncollected Revenue: $<%= @next_trip.total_uncollected_revenue %></h2>
