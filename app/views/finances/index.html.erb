@@ -329,12 +329,13 @@ button {
 
 label {
     text-align: left;
+    font-size: .5em;
     padding: 0.05rem 0;
 }
 
 input {
-    margin: 0.05rem 0;
-    padding: .2rem;
+    /* margin: 0.05rem 0;
+    padding: .2rem; */
 }
 
 button:hover {
@@ -372,7 +373,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
         <h5>Outstanding Balance $<%= golfer_trip.balance %></h5>
         <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
-        <br>
         <%= form_with url: "/payments", method: :post, local: true do |form| %>
             <div class="label">
                 <%= form.label :amount, 'Add a Payment' %>
