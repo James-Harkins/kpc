@@ -4,7 +4,6 @@ body {
     display: flex;
     background: url(<%= asset_path 'course_4.jpeg' %>);
     display: flex;
-    height: 90vh;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -17,6 +16,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     margin: 30px;
     padding: 50px;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
@@ -58,12 +58,6 @@ button {
   
 </style>
     <div class="auth-form-container">
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
         <% flash.each do |name, msg| %>
             <div class="alert" role="alert">
                 <%= content_tag :div, msg, class: name %>
@@ -90,17 +84,6 @@ button {
                 <div class="button">
                     <%= form.submit "Log In" %>
                 </div>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
             <% end %>
         </div>
     </div>
