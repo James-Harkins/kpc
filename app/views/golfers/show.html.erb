@@ -348,6 +348,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <% if @golfer.admin? %>
       <div class=next-trip-cost>
         <h2>KPC <%= @next_trip.number %></h2>
+        <br>
         <%= button_to "Finances", "/finances", :method => :get, :class => 'btn btn-outline-primary-finances', params: {trip_id: @next_trip.id} %>
         <br>
         <h3>Attendance:</h3>
