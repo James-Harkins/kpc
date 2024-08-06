@@ -28,6 +28,10 @@ body {
     border-radius: 25px;
   }
 
+.trip-register-container > h1 {
+    font-size: 50px;
+  }
+
 .check-boxes {
     text-align: left;
     padding-left: 40px;
@@ -100,14 +104,20 @@ button {
 
 <div class='trip-register-container'>
     <h1>REGISTER FOR KPC <%= @next_trip.number %></h1>
+    <br>
     <% flash.each do |name, msg| %>
         <div class="alert" role="alert">
             <%= content_tag :div, msg, class: name %>
         </div>
     <% end %>
+    <br>
     <h3>Check off each night and round that you will attend, then click the submit button.</h3>
     <h3>If you will attend the whole trip, just click "Give me the whole enchilada."</h3>
+    <h3>If you attend the whole trip, Saturday night is free.</h3>
+    <br>
     <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id} %>
+    <br>
+    <br>
     <%= form_with url: "/register_trip", method: :post, params: {trip_id: @next_trip.id}, local: true do |form| %>
         <div class='date-boxes'>
             <% @trip.each do |date| %>
@@ -121,6 +131,7 @@ button {
                         <%= "Round: $#{date[:round][:cost]}" %><br>
                     <% end %>
                 </div>
+                <br>
             <% end %>
         </div>
         <div class='button'>

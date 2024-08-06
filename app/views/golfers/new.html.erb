@@ -52,7 +52,7 @@ button {
 }
 
 .auth-form-container > h1 {
-    font-size: 100px;
+    font-size: 80px;
     text-align: center;
   }
 
@@ -60,12 +60,19 @@ button {
 
 
     <div class="auth-form-container">
-        <h1>REGISTER</h1>    
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
         <% flash.each do |name, msg| %>
             <div class="alert" role="alert">
             <%= content_tag :div, msg, class: name %>
             </div>
         <% end %>
+        <br>
+        <h1>REGISTER</h1>    
         <div class="login-form">
             <%= form_with url: "/golfers", method: :post, local: true do |form| %>
                 <div class="label">

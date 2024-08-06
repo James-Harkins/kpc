@@ -40,7 +40,7 @@ body {
     border-color: black !important;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;;
-    border-radius: 25px;
+    border-radius: 10px;
     font-size: 40px;
   }
 
@@ -60,8 +60,28 @@ body {
     border-color: black !important;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;;
-    border-radius: 25px;
+    border-radius: 10px;
     font-size: 40px;
+  }
+
+.next-trip-cost > h1 {
+    font-size: 80px;
+  }
+
+  .next-trip-cost > h2 {
+    font-size: 60px;
+  }
+
+  .next-trip-cost > h3 {
+    font-size: 50px;
+  }
+
+  .next-trip-cost > h4 {
+    font-size: 40px;
+  }
+
+  .next-trip-cost > h5 {
+    font-size: 30px;
   }
 
   .next-trip-link {
@@ -72,7 +92,7 @@ body {
     margin: 20px;
     text-decoration: none;
     line-height: 3em;
-    border-radius: 25px;
+    border-radius: 10px;
   }
   
   .next-trip-link:hover {
@@ -184,22 +204,22 @@ body {
   background-color: white;
   opacity: .8;
   padding: 20px;
-  font-size: 1.5em;
+  font-size: .5em;
   color: black !important;
   outline: 0 none !important;
   box-shadow: none !important;
   border-color: black !important;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;;
-  border-radius: 25px;
+  border-radius: 10px;
 }
 
 .btn-outline-primary-paid{
-  margin: 1rem 0;
+  margin: 20px;
   background-color: white;
   opacity: .8;
   padding: 20px;
-  font-size: 1em;
+  font-size: .5em;
   color: black !important;
   outline: 0 none !important;
   box-shadow: none !important;
@@ -309,12 +329,13 @@ button {
 
 label {
     text-align: left;
-    padding: 0.25rem 0;
+    font-size: .5em;
+    padding: 0.05rem 0;
 }
 
 input {
-    margin: 0.25rem 0;
-    padding: .5rem;
+    /* margin: 0.05rem 0;
+    padding: .2rem; */
 }
 
 button:hover {
@@ -334,9 +355,10 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <%= content_tag :div, msg, class: name %>
         </div>
     <% end %>
-    <h2>Total Projected Revenue: $<%= @next_trip.total_projected_revenue %></h2>
-    <h2>Total Collected Revenue: $<%= @next_trip.total_collected_revenue %></h2>
-    <h2>Total Uncollected Revenue: $<%= @next_trip.total_uncollected_revenue %></h2>
+    <h1>Finances</h1>
+    <h3>Total Projected Revenue: $<%= @next_trip.total_projected_revenue %></h3>
+    <h3>Total Collected Revenue: $<%= @next_trip.total_collected_revenue %></h3>
+    <h3>Total Uncollected Revenue: $<%= @next_trip.total_uncollected_revenue %></h3>
     <hr class="line">
     <h3><u>Paid:</u></h3>
     <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
@@ -348,11 +370,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <h3><u>Unpaid:</u></h3>
     <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
-        <div class=unpaid-golfer>
         <h4><%= golfer.first_name %> "<%= golfer.nickname %>" <%= golfer.last_name %></h4>
         <h5>Outstanding Balance $<%= golfer_trip.balance %></h5>
-        <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary-paid', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
-        <br>
+        <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
         <%= form_with url: "/payments", method: :post, local: true do |form| %>
             <div class="label">
                 <%= form.label :amount, 'Add a Payment' %>
@@ -365,7 +385,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             </div>
         <% end %>
         <hr class="line-thin">
-        </div>
     <% end %>
     <hr class="line">
 

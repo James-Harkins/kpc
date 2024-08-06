@@ -12,7 +12,6 @@ body {
     text-align: center;
     flex-flow: column;
     color: #fff;
-    font-size: 40px;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
     'Lucida Sans', Arial, sans-serif;
 }
@@ -32,16 +31,18 @@ body {
   .title {
     background-color: #fff;
     opacity: .8;
-    padding: 5px;
-    margin: 5px;
+    padding: 20px;
+    margin: 20px;
     color: black;
     outline: 0 none !important;
     box-shadow: none !important;
     border-color: black !important;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;;
-    border-radius: 25px;
-    font-size: 40px;
+  }
+
+  .title > h1 {
+    font-size: 80px;
   }
 
   .next_trip {
@@ -52,16 +53,22 @@ body {
    .next-trip-cost {
     background-color: #fff;
     opacity: .8;
-    padding: 5px;
-    margin: 5px;
+    padding: 20px;
+    margin: 20px;
     color: black;
     outline: 0 none !important;
     box-shadow: none !important;
     border-color: black !important;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;;
-    border-radius: 25px;
-    font-size: 40px;
+  }
+
+  .next-trip-cost > h2 {
+    font-size: 75px;
+  }
+
+  .next-trip-cost > h3 {
+    font-size: 50px;
   }
 
   .next-trip-link {
@@ -72,7 +79,7 @@ body {
     margin: 20px;
     text-decoration: none;
     line-height: 3em;
-    border-radius: 25px;
+    border-radius: 10px;
   }
   
   .next-trip-link:hover {
@@ -191,7 +198,7 @@ body {
   border-color: black !important;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;;
-  border-radius: 25px;
+  border-radius: 10px;
 }
 
 .btn-outline-primary-paid{
@@ -220,11 +227,11 @@ body {
 }
 
 .btn-outline-primary-finances{
-  margin: 1rem 0;
+  margin: 20px;
   background-color: white;
   opacity: .8;
   padding: 20px;
-  font-size: 1em;
+  font-size: 1.5em;
   color: black !important;
   outline: 0 none !important;
   box-shadow: none !important;
@@ -341,7 +348,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <% if @golfer.admin? %>
       <div class=next-trip-cost>
         <h2>KPC <%= @next_trip.number %></h2>
+        <br>
         <%= button_to "Finances", "/finances", :method => :get, :class => 'btn btn-outline-primary-finances', params: {trip_id: @next_trip.id} %>
+        <br>
         <h3>Attendance:</h3>
         <hr class="line-thin">
         <% @next_trip.sort_by_calendar_admin.each do |date| %>
@@ -359,9 +368,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               <div class='next-trip-cost'>
                 <h3>See you at KPC <%= @next_trip.number %>!</h3>
                 <% if @golfer_next_trip.balance > 0 %>
-                  <h4>You owe Joe Copeland $<%= @golfer_next_trip.balance %>!</h4>
+                  <h3>You owe Joe Copeland $<%= @golfer_next_trip.balance %>!</h3>
                 <% else %>
-                  <h4>You're all paid up. Thanks!</h4>
+                  <h3>You're all paid up. Thanks!</h3>
                 <% end %>
               </div>
           <% else %>
@@ -371,7 +380,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% end %>
       </div>
     <% end %>
-    <br>
     <br>
     <form action="/logout">
         <button id="dashboard_header" type="submit" class="btn btn-outline-primary">LOG OUT</button>

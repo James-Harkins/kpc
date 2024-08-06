@@ -91,6 +91,7 @@
           1,
           1,
           1,
+          1,
           null
         ]
       },
@@ -140,8 +141,56 @@
           null,
           0,
           null,
+          null,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          null,
+          null,
+          0,
+          null,
+          null,
+          0,
+          null,
+          null,
+          1,
+          0,
+          null,
+          null,
+          1,
+          0,
+          null,
+          null,
+          1,
+          0,
+          null,
+          null,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          1,
+          0,
+          null,
           null
         ]
+      },
+      "/Users/jimbo/kpc/kpc_monolith/kpc/app/models/payment.rb": {
+        "lines": [
+          0,
+          0,
+          0
+        ],
+        "branches": {
+        }
       },
       "/Users/jimbo/kpc/kpc_monolith/kpc/app/facades/golfer_trip_facade.rb": {
         "lines": [
@@ -222,6 +271,31 @@
         "branches": {
         }
       },
+      "/Users/jimbo/kpc/kpc_monolith/kpc/app/controllers/payments_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {
+        }
+      },
       "/Users/jimbo/kpc/kpc_monolith/kpc/app/controllers/sessions_controller.rb": {
         "lines": [
           0,
@@ -269,6 +343,12 @@
           0,
           0,
           0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
           0,
           0,
           0,
@@ -281,6 +361,40 @@
           0,
           0,
           null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {
+        }
+      },
+      "/Users/jimbo/kpc/kpc_monolith/kpc/app/controllers/finances_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0,
+          0,
           0,
           0,
           0,
@@ -296,6 +410,6 @@
         }
       }
     },
-    "timestamp": 1722800199
+    "timestamp": 1722880613
   }
 }
