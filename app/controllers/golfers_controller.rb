@@ -14,12 +14,17 @@ class GolfersController < ApplicationController
   end
 
   def create
-    golfer = Golfer.new(golfer_params)
-    if golfer.save
-      redirect_to "/login"
-    else
+    if params[:token] == ENV["REGISTER_TOKEN"]
+      golfer = Golfer.new(golfer_params)
+      if golfer.save
+        redirect_to "/login"
+      else
+        redirect_to "/register"
+        flash[:error] = golfer.errors.full_messages.to_sentence + ", Fucko!"
+      end
+    else 
       redirect_to "/register"
-      flash[:error] = golfer.errors.full_messages.to_sentence + ", Fucko!"
+      flash[:error] = "Invitation only."
     end
   end
 
