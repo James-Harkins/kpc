@@ -116,6 +116,7 @@ button {
     <br>
     <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id} %>
     <br>
+    <br>
     <%= form_with url: "/register_trip", method: :post, params: {trip_id: @next_trip.id}, local: true do |form| %>
         <div class='date-boxes'>
             <% @trip.each do |date| %>
