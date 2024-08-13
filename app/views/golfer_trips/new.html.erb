@@ -120,6 +120,11 @@ button {
     <h3>Check off each night and round that you will attend, then click the submit button.</h3>
     <h3>If you will attend the whole trip, just click "Give me the whole enchilada."</h3>
     <h3>If you attend the whole trip, Saturday night is free.</h3>
+    <h3>Costs for "Night at House" include dinner that night and breakfast the following morning.</h3>
+    <h3>Round prices include $15 for contests.</h3>
+    <h3>Rounds listed as "à la carte" are not included in your KPC costs.</h3> 
+    <h3>You will pay for your round at the course.</h3>
+    <h3>If you will play the à la carte round, please check the box so we have a head count.</h3>
     <br>
     <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id} %>
     <br>
@@ -134,7 +139,11 @@ button {
 
                     <% if date[:round].values.any? %>
                         <%= check_box_tag 'rounds[]', date[:round][:id] %>
-                        <%= "Round: $#{date[:round][:cost]}" %><br>
+                        <% if date[:round][:cost] == 0 %>
+                            <%= "Round: à la carte" %><br>
+                        <% else %>
+                            <%= "Round: $#{date[:round][:cost]}" %><br>
+                        <% end %>
                     <% end %>
                 </div>
                 <br>
