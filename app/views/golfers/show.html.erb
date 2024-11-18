@@ -348,7 +348,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             </div>
         <% end %>
     <div class='title'>
-        <h1>Welcome back, <%= @golfer.nickname.capitalize.strip %>, you fuck!</h1>
+        <h1>Welcome back, <%= @golfer.nickname.titleize.strip %>, you fuck!</h1>
     </div>
     <br>
     <% if @golfer.admin? %>
