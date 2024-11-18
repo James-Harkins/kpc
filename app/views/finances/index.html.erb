@@ -369,14 +369,14 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <h3><u>Paid:</u></h3>
     <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
-        <h4><%= golfer.first_name.capitalize %> "<%= golfer.nickname.capitalize %>" <%= golfer.last_name.capitalize %>: $<%= golfer_trip.cost %></h4>
+        <h4><%= golfer.first_name.capitalize.strip %> "<%= golfer.nickname.capitalize.strip %>" <%= golfer.last_name.capitalize.strip %>: $<%= golfer_trip.cost %></h4>
         <hr class="line-thin">
     <% end %>
     <hr class="line">
     <h3><u>Unpaid:</u></h3>
     <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
-        <h4><%= golfer.first_name.capitalize %> "<%= golfer.nickname.capitalize %>" <%= golfer.last_name.capitalize %></h4>
+        <h4><%= golfer.first_name.capitalize.strip %> "<%= golfer.nickname.capitalize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
         <h5>Outstanding Balance $<%= golfer_trip.balance %></h5>
         <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
         <%= form_with url: "/payments", method: :post, local: true do |form| %>
