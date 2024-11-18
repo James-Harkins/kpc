@@ -361,9 +361,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <hr class="line-thin">
         <% @next_trip.sort_by_calendar_admin.each do |date| %>
           <h4><%= date[:date] %></h4>
-          <h5>House Attendance: <%= date[:house_attendance] %></h5>
+          <h5>House Attendance: <%= date[:house_attendance] + Golfer.admin_count %></h5>
           <% if !date[:round_attendance].nil? %>
-            <h5>Round Attendance: <%= date[:round_attendance] %></h5>
+            <h5>Round Attendance: <%= date[:round_attendance] + Golfer.admin_count %></h5>
           <% end %>
           <hr class="line-thin">
         <% end %>

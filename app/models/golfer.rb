@@ -55,4 +55,8 @@ class Golfer < ApplicationRecord
     
     registered
   end
+
+  def self.admin_count
+    where(role: 1).count
+  end
 end
