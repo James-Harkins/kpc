@@ -1,7 +1,7 @@
-@golfer_1 = Golfer.create!(first_name: 'James', last_name: 'Harkins', nickname: 'Jim Henry', email: 'jh.harkins@protonmail.com', password: 'tobysLungExp4n5ion', password_confirmation: 'tobysLungExp4n5ion', role: 1)
-@golfer_2 = Golfer.create!(first_name: 'Tom', last_name: 'Sardo', nickname: 'Tommy Torts', email: 'Tsardo13@gmail.com', password: '17224Magic!', password_confirmation: '17224Magic!', role: 1)
-@golfer_3 = Golfer.create!(first_name: 'JP', last_name: 'Copeland', nickname: 'Peej', email: 'jp.copeland@outlook.com', password: 'FartParty123!', password_confirmation: 'FartParty123!', role: 1)
-@golfer_4 = Golfer.create!(first_name: 'Joe', last_name: 'Copeland', nickname: 'JoCo', email: 'joe.cbg.jc@gmail.com', password: 'Eaglekpc2025', password_confirmation: 'Eaglekpc2025', role: 1)
+@golfer_1 = Golfer.create!(first_name: 'James', last_name: 'Harkins', nickname: 'Jim Henry', email: 'jh.harkins@protonmail.com', password: 'test', password_confirmation: 'test', role: 1)
+@golfer_2 = Golfer.create!(first_name: 'Tom', last_name: 'Sardo', nickname: 'Tommy Torts', email: 'Tsardo13@gmail.com', password: 'test', password_confirmation: 'test', role: 1)
+@golfer_3 = Golfer.create!(first_name: 'JP', last_name: 'Copeland', nickname: 'Peej', email: 'jp.copeland@outlook.com', password: 'test', password_confirmation: 'test', role: 1)
+@golfer_4 = Golfer.create!(first_name: 'Joe', last_name: 'Copeland', nickname: 'JoCo', email: 'joe.cbg.jc@gmail.com', password: 'test', password_confirmation: 'test', role: 1)
 @golfer_5 = Golfer.create!(first_name: 'Pat', last_name: 'Davidson', nickname: 'Dog', email: 'paddydavidson424@gmail.com', password: 'test', password_confirmation: 'test', role: 1)
 
 @trip_1 = Trip.create!(year: 2013, number: 'XIII', location: 'Dewey Beach')
