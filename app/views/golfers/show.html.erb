@@ -357,29 +357,17 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <br>
         <%= button_to "Finances", "/finances", :method => :get, :class => 'btn btn-outline-primary-finances', params: {trip_id: @next_trip.id} %>
         <br>
-        <h2>Attendance:</h2>
+        <h3>Attendance:</h3>
         <hr class="line-thin">
         <% @next_trip.sort_by_calendar_admin.each do |date| %>
-          <h2><%= date[:date] %></h2>
-          <h3>House Attendance: <%= date[:house_attendance] + Golfer.admin_count %></h>
-          <h4>JoCo</h4>
-          <h4>Peej</h4>
-          <h4>Dog</h4>
-          <h4>Tortellini</h4>
-          <h4>Jim Henry</h4>
-          <% date[:house_attendance_list].each do |golfer| %>
-            <h4><%= golfer.nickname.titleize %></h4>
-          <% end %>
+          <h3><%= date[:date] %></h3>
+          <h4>House Attendance: <%= date[:house_attendance] + Golfer.admin_count %></h4>
+          <h5>JoCo, Peej, Dog, Tortellini, Jim Henry</h5>
+          <h5><%= date[:house_attendance_list].join(', ') %></h5>
           <% if !date[:round_attendance].nil? %>
-            <h3>Round Attendance: <%= date[:round_attendance] + Golfer.admin_count %></h3>
-              <h4>JoCo</h4>
-              <h4>Peej</h4>
-              <h4>Dog</h4>
-              <h4>Tortellini</h4>
-              <h4>Jim Henry</h4>
-              <% date[:round_attendance_list].each do |golfer| %>
-                <h4><%= golfer.nickname.titleize %></h4>
-              <% end %>
+            <h4>Round Attendance: <%= date[:round_attendance] + Golfer.admin_count %></h4>
+              <h5>JoCo, Peej, Dog, Tortellini, Jim Henry</h5>
+              <h5><%= date[:round_attendance_list].join(', ') %></h5>
           <% end %>
           <hr class="line-thin">
         <% end %>
