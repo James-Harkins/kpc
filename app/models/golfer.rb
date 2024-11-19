@@ -59,4 +59,12 @@ class Golfer < ApplicationRecord
   def self.admin_count
     where(role: 1).count
   end
+
+  def trip_night_calendar(trip_id)
+    nights.where(trip_id: trip_id)
+  end
+
+  def trip_round_calendar(trip_id)
+    rounds.where(trip_id: trip_id)
+  end
 end

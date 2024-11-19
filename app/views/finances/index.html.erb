@@ -370,6 +370,14 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
         <h4><%= golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %>: $<%= golfer_trip.cost %></h4>
+        <h4>Nights:</h4>
+          <% golfer.trip_night_calendar(@next_trip.id).each do |night| %>
+            <h6><%= night.date.strftime('%A') %> </h6>
+          <% end %>
+        <h4>Rounds:</h4>
+          <% golfer.trip_round_calendar(@next_trip.id).each do |round| %>
+            <h6><%= round.date.strftime('%A') %> </h6>
+          <% end %>
         <hr class="line-thin">
     <% end %>
     <hr class="line">
@@ -390,6 +398,14 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
                 <%= form.button "Add Payment", name: :golfer_trip_id, value: golfer_trip.id %>
             </div>
         <% end %>
+        <h4>Nights:</h4>
+          <% golfer.trip_night_calendar(@next_trip.id).each do |night| %>
+            <h6><%= night.date.strftime('%A') %> </h6>
+          <% end %>
+        <h4>Rounds:</h4>
+          <% golfer.trip_round_calendar(@next_trip.id).each do |round| %>
+            <h6><%= round.date.strftime('%A') %> </h6>
+          <% end %>
         <hr class="line-thin">
     <% end %>
     <hr class="line">
