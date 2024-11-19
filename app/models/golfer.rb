@@ -67,4 +67,9 @@ class Golfer < ApplicationRecord
   def trip_round_calendar(trip_id)
     rounds.where(trip_id: trip_id).map {|round| round.date.strftime('%A')}
   end
+
+  def registered_full_trip(trip_id)
+    trip_night_calendar(trip_id).length == 7 &&
+    trip_round_calendar(trip_id).length == 6
+  end
 end
