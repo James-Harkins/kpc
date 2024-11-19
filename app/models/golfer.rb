@@ -61,10 +61,10 @@ class Golfer < ApplicationRecord
   end
 
   def trip_night_calendar(trip_id)
-    nights.where(trip_id: trip_id)
+    nights.where(trip_id: trip_id).map {|night| night.date.strftime('%A')}
   end
 
   def trip_round_calendar(trip_id)
-    rounds.where(trip_id: trip_id)
+    rounds.where(trip_id: trip_id).map {|round| round.date.strftime('%A')}
   end
 end
