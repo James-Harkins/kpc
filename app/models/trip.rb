@@ -31,11 +31,11 @@ class Trip < ApplicationRecord
       calendar_date = Hash.new
       calendar_date[:date] = night.date.strftime('%A %B %d, %Y') 
       calendar_date[:house_attendance] = night.golfer_nights.length
-      calendar_date[:house_attendance_list] = night.golfer_nights.map {|golfer_night| golfer_night.golfer.nickname.titleize}
+      calendar_date[:house_attendance_list] = night.golfer_nights.map {|golfer_night| golfer_night.golfer.nickname.strip.titleize}
       
       rounds.where(date: night.date).each do |round|
         calendar_date[:round_attendance] = round.golfer_rounds.length
-        calendar_date[:round_attendance_list] = round.golfer_rounds.map {|golfer_round| golfer_round.golfer.nickname.titleize}
+        calendar_date[:round_attendance_list] = round.golfer_rounds.map {|golfer_round| golfer_round.golfer.nickname.strip.titleize}
       end
 
       calendar << calendar_date
