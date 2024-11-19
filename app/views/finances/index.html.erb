@@ -389,6 +389,14 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
         <h4><%= golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
+        <% if golfer.registered_full_trip(@next_trip.id) %>
+          <h5>Whole Enchilada!</h5>
+        <% else %>
+          <h5>Nights:</h5>
+            <h6><%= golfer.trip_night_calendar(@next_trip.id).join(', ') %></h6>
+          <h5>Rounds:</h5>
+            <h6><%= golfer.trip_round_calendar(@next_trip.id).join(', ') %></h6>
+        <% end %>
         <h5>Outstanding Balance $<%= golfer_trip.balance %></h5>
         <%= button_to "Mark as Paid", "/update_golfer_payment", :method => :put, :class => 'btn btn-outline-primary', params: {golfer_trip_id: golfer_trip.id, paid: true} %>
         <%= form_with url: "/payments", method: :post, local: true do |form| %>
@@ -401,14 +409,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <div class="button">
                 <%= form.button "Add Payment", name: :golfer_trip_id, value: golfer_trip.id %>
             </div>
-        <% end %>
-        <% if golfer.registered_full_trip(@next_trip.id) %>
-          <h5>Whole Enchilada!</h5>
-        <% else %>
-          <h5>Nights:</h5>
-            <h6><%= golfer.trip_night_calendar(@next_trip.id).join(', ') %></h6>
-          <h5>Rounds:</h5>
-            <h6><%= golfer.trip_round_calendar(@next_trip.id).join(', ') %></h6>
         <% end %>
         <hr class="line-thin">
     <% end %>
