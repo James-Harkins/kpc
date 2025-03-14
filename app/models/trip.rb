@@ -65,4 +65,10 @@ class Trip < ApplicationRecord
   def total_uncollected_revenue
     golfer_trips.sum(:balance)
   end
+
+  def total_man_nights
+    man_nights = 0
+    nights.each {|night| man_nights += night.golfer_nights.length}
+    man_nights
+  end
 end

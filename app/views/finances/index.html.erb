@@ -365,6 +365,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <h3>Total Projected Revenue: $<%= @next_trip.total_projected_revenue %></h3>
     <h3>Total Collected Revenue: $<%= @next_trip.total_collected_revenue %></h3>
     <h3>Total Uncollected Revenue: $<%= @next_trip.total_uncollected_revenue %></h3>
+    <h3>Total Man-Nights: <%= @next_trip.total_man_nights %></h3>
     <hr class="line">
     <h3><u>Paid:</u></h3>
     <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
