@@ -132,6 +132,6 @@
 @trip_5_course_1 = @trip_5.rounds.create!(date: Date.parse('2026-04-26'), cost: 0)
 @trip_5_course_2 = @trip_5.rounds.create!(date: Date.parse('2026-04-27'), cost: 0)
 @trip_5_course_3 = @trip_5.rounds.create!(date: Date.parse('2026-04-28'), cost: 75)
-@trip_5_course_4 = @trip_5.rounds.create!(date: Date.parse('2026-04-39'), cost: 75)
+@trip_5_course_4 = @trip_5.rounds.create!(date: Date.parse('2026-04-29'), cost: 75)
 @trip_5_course_5 = @trip_5.rounds.create!(date: Date.parse('2026-04-30'), cost: 75)
 @trip_5_course_6 = @trip_5.rounds.create!(date: Date.parse('2026-05-01'), cost: 75)
