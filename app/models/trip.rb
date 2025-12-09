@@ -69,6 +69,10 @@ class Trip < ApplicationRecord
   def total_man_nights
     man_nights = 0
     nights.each {|night| man_nights += night.golfer_nights.length}
-    man_nights
+    man_nights - number_of_full_trips
+  end
+
+  def number_of_full_trips
+    golfer_trips.where(is_full_trip: true).count
   end
 end
