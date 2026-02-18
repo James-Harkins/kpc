@@ -72,4 +72,14 @@ class Golfer < ApplicationRecord
     trip_night_calendar(trip_id).length == 7 &&
     trip_round_calendar(trip_id).length == 6
   end
+
+  def generate_password_reset_token!
+    self.password_reset_token = SecureRandom.urlsafe_base64
+    self.password_reset_sent_at = Time.zone.now
+    save!(validate: false)
+  end
+
+  def password_reset_expired?
+    password_reset_sent_at < 2.hours.ago
+  end
 end

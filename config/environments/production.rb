@@ -64,6 +64,15 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "kpc_#{Rails.env}"
 
   config.action_mailer.perform_caching = false
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: "smtp.resend.com",
+    port: 587,
+    authentication: :plain,
+    user_name: "resend",
+    password: ENV["RESEND_API_KEY"]
+  }
+  config.action_mailer.default_url_options = { host: "kitchenpassclassic.com", protocol: "https" }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
