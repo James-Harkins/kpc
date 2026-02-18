@@ -1,0 +1,88 @@
+<style>
+body {
+    display: flex;
+    background: url(<%= asset_path 'course_4.jpeg' %>);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.auth-form-container, .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+    padding: 50px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    color: black;
+    background-color: white;
+    opacity: 0.8;
+    border-radius: 25px;
+}
+
+label {
+    text-align: left;
+    padding: 0.25rem 0;
+}
+
+input {
+    margin: 0.25rem 0;
+    padding: .5rem;
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.auth-form-container > h1 {
+    font-size: 60px;
+    text-align: center;
+}
+
+.error-message {
+    color: red;
+    margin: 0.25rem 0;
+}
+</style>
+
+<div class="auth-form-container">
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+        </div>
+    <% end %>
+    <h1>RESET PASSWORD</h1>
+    <div class="login-form">
+        <% if @golfer.errors.any? %>
+            <% @golfer.errors.full_messages.each do |msg| %>
+                <p class="error-message"><%= msg %></p>
+            <% end %>
+        <% end %>
+        <%= form_with url: password_reset_path(params[:token]), method: :patch, local: true do |form| %>
+            <div class="label">
+                <%= form.label :password, "New Password" %>
+            </div>
+            <div class="input">
+                <%= form.password_field :password, name: "golfer[password]" %><br>
+            </div>
+            <div class="label">
+                <%= form.label :password_confirmation, "Confirm New Password" %>
+            </div>
+            <div class="input">
+                <%= form.password_field :password_confirmation, name: "golfer[password_confirmation]" %><br>
+            </div>
+            <div class="button">
+                <%= form.submit "Update Password" %>
+            </div>
+        <% end %>
+    </div>
+</div>
