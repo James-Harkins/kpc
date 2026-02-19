@@ -2,19 +2,19 @@ KPC <%= @trip.number %> - You're In!
 
 Hey <%= @golfer.nickname %>,
 
-You're signed up for KPC <%= @trip.number %> in <%= @trip.location %> (<%= @trip.year %>)!
+You're signed up for KPC <%= @trip.number %> in <%= @trip.location %>, you fuck!
 
 YOUR ITINERARY
 <% if @nights.any? %>
 Nights:
 <% @nights.each do |night| %>
-  <%= night.date.strftime("%A, %B %-d") %> — $<%= night.cost %>
+  <%= night.date.strftime("%A, %B %-d") %>
 <% end %>
 <% end %>
 <% if @rounds.any? %>
 Rounds:
 <% @rounds.each do |round| %>
-  <%= round.date.strftime("%A, %B %-d") %> — $<%= round.cost %>
+  <%= round.date.strftime("%A, %B %-d") %>
 <% end %>
 <% end %>
 
