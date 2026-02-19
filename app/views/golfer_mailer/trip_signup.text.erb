@@ -8,13 +8,13 @@ YOUR ITINERARY
 <% if @nights.any? %>
 Nights:
 <% @nights.each do |night| %>
-  <%= night.date.strftime("%A, %B %-d") %>
+  <%= night.date.strftime("%A, %B %-d") %> — $<%= night.cost %>
 <% end %>
 <% end %>
 <% if @rounds.any? %>
 Rounds:
 <% @rounds.each do |round| %>
-  <%= round.date.strftime("%A, %B %-d") %>
+  <%= round.date.strftime("%A, %B %-d") %> — $<%= round.cost %>
 <% end %>
 <% end %>
 
@@ -23,7 +23,7 @@ TOTAL OWED: $<%= @golfer_trip.balance %>
 (Your balance includes the full-trip first-night discount.)
 <% end %>
 
-HOW TO PAY
+HOW TO PAY - GET YOUR MONEY IN, FUCKO!
 Send payment to <%= ENV["TREASURER_NAME"] %>:
   Venmo:  <%= ENV["TREASURER_VENMO"] %>
   PayPal: <%= ENV["TREASURER_PAYPAL"] %>
