@@ -13,6 +13,7 @@ class Golfer < ApplicationRecord
   validates :email, uniqueness: true
   validates_presence_of :password
   validates_presence_of :password_confirmation
+  validates :password, length: { minimum: 8 }, if: -> { password.present? }
   has_secure_password
   enum role: [:default, :admin]
 
@@ -57,7 +58,7 @@ class Golfer < ApplicationRecord
   end
 
   def self.admin_count
-    where(role: 1).count
+    where(role: :admin).count
   end
 
   def trip_night_calendar(trip_id)
@@ -74,9 +75,12 @@ class Golfer < ApplicationRecord
   end
 
   def generate_password_reset_token!
-    self.password_reset_token = SecureRandom.urlsafe_base64
-    self.password_reset_sent_at = Time.zone.now
-    save!(validate: false)
+    raw_token = SecureRandom.urlsafe_base64
+    update_columns(
+      password_reset_token: Digest::SHA256.hexdigest(raw_token),
+      password_reset_sent_at: Time.zone.now
+    )
+    raw_token
   end
 
   def password_reset_expired?

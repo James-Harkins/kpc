@@ -385,13 +385,12 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               <div class='next-trip-cost'>
                 <h3>See you at KPC <%= @next_trip.number %>!</h3>
                 <% if @golfer_next_trip.balance > 0 %>
-                  <h3>You owe Joe Copeland $<%= @golfer_next_trip.balance %>!</h3>
-                  <h4>Venmo: @Joe-Copeland-8</h4>
-                  <h4>PayPal: 3critters@verizon.net</h4>
+                  <h3>You owe <%= ENV["TREASURER_NAME"] %> $<%= @golfer_next_trip.balance %>!</h3>
+                  <h4>Venmo: <%= ENV["TREASURER_VENMO"] %></h4>
+                  <h4>PayPal: <%= ENV["TREASURER_PAYPAL"] %></h4>
                   <h4>Checks: Americans only! Canadian checks are fucked.</h4>
-                  <h4>KPC Treasurer<h4>
-                  <h4>613 Meadow Lane SW</h4>
-                  <h4>Vienna, Virginia 32180-6342</h4>
+                  <h4>KPC Treasurer</h4>
+                  <h4><%= ENV["TREASURER_ADDRESS"] %></h4>
                 <% else %>
                   <h3>You're all paid up. Thanks!</h3>
                 <% end %>
@@ -404,7 +403,5 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
       </div>
     <% end %>
     <br>
-    <form action="/logout">
-        <button id="dashboard_header" type="submit" class="btn btn-outline-primary">LOG OUT</button>
-    </form>
+    <%= button_to "LOG OUT", "/logout", method: :delete, class: "btn btn-outline-primary", id: "dashboard_header" %>
 </div>

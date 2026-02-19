@@ -107,9 +107,7 @@ h3 {
 
     <div class="inner">
          <% if current_user %>
-            <form action="/logout">
-                <button id="dashboard_header" type="submit" class="btn btn-outline-primary">LOG OUT</button>
-            </form>
+            <%= button_to "LOG OUT", "/logout", method: :delete, class: "btn btn-outline-primary", id: "dashboard_header" %>
         <% else %>
             <form action="/register">
                 <button id="dashboard_header" type="submit" class="btn btn-outline-primary">REGISTER</button>

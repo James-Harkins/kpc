@@ -7,8 +7,8 @@ class PasswordResetsController < ApplicationController
   def create
     golfer = Golfer.find_by(email: params[:email].downcase.strip)
     if golfer
-      golfer.generate_password_reset_token!
-      GolferMailer.password_reset(golfer).deliver_now
+      token = golfer.generate_password_reset_token!
+      GolferMailer.password_reset(golfer, token).deliver_now
     end
     flash[:notice] = "If that email is registered, you'll receive a reset link shortly."
     redirect_to "/login"
@@ -21,19 +21,26 @@ class PasswordResetsController < ApplicationController
     if @golfer.password_reset_expired?
       flash[:error] = "That reset link has expired. Please request a new one."
       redirect_to "/forgot_password"
-    elsif @golfer.update(password_params)
-      @golfer.update_columns(password_reset_token: nil, password_reset_sent_at: nil)
-      flash[:notice] = "Password updated! Please log in."
-      redirect_to "/login"
     else
-      render :edit
+      updated = false
+      ActiveRecord::Base.transaction do
+        updated = @golfer.update(password_params)
+        @golfer.update_columns(password_reset_token: nil, password_reset_sent_at: nil) if updated
+      end
+      if updated
+        flash[:notice] = "Password updated! Please log in."
+        redirect_to "/login"
+      else
+        render :edit
+      end
     end
   end
 
   private
 
   def load_golfer_by_token
-    @golfer = Golfer.find_by(password_reset_token: params[:token])
+    hashed = Digest::SHA256.hexdigest(params[:token])
+    @golfer = Golfer.find_by(password_reset_token: hashed)
     unless @golfer
       flash[:error] = "Invalid or expired reset link."
       redirect_to "/forgot_password"
