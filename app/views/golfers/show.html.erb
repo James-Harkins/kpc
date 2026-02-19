@@ -1,11 +1,7 @@
 <style>
 body {
     display: flex;
-    background: url(<%= asset_path 'course_1.jpeg' %>);
-    display: flex;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
+    min-height: 100vh;
     align-items: center;
     justify-content: center;
     flex-direction: column;
@@ -14,6 +10,17 @@ body {
     color: #fff;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
     'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_1.jpeg' %>) center/cover no-repeat;
+    z-index: -1;
 }
 
 .trips {
@@ -187,8 +194,8 @@ body {
   }
 
   @media (max-width: 800px) {
-   body {
-    display: flex;
+    body {
+      align-items: stretch;
     }
 }
 
