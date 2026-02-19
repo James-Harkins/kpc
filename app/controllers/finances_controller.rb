@@ -1,15 +1,7 @@
 class FinancesController < ApplicationController
+  before_action :require_admin
+
   def index
-    if current_user
-      if current_user.admin?
-        @next_trip = Trip.find(params[:trip_id])
-      else
-        redirect_to "/dashboard"
-        flash[:login] = "Admins only, Fucko!"
-      end
-    else 
-      redirect_to "/login"
-      flash[:login] = "Log in first, Fucko!"
-    end
+    @next_trip = Trip.find(params[:trip_id])
   end
 end

@@ -1,13 +1,10 @@
 class GolfersController < ApplicationController
+  before_action :require_login, only: [:show]
+
   def show
-    if current_user
-      @golfer = current_user
-      @next_trip = Trip.where('start_date > ?', Date.today).first
-      @golfer_next_trip = @golfer.golfer_trips.where(trip_id: @next_trip.id).first
-    else
-      redirect_to "/login"
-      flash[:login] = "Log in first, Fucko!"
-    end
+    @golfer = current_user
+    @next_trip = Trip.where('start_date > ?', Date.today).first
+    @golfer_next_trip = @golfer.golfer_trips.where(trip_id: @next_trip.id).first
   end
 
   def new
@@ -19,12 +16,12 @@ class GolfersController < ApplicationController
       if golfer.save
         redirect_to "/login"
       else
-        redirect_to "/register"
         flash[:error] = golfer.errors.full_messages.to_sentence + ", Fucko!"
+        redirect_to "/register"
       end
-    else 
-      redirect_to "/register"
+    else
       flash[:error] = "Invitation only."
+      redirect_to "/register"
     end
   end
 
