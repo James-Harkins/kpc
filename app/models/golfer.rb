@@ -75,10 +75,12 @@ class Golfer < ApplicationRecord
   end
 
   def generate_password_reset_token!
+    raw_token = SecureRandom.urlsafe_base64
     update_columns(
-      password_reset_token: SecureRandom.urlsafe_base64,
+      password_reset_token: Digest::SHA256.hexdigest(raw_token),
       password_reset_sent_at: Time.zone.now
     )
+    raw_token
   end
 
   def password_reset_expired?
