@@ -22,6 +22,7 @@ class GolferTripsController < ApplicationController
       golfer_trip.cost = cost
       golfer_trip.balance = cost
       golfer_trip.save
+      GolferMailer.trip_signup(golfer, golfer_trip).deliver_now
       redirect_to "/dashboard"
     else
       flash[:error] = golfer.errors.full_messages.to_sentence + ", Fucko!"
