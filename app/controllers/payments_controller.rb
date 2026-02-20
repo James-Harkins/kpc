@@ -5,12 +5,15 @@ class PaymentsController < ApplicationController
     golfer_trip = GolferTrip.find(params[:golfer_trip_id])
     amount = params[:amount].to_i
     if amount <= golfer_trip.balance
-      Payment.create!(golfer_trip: golfer_trip, amount: amount)
+      payment = Payment.create!(golfer_trip: golfer_trip, amount: amount)
       golfer_trip.balance = golfer_trip.balance - amount
       golfer_trip.save
       if golfer_trip.balance == 0
         golfer_trip.is_paid = true
         golfer_trip.save
+        GolferMailer.balance_paid(golfer_trip.golfer, golfer_trip).deliver_now
+      else
+        GolferMailer.payment_received(golfer_trip.golfer, golfer_trip, payment).deliver_now
       end
     else
       flash[:error] = "Payment cannot be greater than outstanding balance."
