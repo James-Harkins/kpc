@@ -1,0 +1,14 @@
+KPC <%= @trip.number %> - Payment Received
+
+Hey <%= @golfer.nickname %>,
+
+We got your payment of $<%= @payment.amount %>.
+
+Remaining balance: $<%= @golfer_trip.balance %>
+
+That means you still owe money, fucko! Send the rest to <%= ENV["TREASURER_NAME"] %>:
+  Venmo:  <%= ENV["TREASURER_VENMO"] %>
+  PayPal: <%= ENV["TREASURER_PAYPAL"] %>
+  Check (Americans only — Canadian checks are fucked):
+    Payable to KPC Treasurer
+    <%= ENV["TREASURER_ADDRESS"] %>

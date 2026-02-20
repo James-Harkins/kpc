@@ -37,6 +37,7 @@ class GolferTripsController < ApplicationController
       golfer_trip.balance = 0
       golfer_trip.is_paid = true
       golfer_trip.save
+      GolferMailer.balance_paid(golfer_trip.golfer, golfer_trip).deliver_now
       redirect_to "/finances?trip_id=#{golfer_trip.trip_id}"
     end
   end
