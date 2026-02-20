@@ -189,3 +189,39 @@ A 1099-K reports gross payment volume — it does not automatically mean tax is 
 3. Whether the ~$50–75/year in fees is acceptable in exchange for full US payment automation
 
 If the treasurer prefers to keep the current zero-fee, fully manual process and simply continue recording payments by hand, that remains a perfectly valid choice and requires no development work.
+
+---
+
+## Committee Decision
+
+> **TODO:** Fill this in after the committee meeting before starting development.
+
+```
+Decision date:
+Proceeding with: Model A / Model B (circle one)
+Treasurer who will hold the Stripe account:
+Treasurer has been informed of 1099-K reporting: yes / no
+Notes:
+```
+
+---
+
+## How to Move Forward After the Decision
+
+Once the committee has filled in the section above, share this document with the developer and say:
+
+> "We've made our decision — please implement the Stripe ACH integration as described in `STRIPE_ACH_ANALYSIS.md`."
+
+Claude (or any developer) will read this file, explore the existing codebase, and have everything needed to begin. No additional context is required beyond what is already documented here.
+
+**Before starting development, confirm:**
+1. The treasurer has created their Stripe account and completed identity verification at stripe.com
+2. The treasurer has their Stripe **publishable key** and **secret key** ready to share with the developer (found in the Stripe dashboard under Developers → API Keys)
+3. The committee has decided between Model A and Model B
+
+**The developer will handle:**
+- Configuring the app with the Stripe API keys
+- Building the payment flow for US golfers
+- Setting up automatic payment recording when transfers settle
+- Keeping the Canadian golfer experience unchanged
+- Testing the full flow in Stripe's sandbox environment before going live
