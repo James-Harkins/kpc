@@ -3,7 +3,7 @@ class GolfersController < ApplicationController
 
   def show
     @golfer = current_user
-    @next_trip = Trip.where('start_date > ?', Date.today).first
+    @next_trip = Trip.current
     @golfer_next_trip = @golfer.golfer_trips.where(trip_id: @next_trip.id).first
   end
 

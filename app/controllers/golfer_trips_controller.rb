@@ -3,7 +3,7 @@ class GolferTripsController < ApplicationController
   before_action :require_admin,  only: [:update]
 
   def new
-    @next_trip = Trip.where('start_date > ?', Date.today).first
+    @next_trip = Trip.current
     if current_user.is_registered_for_next_trip(@next_trip)
       flash[:login] = "You're already signed up, Fucko!"
       redirect_to "/dashboard"
@@ -14,7 +14,7 @@ class GolferTripsController < ApplicationController
 
   def create
     golfer = current_user
-    trip = Trip.where('start_date > ?', Date.today).first
+    trip = Trip.current
     golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
 
     if golfer_trip.save
