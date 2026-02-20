@@ -4,6 +4,10 @@ class Trip < ApplicationRecord
   has_many :golfer_trips
   has_many :golfers, through: :golfer_trips
 
+  def self.current
+    where(number: ENV['CURRENT_TRIP_NUMBER']).first
+  end
+
   def sort_by_calendar
     calendar = []
     nights.each do |night|
