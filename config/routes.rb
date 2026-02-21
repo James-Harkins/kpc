@@ -18,6 +18,9 @@ Rails.application.routes.draw do
 
   get "/finances", to: "finances#index"
 
+  get  "/announcements/new", to: "announcements#new"
+  post "/announcements",     to: "announcements#create"
+
   get   "/forgot_password",             to: "password_resets#new"
   post  "/password_resets",             to: "password_resets#create"
   get   "/password_resets/:token/edit", to: "password_resets#edit",   as: :edit_password_reset

@@ -28,4 +28,12 @@ class GolferMailer < ApplicationMailer
     @trip        = golfer_trip.trip
     mail(to: golfer.email, subject: "KPC #{@trip.number} - You're All Paid Up!")
   end
+
+  def announcement(golfer, subject, body, trip)
+    @golfer  = golfer
+    @subject = subject
+    @body    = body
+    @trip    = trip
+    mail(to: golfer.email, subject: subject)
+  end
 end
