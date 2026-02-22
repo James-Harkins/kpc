@@ -363,7 +363,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <h2>KPC <%= @next_trip.number %></h2>
         <br>
         <%= button_to "Finances", "/finances", :method => :get, :class => 'btn btn-outline-primary-finances', params: {trip_id: @next_trip.id} %>
-        <%= button_to "Send Email", "/announcements/new", :method => :get, :class => 'btn btn-outline-primary-finances' %>
+        <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
+          <%= button_to "Broadcast", "/announcements/new", :method => :get, :class => 'btn btn-outline-primary-finances' %>
+        <% end %>
         <br>
         <h3>Attendance:</h3>
         <hr class="line-thin">
