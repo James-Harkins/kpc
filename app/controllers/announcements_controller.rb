@@ -12,6 +12,7 @@ class AnnouncementsController < ApplicationController
 
     trip.golfers.each do |golfer|
       GolferMailer.announcement(golfer, subject, body, trip).deliver_now
+      sleep(0.6)
     end
 
     flash[:notice] = "Email sent to all golfers on KPC #{trip.number}!"
