@@ -22,4 +22,14 @@ class ApplicationController < ActionController::Base
       redirect_to "/dashboard"
     end
   end
+
+  def require_site_admin
+    require_login
+    return if performed?
+    site_admin = Golfer.where(email: ENV["SITE_ADMIN_EMAIL"]).first
+    unless site_admin && current_user == site_admin
+      flash[:login] = "Site admin only, Fucko!"
+      redirect_to "/dashboard"
+    end
+  end
 end
