@@ -23,6 +23,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_non_admin
+    require_login
+    return if performed?
+    if current_user.admin?
+      flash[:login] = "Not for admins, Fucko!"
+      redirect_to "/dashboard"
+    end
+  end
+
   def require_site_admin
     require_login
     return if performed?
