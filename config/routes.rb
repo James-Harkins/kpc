@@ -5,6 +5,9 @@ Rails.application.routes.draw do
   post "/golfers", to: "golfers#create"
   get "/dashboard", to: "golfers#show"
 
+  get   "/profile/edit", to: "golfers#edit"
+  patch "/profile",      to: "golfers#update"
+
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
   delete "/logout", to: "sessions#destroy"

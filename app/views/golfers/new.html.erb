@@ -39,7 +39,7 @@ label {
     padding: 0.25rem 0;
 }
 
-input {
+input, select {
     margin: 0.25rem 0;
     padding: .5rem;
 }
@@ -127,9 +127,18 @@ button {
                 </div>
 
                 <div class="label">
+                    <%= form.label :t_shirt_size, "T-Shirt Size" %>
+                </div>
+                <div class="input">
+                    <%= form.select :t_shirt_size,
+                          [["S", "s"], ["M", "m"], ["L", "l"], ["XL", "xl"], ["XXL", "xxl"], ["XXXL", "xxxl"]],
+                          { include_blank: "Select a size" } %><br>
+                </div>
+
+                <div class="label">
                     <%= form.label :token %>
                 </div>
-                
+
                 <div class="input">
                     <%= form.password_field :token %><br>
                 </div>

@@ -406,5 +406,8 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
       </div>
     <% end %>
     <br>
+    <% unless @golfer.admin? %>
+      <%= button_to "EDIT PROFILE", "/profile/edit", method: :get, class: "btn btn-outline-primary", id: "dashboard_header" %>
+    <% end %>
     <%= button_to "LOG OUT", "/logout", method: :delete, class: "btn btn-outline-primary", id: "dashboard_header" %>
 </div>
