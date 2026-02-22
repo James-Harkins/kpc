@@ -145,8 +145,8 @@ body::before {
       <%= content_tag :div, msg, class: name %>
     </div>
   <% end %>
-  <h1>Send Email</h1>
-  <h3>Send a message to all golfers on a trip</h3>
+  <h1>Broadcast</h1>
+  <h4>Send a message to all golfers or all golfers for a given trip</h4>
   <hr class="line">
 
   <%= form_with url: "/announcements", method: :post, local: true do |form| %>
