@@ -14,6 +14,8 @@ on:
 jobs:
   send_reminders:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - uses: actions/checkout@v4
 
@@ -29,3 +31,13 @@ jobs:
             --restart no \
             --env DRY_RUN=${{ github.event.inputs.dry_run || 'false' }} \
             -- bin/rails emails:send_pre_trip_reminder
+
+      - name: Disable workflow after March 1 send
+        if: github.event_name == 'schedule'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$(date +%m-%d)" = "03-01" ]; then
+            gh workflow disable trip_reminder.yml --repo ${{ github.repository }}
+            echo "Workflow disabled after March 1 send."
+          fi
