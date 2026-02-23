@@ -1,0 +1,21 @@
+KPC <%= @trip.number %> - One Month Out!
+
+Hey <%= @golfer.nickname %>,
+
+We're one month out from KPC <%= @trip.number %> in <%= @trip.location %>! You're all paid up. Thanks for getting your money in on time! Here's a reminder of what you signed up for:
+
+YOUR ITINERARY
+<% if @nights.any? %>
+Nights:
+<% @nights.each do |night| %>
+  <%= night.date.strftime("%A, %B %-d") %> — $<%= night.cost %>
+<% end %>
+<% end %>
+<% if @rounds.any? %>
+Rounds:
+<% @rounds.each do |round| %>
+  <%= round.date.strftime("%A, %B %-d") %> — $<%= round.cost %>
+<% end %>
+<% end %>
+
+See you in <%= @trip.location %>!

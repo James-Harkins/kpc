@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; padding:0; background-color:#f0f0f0; font-family:'Trebuchet MS', Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0f0f0; padding:30px 0;">
+    <tr>
+      <td align="center">
+
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#1a4d2e; padding:36px 40px; text-align:center;">
+              <div style="font-size:42px; line-height:1; margin-bottom:12px;">⛳</div>
+              <h1 style="color:#ffffff; margin:0 0 8px; font-size:26px; font-weight:bold; letter-spacing:1px;">
+                One Month Out!
+              </h1>
+              <p style="color:#a8d5b5; margin:0; font-size:15px;">
+                KPC <%= @trip.number %> &bull; <%= @trip.location %> &bull; <%= @trip.year %>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px 40px;">
+
+              <p style="color:#333333; font-size:16px; margin:0 0 28px; line-height:1.5;">
+                Hey <strong><%= @golfer.nickname %></strong>, we're one month out from KPC <%= @trip.number %>! You're all paid up. Thanks for getting your money in on time &mdash; here's a reminder of what you signed up for:
+              </p>
+
+              <!-- Nights -->
+              <% if @nights.any? %>
+                <h3 style="color:#1a4d2e; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 8px; padding-bottom:6px; border-bottom:2px solid #1a4d2e;">
+                  Nights
+                </h3>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                  <% @nights.each_with_index do |night, i| %>
+                    <tr style="background-color:<%= i.even? ? '#f5faf7' : '#ffffff' %>;">
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; border-bottom:1px solid #e8e8e8;">
+                        <%= night.date.strftime("%A, %B %-d") %>
+                      </td>
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; text-align:right; border-bottom:1px solid #e8e8e8;">
+                        $<%= night.cost %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+
+              <!-- Rounds -->
+              <% if @rounds.any? %>
+                <h3 style="color:#1a4d2e; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 8px; padding-bottom:6px; border-bottom:2px solid #1a4d2e;">
+                  Rounds
+                </h3>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                  <% @rounds.each_with_index do |round, i| %>
+                    <tr style="background-color:<%= i.even? ? '#f5faf7' : '#ffffff' %>;">
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; border-bottom:1px solid #e8e8e8;">
+                        <%= round.date.strftime("%A, %B %-d") %>
+                      </td>
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; text-align:right; border-bottom:1px solid #e8e8e8;">
+                        $<%= round.cost %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+
+              <p style="color:#333333; font-size:15px; margin:0; line-height:1.5;">
+                See you in <%= @trip.location %>!
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f5faf7; padding:20px 40px; text-align:center; border-top:1px solid #ddeee4;">
+              <p style="color:#aaaaaa; font-size:12px; margin:0;">
+                Kitchen Pass Classic &bull; See you on the course 🏌️
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
