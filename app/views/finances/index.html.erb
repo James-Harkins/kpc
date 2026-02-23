@@ -378,6 +378,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <% @next_trip.paid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
         <h4><%= golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %>: $<%= golfer_trip.cost %></h4>
+        <% if golfer.t_shirt_size.present? %>
+          <h5>T-Shirt Size: <%= golfer.t_shirt_size.upcase %></h5>
+        <% end %>
         <% if golfer.registered_full_trip(@next_trip.id) %>
           <h5>Whole Enchilada!</h5>
         <% else %>
@@ -393,6 +396,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <% @next_trip.unpaid_golfer_trips.each do |golfer_trip| %>
         <% golfer = golfer_trip.golfer %>
         <h4><%= golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
+        <% if golfer.t_shirt_size.present? %>
+          <h5>T-Shirt Size: <%= golfer.t_shirt_size.upcase %></h5>
+        <% end %>
         <% if golfer.registered_full_trip(@next_trip.id) %>
           <h5>Whole Enchilada!</h5>
         <% else %>
