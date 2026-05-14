@@ -54,7 +54,103 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 
 ## Database Schema
 
-![Database schema](https://github.com/user-attachments/assets/e750002f-8c8d-4cbd-91bb-19439f06808a)
+```mermaid
+erDiagram
+    GOLFERS {
+        bigint id PK
+        string first_name
+        string last_name
+        string nickname
+        string email
+        string password_digest
+        integer role
+        integer t_shirt_size
+        string password_reset_token
+        datetime password_reset_sent_at
+    }
+    TRIPS {
+        bigint id PK
+        integer year
+        string number
+        string location
+        datetime start_date
+        boolean completed
+    }
+    NIGHTS {
+        bigint id PK
+        bigint trip_id FK
+        date date
+        integer cost
+    }
+    ROUNDS {
+        bigint id PK
+        bigint trip_id FK
+        integer course_id FK
+        date date
+        integer cost
+        string tee_time
+    }
+    COURSES {
+        bigint id PK
+        string name
+        string address
+    }
+    GOLFER_TRIPS {
+        bigint id PK
+        bigint golfer_id FK
+        bigint trip_id FK
+        integer cost
+        integer balance
+        boolean is_paid
+        boolean is_full_trip
+    }
+    GOLFER_NIGHTS {
+        bigint id PK
+        bigint golfer_id FK
+        bigint night_id FK
+    }
+    GOLFER_ROUNDS {
+        bigint id PK
+        bigint golfer_id FK
+        bigint round_id FK
+    }
+    PAYMENTS {
+        bigint id PK
+        bigint golfer_trip_id FK
+        integer amount
+    }
+    EXPENSES {
+        bigint id PK
+        bigint trip_id FK
+        bigint golfer_id FK
+        integer amount
+        string description
+        date date
+    }
+    TRIP_FINANCIAL_SUMMARIES {
+        bigint id PK
+        bigint trip_id FK
+        integer total_revenue
+        integer total_expenses
+        integer total_deficit
+        integer fair_share
+        integer committee_count
+    }
+
+    GOLFERS ||--o{ GOLFER_TRIPS : ""
+    TRIPS ||--o{ GOLFER_TRIPS : ""
+    GOLFER_TRIPS ||--o{ PAYMENTS : ""
+    TRIPS ||--o{ NIGHTS : ""
+    TRIPS ||--o{ ROUNDS : ""
+    TRIPS ||--o{ EXPENSES : ""
+    TRIPS ||--o| TRIP_FINANCIAL_SUMMARIES : ""
+    GOLFERS ||--o{ GOLFER_NIGHTS : ""
+    NIGHTS ||--o{ GOLFER_NIGHTS : ""
+    GOLFERS ||--o{ GOLFER_ROUNDS : ""
+    ROUNDS ||--o{ GOLFER_ROUNDS : ""
+    GOLFERS ||--o{ EXPENSES : ""
+    COURSES ||--o{ ROUNDS : ""
+```
 
 ### Key Models
 
