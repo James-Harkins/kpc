@@ -1,0 +1,312 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    flex-flow: column;
+    color: #fff;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .8;
+    padding: 30px 40px;
+    margin: 20px auto;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    text-align: left;
+    max-width: 900px;
+    width: 90%;
+}
+
+.next-trip-cost > h1 {
+    font-size: 50px;
+    text-align: center;
+    margin: 0 0 20px;
+}
+
+.line {
+    border-top: 5px solid black;
+}
+
+.line-thin {
+    border-top: 1px solid black;
+}
+
+.date-card {
+    background-color: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin: 16px 0;
+}
+
+.date-card h3 {
+    margin: 0 0 10px 0;
+    font-weight: bold;
+    font-size: 1.4em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 6px;
+}
+
+.date-card h4 {
+    margin: 8px 0 2px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.date-card h5 {
+    margin: 2px 0 6px 16px;
+    font-size: 1.0em;
+    font-weight: normal;
+    color: #444;
+    line-height: 1.4;
+}
+
+.attendance-grid {
+    width: 100%;
+    margin: 8px 0 12px;
+}
+
+.attendance-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 5px;
+}
+
+.golfer-name-col {
+    width: 90px;
+    flex-shrink: 0;
+    font-size: 14px;
+    color: #444;
+    padding-right: 10px;
+    padding-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.attendance-bars {
+    flex: 1;
+    min-width: 0;
+}
+
+.cal-dates {
+    display: flex;
+    margin-bottom: 3px;
+}
+
+.cal-date {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.3;
+    transition: color 0.12s ease;
+}
+
+.cal-date-highlighted {
+    color: #111;
+    font-weight: bold;
+}
+
+.attendance-grid:has(.attendance-row:not(.attendance-header-row):hover) .cal-date:not(.cal-date-highlighted) {
+    opacity: 0.15;
+}
+
+.cal-bar {
+    display: flex;
+    height: 7px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.08);
+    margin-bottom: 2px;
+}
+
+.cal-segment {
+    flex: 1;
+    height: 100%;
+    background-color: transparent;
+}
+
+.night-active {
+    background-color: #4a90d9;
+}
+
+.round-active {
+    background-color: #e87f3a;
+}
+
+.cal-legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #555;
+}
+
+.cal-legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+
+.attendance-row {
+    transition: opacity 0.12s ease;
+    cursor: default;
+}
+
+.attendance-header-row {
+    cursor: default;
+}
+
+.attendance-grid:has(.attendance-row:not(.attendance-header-row):hover) .attendance-row:not(:hover):not(.attendance-header-row) {
+    opacity: 0.25;
+}
+
+.attendance-row:hover {
+    cursor: pointer;
+}
+
+.attendance-row:hover .golfer-name-col {
+    font-weight: bold;
+    color: #111;
+}
+
+.btn-outline-primary {
+    margin: 1rem 0;
+    background-color: white;
+    opacity: .8;
+    padding: 20px;
+    font-size: 1em;
+    color: black !important;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn-outline-primary:hover {
+    background-color: gray !important;
+}
+
+@media (max-width: 800px) {
+    body { align-items: stretch; }
+    .next-trip-cost { padding: 20px 18px; }
+    .next-trip-cost > h1 { font-size: 36px; }
+    .golfer-name-col { width: 70px; font-size: 12px; }
+}
+</style>
+
+<div class="next-trip-cost">
+    <h1>Attendance &mdash; KPC <%= @next_trip.number %></h1>
+
+    <% adm_nights = @next_trip.nights.order(:date).to_a %>
+    <% adm_rounds_by_date = @next_trip.rounds.order(:date).index_by(&:date) %>
+    <% adm_golfers = @next_trip.golfers.where(role: :default).order(:nickname) %>
+
+    <% if adm_nights.any? && adm_golfers.any? %>
+        <div class="attendance-grid">
+            <div class="attendance-row attendance-header-row">
+                <div class="golfer-name-col"></div>
+                <div class="attendance-bars">
+                    <div class="cal-dates">
+                        <% adm_nights.each do |night| %>
+                            <div class="cal-date"><%= night.date.strftime('%a') %><br><%= night.date.day %></div>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+            <% adm_golfers.each do |golfer| %>
+                <% golfer_night_ids = golfer.nights.where(trip_id: @next_trip.id).pluck(:id).to_set %>
+                <% golfer_round_ids = golfer.rounds.where(trip_id: @next_trip.id).pluck(:id).to_set %>
+                <div class="attendance-row">
+                    <div class="golfer-name-col"><%= golfer.nickname.titleize %></div>
+                    <div class="attendance-bars">
+                        <div class="cal-bar">
+                            <% adm_nights.each do |night| %>
+                                <div class="cal-segment <%= 'night-active' if golfer_night_ids.include?(night.id) %>"></div>
+                            <% end %>
+                        </div>
+                        <div class="cal-bar">
+                            <% adm_nights.each do |night| %>
+                                <% round = adm_rounds_by_date[night.date] %>
+                                <div class="cal-segment <%= 'round-active' if round && golfer_round_ids.include?(round.id) %>"></div>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+        <div class="cal-legend">
+            <span><span class="cal-legend-dot" style="background:#4a90d9"></span>Nights</span>
+            <span><span class="cal-legend-dot" style="background:#e87f3a"></span>Rounds</span>
+        </div>
+    <% end %>
+
+    <hr class="line">
+
+    <% @next_trip.sort_by_calendar_admin.each do |date| %>
+        <div class="date-card">
+            <h3><%= date[:date] %></h3>
+            <h4>House Attendance: <%= date[:house_attendance] + Golfer.night_admin_count(date[:date]) %></h4>
+            <h5>Chrissy, Dog, Tortellini<%= ', Tony' if Date.parse(date[:date]) != Date.parse('2026-04-18') && Date.parse(date[:date]) != Date.parse('2026-04-19') %></h5>
+            <h5><%= date[:house_attendance_list].join(', ') %></h5>
+            <% if !date[:round_attendance].nil? %>
+                <h4>Round Attendance: <%= date[:round_attendance] + Golfer.round_admin_count(date[:date]) %></h4>
+                <h5>Chrissy, Dog, Tortellini<%= ', Tony' if Date.parse(date[:date]) != Date.parse('2026-04-19') && Date.parse(date[:date]) != Date.parse('2026-04-20') %></h5>
+                <h5><%= date[:round_attendance_list].join(', ') %></h5>
+            <% end %>
+        </div>
+    <% end %>
+
+    <hr class="line">
+    <%= button_to "Back to Dashboard", "/dashboard", method: :get, class: 'btn btn-outline-primary' %>
+</div>
+
+<script>
+  document.querySelectorAll('.attendance-grid').forEach(function(grid) {
+    var headerDates = grid.querySelectorAll('.cal-dates .cal-date');
+    grid.querySelectorAll('.attendance-row:not(.attendance-header-row)').forEach(function(row) {
+      row.addEventListener('mouseenter', function() {
+        var activeIndices = new Set();
+        row.querySelectorAll('.cal-bar').forEach(function(bar) {
+          bar.querySelectorAll('.cal-segment').forEach(function(seg, idx) {
+            if (seg.classList.contains('night-active') || seg.classList.contains('round-active')) {
+              activeIndices.add(idx);
+            }
+          });
+        });
+        headerDates.forEach(function(dateEl, idx) {
+          dateEl.classList.toggle('cal-date-highlighted', activeIndices.has(idx));
+        });
+      });
+      row.addEventListener('mouseleave', function() {
+        headerDates.forEach(function(dateEl) {
+          dateEl.classList.remove('cal-date-highlighted');
+        });
+      });
+    });
+  });
+</script>

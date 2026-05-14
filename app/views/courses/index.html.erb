@@ -1,0 +1,86 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .9;
+    padding: 30px;
+    margin: 20px;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    width: 90%;
+    max-width: 700px;
+}
+
+.next-trip-cost h1 { font-size: 50px; }
+
+table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+th, td { padding: 10px 14px; text-align: left; border: 1px solid #ccc; }
+th { background-color: #f0f0f0; }
+
+.btn-outline-primary-finances {
+    margin: 10px 5px;
+    background-color: white;
+    opacity: .8;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: black !important;
+    border: 1px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-outline-primary-finances:hover { background-color: gray !important; color: white !important; }
+</style>
+
+<div class="next-trip-cost">
+    <h1>Courses</h1>
+
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert"><%= content_tag :div, msg, class: name %></div>
+    <% end %>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @courses.each do |course| %>
+            <tr>
+                <td><%= course.name %></td>
+                <td><%= course.address %></td>
+                <td><%= link_to "Edit", edit_course_path(course), class: 'btn-outline-primary-finances' %></td>
+            </tr>
+            <% end %>
+            <% if @courses.empty? %>
+            <tr><td colspan="3">No courses yet.</td></tr>
+            <% end %>
+        </tbody>
+    </table>
+
+    <%= button_to "Add Course", new_course_path, method: :get, class: 'btn-outline-primary-finances' %>
+    <%= button_to "Back to Dashboard", '/dashboard', method: :get, class: 'btn-outline-primary-finances' %>
+</div>

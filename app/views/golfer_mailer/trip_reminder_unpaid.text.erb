@@ -1,0 +1,26 @@
+KPC <%= @trip.number %> - One Month Out (Balance Due)
+
+Hey <%= @golfer.nickname %>,
+
+Hey <%= @golfer.nickname %>, we're one month out from KPC <%= @trip.number %>! You still have a balance due. Please settle up before the trip starts on <%= @trip.start_date.strftime("%A, %B %-d") %>
+
+OUTSTANDING BALANCE: $<%= number_with_delimiter(@golfer_trip.balance) %>
+
+PAY UP!
+Send payment to <%= ENV["TREASURER_NAME"] %>:
+  Venmo:  <%= ENV["TREASURER_VENMO"] %>
+  PayPal: <%= ENV["TREASURER_PAYPAL"] %>
+
+YOUR ITINERARY
+<% if @nights.any? %>
+Nights:
+<% @nights.each do |night| %>
+  <%= night.date.strftime("%A, %B %-d") %> — $<%= number_with_delimiter(night.cost) %>
+<% end %>
+<% end %>
+<% if @rounds.any? %>
+Rounds:
+<% @rounds.each do |round| %>
+  <%= round.date.strftime("%A, %B %-d") %> — <%= round.cost == 0 ? "à la carte" : "$#{number_with_delimiter(round.cost)}" %>
+<% end %>
+<% end %>

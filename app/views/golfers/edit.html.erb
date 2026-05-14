@@ -1,0 +1,167 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    flex-flow: column;
+    color: #fff;
+    font-size: 40px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_5.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+  background-color: #fff;
+  opacity: .8;
+  padding: 30px 40px;
+  margin: 20px auto;
+  color: black;
+  border-radius: 10px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  font-size: 40px;
+  text-align: left;
+  max-width: 700px;
+  width: 90%;
+}
+
+.next-trip-cost > h1 {
+  font-size: 80px;
+  text-align: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 10px 0;
+}
+
+.form-group label {
+  font-size: 0.5em;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.4em;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.btn-outline-primary-finances {
+  margin: 20px;
+  background-color: white;
+  opacity: .8;
+  padding: 20px;
+  font-size: 0.5em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  border-radius: 10px;
+}
+
+.btn-outline-primary-finances:hover {
+  background-color: gray !important;
+}
+
+.btn-outline-primary-finances:focus, .btn-outline-primary-finances:active:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.btn-outline-primary {
+  margin: 20px;
+  background-color: white;
+  opacity: .8;
+  padding: 20px;
+  font-size: .5em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  border-radius: 10px;
+}
+
+.btn-outline-primary:hover {
+  background-color: gray !important;
+}
+
+.btn-outline-primary:focus, .btn-outline-primary:active:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.line {
+  border-top: 5px solid black;
+}
+
+@media (max-width: 800px) {
+  body {
+    align-items: stretch;
+  }
+}
+</style>
+
+<div class="next-trip-cost">
+  <% flash.each do |name, msg| %>
+    <div class="alert" role="alert">
+      <%= content_tag :div, msg, class: name %>
+    </div>
+  <% end %>
+  <h1>Edit Profile</h1>
+  <hr class="line">
+
+  <%= form_with url: "/profile", method: :patch, local: true do |form| %>
+    <div class="form-group">
+      <%= form.label :email, "Email" %>
+      <%= form.text_field :email, value: @golfer.email, placeholder: "Email" %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :nickname, "Nickname" %>
+      <%= form.text_field :nickname, value: @golfer.nickname, placeholder: "Nickname" %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :t_shirt_size, "T-Shirt Size" %>
+      <%= form.select :t_shirt_size,
+            [["S", "s"], ["M", "m"], ["L", "l"], ["XL", "xl"], ["XXL", "xxl"], ["XXXL", "xxxl"]],
+            { selected: @golfer.t_shirt_size, include_blank: "Select a size" } %>
+    </div>
+
+    <%= form.submit "Save Changes", class: "btn btn-outline-primary-finances" %>
+  <% end %>
+
+  <hr class="line">
+  <form action="/dashboard">
+    <button type="submit" class="btn btn-outline-primary">DASHBOARD</button>
+  </form>
+</div>

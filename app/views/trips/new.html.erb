@@ -1,0 +1,190 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .9;
+    padding: 30px;
+    margin: 20px;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    width: 90%;
+    max-width: 900px;
+}
+
+.next-trip-cost h1 { font-size: 50px; }
+.next-trip-cost h2 { font-size: 35px; }
+
+table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #ccc; }
+th { background-color: #f0f0f0; }
+
+input[type="text"], input[type="number"], input[type="date"], select {
+    padding: 6px 10px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-outline-primary-finances {
+    margin: 10px 5px;
+    background-color: white;
+    opacity: .8;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: black !important;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.btn-outline-primary-finances:hover { background-color: gray !important; }
+
+.btn-danger {
+    background-color: rgb(222, 74, 72);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.new-course-fields { display: none; margin-top: 6px; }
+</style>
+
+<div class="next-trip-cost">
+    <h1>Create New Trip</h1>
+
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert"><%= content_tag :div, msg, class: name %></div>
+    <% end %>
+
+    <%= form_with model: @trip, url: '/trips', method: :post, local: true do |form| %>
+
+        <h2>Trip Details</h2>
+        <table>
+            <tr>
+                <th>Year</th>
+                <th>Number (Roman)</th>
+                <th>Location</th>
+                <th>Start Date</th>
+            </tr>
+            <tr>
+                <td><%= form.text_field :year %></td>
+                <td><%= form.text_field :number %></td>
+                <td><%= form.text_field :location %></td>
+                <td><%= form.text_field :start_date, placeholder: 'YYYY-MM-DD' %></td>
+            </tr>
+        </table>
+
+        <h2>Nights</h2>
+        <table id="nights-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Cost ($)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="nights-body">
+            </tbody>
+        </table>
+        <button type="button" class="btn-outline-primary-finances" onclick="addNight()">+ Add Night</button>
+
+        <h2>Rounds</h2>
+        <table id="rounds-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Cost ($)</th>
+                    <th>Tee Time</th>
+                    <th>Course</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="rounds-body">
+            </tbody>
+        </table>
+        <button type="button" class="btn-outline-primary-finances" onclick="addRound()">+ Add Round</button>
+
+        <br><br>
+        <input type="submit" value="Create Trip" class="btn-outline-primary-finances">
+        <button type="button" class="btn-outline-primary-finances" onclick="window.location='/dashboard'">Cancel</button>
+
+    <% end %>
+</div>
+
+<script>
+var nightIndex = 0;
+var roundIndex = 0;
+var courseOptions = '<option value="">None</option>' +
+    '<% @courses.each do |c| %>' +
+    '<option value="<%= c.id %>"><%= j c.name %></option>' +
+    '<% end %>' +
+    '<option value="new">New Course...</option>';
+
+function addNight() {
+    var idx = nightIndex++;
+    var row = document.createElement('tr');
+    row.id = 'night-row-' + idx;
+    row.innerHTML =
+        '<td><input type="date" name="new_nights[' + idx + '][date]"></td>' +
+        '<td><input type="number" name="new_nights[' + idx + '][cost]" min="0"></td>' +
+        '<td><button type="button" class="btn-danger" onclick="removeRow(this)">Remove</button></td>';
+    document.getElementById('nights-body').appendChild(row);
+}
+
+function addRound() {
+    var idx = roundIndex++;
+    var row = document.createElement('tr');
+    row.id = 'round-row-' + idx;
+    row.innerHTML =
+        '<td><input type="date" name="new_rounds[' + idx + '][date]"></td>' +
+        '<td><input type="number" name="new_rounds[' + idx + '][cost]" min="0"></td>' +
+        '<td><input type="text" name="new_rounds[' + idx + '][tee_time]" placeholder="e.g. 7:30 AM"></td>' +
+        '<td>' +
+            '<select name="new_rounds[' + idx + '][course_id]" onchange="toggleNewCourse(this)">' +
+                courseOptions +
+            '</select>' +
+            '<div class="new-course-fields" id="new-course-' + idx + '">' +
+                '<input type="text" name="new_rounds[' + idx + '][new_course_name]" placeholder="Course name">' +
+                '<input type="text" name="new_rounds[' + idx + '][new_course_address]" placeholder="Address">' +
+            '</div>' +
+        '</td>' +
+        '<td><button type="button" class="btn-danger" onclick="removeRow(this)">Remove</button></td>';
+    document.getElementById('rounds-body').appendChild(row);
+}
+
+function removeRow(btn) {
+    btn.closest('tr').remove();
+}
+
+function toggleNewCourse(select) {
+    var row = select.closest('tr');
+    var newFields = row.querySelector('.new-course-fields');
+    if (newFields) {
+        newFields.style.display = (select.value === 'new') ? 'block' : 'none';
+    }
+}
+</script>

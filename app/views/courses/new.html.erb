@@ -1,0 +1,78 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .9;
+    padding: 30px;
+    margin: 20px;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    width: 90%;
+    max-width: 500px;
+}
+
+.next-trip-cost h1 { font-size: 45px; }
+
+label { display: block; font-weight: bold; margin-top: 15px; }
+input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 4px;
+}
+
+.btn-outline-primary-finances {
+    margin: 10px 5px;
+    background-color: white;
+    opacity: .8;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: black !important;
+    border: 1px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+.btn-outline-primary-finances:hover { background-color: gray !important; }
+</style>
+
+<div class="next-trip-cost">
+    <h1>New Course</h1>
+
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert"><%= content_tag :div, msg, class: name %></div>
+    <% end %>
+
+    <%= form_with model: @course, url: '/courses', method: :post, local: true do |form| %>
+        <label>Name *</label>
+        <%= form.text_field :name %>
+
+        <label>Address</label>
+        <%= form.text_field :address %>
+
+        <br><br>
+        <%= form.submit "Create Course", class: 'btn-outline-primary-finances' %>
+        <%= button_to "Cancel", courses_path, method: :get, class: 'btn-outline-primary-finances' %>
+    <% end %>
+</div>

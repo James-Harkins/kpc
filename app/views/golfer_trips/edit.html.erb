@@ -1,0 +1,213 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_6.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .9;
+    padding: 30px;
+    margin: 20px;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    width: 90%;
+    max-width: 700px;
+}
+
+.next-trip-cost h1 { font-size: 40px; }
+.next-trip-cost h2 { font-size: 28px; }
+.next-trip-cost h3 { font-size: 22px; }
+
+.cost-summary {
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1em;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+
+.overpayment-warning {
+    background-color: #ffe0e0;
+    border: 2px solid red;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    color: #900;
+}
+
+.btn-outline-primary-finances {
+    margin: 10px 5px;
+    background-color: white;
+    opacity: .8;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: black !important;
+    border: 1px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+.btn-outline-primary-finances:hover { background-color: gray !important; }
+.btn-outline-primary-finances:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.line-thin { border-top: 1px solid #ccc; margin: 10px 0; }
+</style>
+
+<div class="next-trip-cost">
+    <h1>Edit Trip for <%= @golfer.first_name.capitalize.strip %> "<%= @golfer.nickname.titleize.strip %>" <%= @golfer.last_name.capitalize.strip %></h1>
+    <h2>KPC <%= @trip.number %> (<%= @trip.year %>)</h2>
+
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert"><%= content_tag :div, msg, class: name %></div>
+    <% end %>
+
+    <div class="cost-summary">
+        <h3>Current Cost: $<%= number_with_delimiter(@golfer_trip.cost) %></h3>
+        <h3>Total Paid: $<%= number_with_delimiter(@total_paid) %></h3>
+        <h3>Current Balance: $<%= number_with_delimiter(@golfer_trip.balance) %></h3>
+        <h3>Projected Cost: $<span id="projected-cost">0</span></h3>
+    </div>
+
+    <% if @overpayment_warning %>
+    <div class="overpayment-warning">
+        <strong>Warning: Overpayment</strong><br>
+        The new cost ($<%= number_with_delimiter(@trip.nights.where(id: @selected_night_ids).sum(:cost) + @trip.rounds.where(id: @selected_round_ids).sum(:cost)) %>) is less than the total paid ($<%= number_with_delimiter(@total_paid) %>).
+        The balance will be set to $0.<br><br>
+        <label>
+            <input type="checkbox" id="confirm-overpayment-check" onchange="updateSubmitState()">
+            I understand, proceed anyway
+        </label>
+    </div>
+    <% end %>
+
+    <%= form_with url: golfer_trip_path(@golfer_trip), method: :patch, local: true, id: 'edit-golfer-trip-form' do |form| %>
+
+        <% if @overpayment_warning %>
+            <input type="hidden" name="confirm_overpayment" id="confirm-overpayment-hidden" value="0">
+        <% end %>
+
+        <h2>Nights</h2>
+        <% @trip.nights.order(:date).each do |night| %>
+        <div class="checkbox-item">
+            <input type="checkbox"
+                   name="nights[]"
+                   value="<%= night.id %>"
+                   id="night-<%= night.id %>"
+                   data-cost="<%= night.cost %>"
+                   <%= 'checked' if (@selected_night_ids || []).include?(night.id) %>
+                   onchange="updateProjectedCost()">
+            <label for="night-<%= night.id %>">
+                <%= night.date.strftime('%A, %B %d, %Y') %> &mdash; $<%= number_with_delimiter(night.cost) %>
+            </label>
+        </div>
+        <% end %>
+
+        <hr class="line-thin">
+        <h2>Rounds</h2>
+        <% @trip.rounds.order(:date).each do |round| %>
+        <div class="checkbox-item">
+            <input type="checkbox"
+                   name="rounds[]"
+                   value="<%= round.id %>"
+                   id="round-<%= round.id %>"
+                   data-cost="<%= round.cost %>"
+                   <%= 'checked' if (@selected_round_ids || []).include?(round.id) %>
+                   onchange="updateProjectedCost()">
+            <label for="round-<%= round.id %>">
+                <%= round.date.strftime('%A, %B %d, %Y') %>
+                <% if round.tee_time.present? %> &mdash; <%= round.tee_time %><% end %>
+                <% if round.course.present? %> @ <%= round.course.name %><% end %>
+                &mdash; $<%= number_with_delimiter(round.cost) %>
+            </label>
+        </div>
+        <% end %>
+
+        <br>
+        <%= form.submit "Save Changes", class: 'btn-outline-primary-finances', id: 'submit-btn' %>
+        <%= button_to "Cancel", "/finances?trip_id=#{@trip.id}", method: :get, class: 'btn-outline-primary-finances' %>
+
+    <% end %>
+</div>
+
+<script>
+var nightCosts = {};
+var roundCosts = {};
+var totalNights = 0;
+var totalRounds = 0;
+var firstNightCost = <%= @trip.nights.order(:date).first&.cost || 0 %>;
+var hasOverpaymentWarning = <%= @overpayment_warning ? 'true' : 'false' %>;
+
+document.querySelectorAll('input[name="nights[]"]').forEach(function(cb) {
+    nightCosts[cb.value] = parseInt(cb.dataset.cost) || 0;
+    totalNights++;
+});
+document.querySelectorAll('input[name="rounds[]"]').forEach(function(cb) {
+    roundCosts[cb.value] = parseInt(cb.dataset.cost) || 0;
+    totalRounds++;
+});
+
+function updateProjectedCost() {
+    var nightsChecked = document.querySelectorAll('input[name="nights[]"]:checked');
+    var roundsChecked = document.querySelectorAll('input[name="rounds[]"]:checked');
+
+    var nightsTotal = 0;
+    nightsChecked.forEach(function(cb) { nightsTotal += nightCosts[cb.value] || 0; });
+
+    var roundsTotal = 0;
+    roundsChecked.forEach(function(cb) { roundsTotal += roundCosts[cb.value] || 0; });
+
+    var isFullTrip = (nightsChecked.length === totalNights && roundsChecked.length === totalRounds);
+    var gross = nightsTotal + roundsTotal;
+    var projected = isFullTrip ? gross - firstNightCost : gross;
+
+    document.getElementById('projected-cost').textContent = projected;
+}
+
+function updateSubmitState() {
+    var submitBtn = document.getElementById('submit-btn');
+    var confirmCheck = document.getElementById('confirm-overpayment-check');
+    var hiddenField = document.getElementById('confirm-overpayment-hidden');
+    if (confirmCheck && confirmCheck.checked) {
+        submitBtn.disabled = false;
+        if (hiddenField) hiddenField.value = '1';
+    } else {
+        submitBtn.disabled = true;
+        if (hiddenField) hiddenField.value = '0';
+    }
+}
+
+updateProjectedCost();
+if (hasOverpaymentWarning) {
+    document.getElementById('submit-btn').disabled = true;
+}
+</script>

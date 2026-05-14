@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>KPC</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= favicon_link_tag asset_path('favicon.ico') %>
+    <style>
+      .flash-message { border-radius: 8px; padding: 12px 18px; margin: 8px 0; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size: 0.9rem; font-weight: bold; }
+      .error  { background-color: #fde8e8; border: 1px solid #e53e3e; color: #9b1c1c; border-radius: 8px; padding: 12px 18px; margin: 8px 0; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size: 1.8rem; }
+      .notice { background-color: #e8f5e9; border: 1px solid #38a169; color: #1c4532; border-radius: 8px; padding: 12px 18px; margin: 8px 0; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size: 1.8rem; }
+      .login  { background-color: #fff8e1; border: 1px solid #d97706; color: #78350f; border-radius: 8px; padding: 12px 18px; margin: 8px 0; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size: 1.8rem; }
+      .alert  { margin: 0; padding: 0; background: none; border: none; }
+    </style>
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    integrity="sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw=="
+    crossorigin="anonymous"/>
+  </head>
+
+  <body>
+    <br>
+    <%= yield %>
+  </body>
+</html>
+
+

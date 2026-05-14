@@ -1,0 +1,89 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_4.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.auth-form-container, .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+    padding: 50px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    color: black;
+    background-color: white;
+    opacity: 0.8;
+    border-radius: 25px;
+}
+
+label {
+    text-align: left;
+    padding: 0.25rem 0;
+}
+
+input {
+    margin: 0.25rem 0;
+    padding: .5rem;
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.auth-form-container > h1 {
+    font-size: 60px;
+    text-align: center;
+}
+
+.back-link {
+    margin-top: 1rem;
+    color: #333;
+    text-decoration: underline;
+    cursor: pointer;
+}
+</style>
+
+<div class="auth-form-container">
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+        </div>
+    <% end %>
+    <h1>FORGOT PASSWORD</h1>
+    <div class="login-form">
+        <p>Enter your email and we'll send you a reset link.</p>
+        <%= form_with url: "/password_resets", method: :post, local: true do |form| %>
+            <div class="label">
+                <%= form.label :email %>
+            </div>
+            <div class="input">
+                <%= form.email_field :email %><br>
+            </div>
+            <div class="button">
+                <%= form.submit "Send Reset Link" %>
+            </div>
+        <% end %>
+        <a class="back-link" href="/login">Back to Login</a>
+    </div>
+</div>

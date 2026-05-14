@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; padding:0; background-color:#f0f0f0; font-family:'Trebuchet MS', Arial, sans-serif;">
+
+  <!-- Outer wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0f0f0; padding:30px 0;">
+    <tr>
+      <td align="center">
+
+        <!-- Card -->
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#1a4d2e; padding:36px 40px; text-align:center;">
+              <div style="font-size:42px; line-height:1; margin-bottom:12px;">⛳</div>
+              <h1 style="color:#ffffff; margin:0 0 8px; font-size:26px; font-weight:bold; letter-spacing:1px;">
+                KPC <%= @trip.number %> &mdash; You're In!
+              </h1>
+              <p style="color:#a8d5b5; margin:0; font-size:15px;">
+                <%= @trip.location %> &bull; <%= @trip.year %>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px 40px;">
+
+              <p style="color:#333333; font-size:16px; margin:0 0 28px; line-height:1.5;">
+                Hey <strong><%= @golfer.nickname %></strong>, you're locked in! Here's what you signed up for:
+              </p>
+
+              <!-- Nights -->
+              <% if @nights.any? %>
+                <h3 style="color:#1a4d2e; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 8px; padding-bottom:6px; border-bottom:2px solid #1a4d2e;">
+                  Nights
+                </h3>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                  <% @nights.each_with_index do |night, i| %>
+                    <tr style="background-color:<%= i.even? ? '#f5faf7' : '#ffffff' %>;">
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; border-bottom:1px solid #e8e8e8;">
+                        <%= night.date.strftime("%A, %B %-d") %>
+                      </td>
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; text-align:right; border-bottom:1px solid #e8e8e8;">
+                        $<%= number_with_delimiter(night.cost) %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+
+              <!-- Rounds -->
+              <% if @rounds.any? %>
+                <h3 style="color:#1a4d2e; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 8px; padding-bottom:6px; border-bottom:2px solid #1a4d2e;">
+                  Rounds
+                </h3>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                  <% @rounds.each_with_index do |round, i| %>
+                    <tr style="background-color:<%= i.even? ? '#f5faf7' : '#ffffff' %>;">
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; border-bottom:1px solid #e8e8e8;">
+                        <%= round.date.strftime("%A, %B %-d") %>
+                      </td>
+                      <td style="padding:10px 12px; color:#333333; font-size:15px; text-align:right; border-bottom:1px solid #e8e8e8;">
+                        <%= round.cost == 0 ? "à la carte" : "$#{number_with_delimiter(round.cost)}" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+
+              <!-- Total -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#1a4d2e; border-radius:6px; margin-bottom:6px;">
+                <tr>
+                  <td style="padding:14px 16px; color:#ffffff; font-size:16px; font-weight:bold;">
+                    Total Owed
+                  </td>
+                  <td style="padding:14px 16px; color:#ffffff; font-size:16px; font-weight:bold; text-align:right;">
+                    $<%= number_with_delimiter(@golfer_trip.balance) %>
+                  </td>
+                </tr>
+              </table>
+
+              <% if @golfer_trip.is_full_trip %>
+                <p style="color:#777777; font-size:13px; font-style:italic; margin:6px 0 28px;">
+                  Full-trip first-night discount applied.
+                </p>
+              <% else %>
+                <div style="margin-bottom:28px;"></div>
+              <% end %>
+
+              <!-- How to Pay -->
+              <h3 style="color:#1a4d2e; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 8px; padding-bottom:6px; border-bottom:2px solid #1a4d2e;">
+                Pay up!
+              </h3>
+              <p style="color:#333333; font-size:15px; margin:0 0 12px;">
+                Send payment to <strong><%= ENV["TREASURER_NAME"] %></strong>:
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:9px 12px; font-size:14px; color:#777777; width:72px; border-bottom:1px solid #e8e8e8;">Venmo</td>
+                  <td style="padding:9px 12px; font-size:14px; color:#333333; border-bottom:1px solid #e8e8e8;"><%= ENV["TREASURER_VENMO"] %></td>
+                </tr>
+                <tr style="background-color:#f5faf7;">
+                  <td style="padding:9px 12px; font-size:14px; color:#777777; border-bottom:1px solid #e8e8e8;">PayPal</td>
+                  <td style="padding:9px 12px; font-size:14px; color:#333333; border-bottom:1px solid #e8e8e8;"><%= ENV["TREASURER_PAYPAL"] %></td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f5faf7; padding:20px 40px; text-align:center; border-top:1px solid #ddeee4;">
+              <p style="color:#aaaaaa; font-size:12px; margin:0;">
+                Kitchen Pass Classic &bull; See you on the course 🏌️
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

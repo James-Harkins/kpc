@@ -1,0 +1,29 @@
+KPC <%= @trip.number %> - You're In!
+
+Hey <%= @golfer.nickname %>,
+
+You're signed up for KPC <%= @trip.number %> in <%= @trip.location %>!
+
+YOUR ITINERARY
+<% if @nights.any? %>
+Nights:
+<% @nights.each do |night| %>
+  <%= night.date.strftime("%A, %B %-d") %> — $<%= number_with_delimiter(night.cost) %>
+<% end %>
+<% end %>
+<% if @rounds.any? %>
+Rounds:
+<% @rounds.each do |round| %>
+  <%= round.date.strftime("%A, %B %-d") %> — <%= round.cost == 0 ? "à la carte" : "$#{number_with_delimiter(round.cost)}" %>
+<% end %>
+<% end %>
+
+TOTAL OWED: $<%= number_with_delimiter(@golfer_trip.balance) %>
+<% if @golfer_trip.is_full_trip %>
+(Your balance includes the full-trip first-night discount.)
+<% end %>
+
+HOW TO PAY - GET YOUR MONEY IN!
+Send payment to <%= ENV["TREASURER_NAME"] %>:
+  Venmo:  <%= ENV["TREASURER_VENMO"] %>
+  PayPal: <%= ENV["TREASURER_PAYPAL"] %>

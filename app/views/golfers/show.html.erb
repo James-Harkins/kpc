@@ -1,0 +1,605 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    flex-flow: column;
+    color: #fff;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.trips {
+    color: #fff;
+    text-align: center;
+    flex-flow: column;
+    color: #fff;
+    font-size: 30px;
+  }
+
+  .title {
+    background-color: #fff;
+    opacity: .8;
+    padding: 20px;
+    margin: 20px;
+    color: black;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+  }
+
+  .title > h1 {
+    font-size: 80px;
+  }
+
+  .next_trip {
+    font-size: 40px;
+    align-items: center;
+  }
+
+   .next-trip-cost {
+    background-color: #fff;
+    opacity: .8;
+    padding: 30px 40px;
+    margin: 20px auto;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    text-align: left;
+    max-width: 900px;
+    width: 90%;
+  }
+
+  .next-trip-cost > h2 {
+    font-size: 60px;
+  }
+
+  .next-trip-cost > h3 {
+    font-size: 40px;
+  }
+
+  .date-card {
+    background-color: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin: 16px 0;
+  }
+
+  .date-card h3 {
+    margin: 0 0 10px 0;
+    font-weight: bold;
+    font-size: 1.1em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 6px;
+  }
+
+  .date-card h4 {
+    margin: 8px 0 2px;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  .date-card h5 {
+    margin: 2px 0 6px 16px;
+    font-size: 0.8em;
+    font-weight: normal;
+    color: #444;
+    line-height: 1.4;
+  }
+
+  .next-trip-link {
+    background: white;
+    width: 50%;
+    color: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(26, 23, 23) 100%);
+    padding: 20px;
+    margin: 20px;
+    text-decoration: none;
+    line-height: 3em;
+    border-radius: 10px;
+  }
+  
+  .next-trip-link:hover {
+    border-bottom: 4px solid #fff;
+    transition: all 0.2s ease-out;
+  }
+
+  .trips__container {
+    display: flex;
+    align-items: center;
+    max-width: 1120px;
+    width: 90%;
+    margin: 0 auto;
+  }
+  
+  .trips__wrapper {
+    position: relative;
+    margin: 50px 0 45px;
+  }
+  
+  .trip__blocks {
+    margin-bottom: 24px;
+    display: flex;
+    /* margin: 1em auto; */
+  }
+  
+  .trip__block {
+    align-items: center;
+    max-width: 1120px;
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex: 1;
+    border-radius: 10px;
+  }
+  
+  .trip__block__div {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    box-shadow: 0 6px 20px rgba(56, 125, 255, 0.17);
+    -webkit-filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
+    filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    padding: 0.5em .25em;
+  }
+  
+  .trip__block__pic-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 67%;
+    overflow: hidden;
+  }
+  
+  .fade-img {
+    animation-name: fade-img;
+    animation-duration: 2s;
+  }
+  
+  .trip__block__img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    transition: all 0.2s linear;
+  }
+  
+  .trip__block__info {
+    background-color: #fff;
+    padding: 20px 30px 30px;
+  }
+  
+  .trip__block__text {
+    color: #252e48;
+    font-size: 18px;
+    line-height: 24px;
+  }
+  
+  @media only screen and (min-width: 1200px) {
+    .content__blog__container {
+      width: 84%;
+    }
+  }
+  
+  @media only screen and (min-width: 1024px) {
+    .trips__blocks {
+      display: flex;
+    }
+  }
+  
+  @media only screen and (max-width: 1024px) {
+    .trips__block {
+      margin-bottom: 2rem;
+    }
+  }
+
+  @media (max-width: 800px) {
+    body {
+      align-items: stretch;
+    }
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 20px;
+}
+
+.button-row form {
+  margin: 0;
+}
+
+.trip-select {
+  margin: 0;
+  background-color: white;
+  opacity: .8;
+  padding: 10px 40px 10px 20px;
+  font-size: 0.85em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='black' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+.trip-select:hover {
+  background-color: gray !important;
+  color: white !important;
+}
+
+.btn-outline-primary{
+  margin: 1rem 0;
+  background-color: white;
+  opacity: .8;
+  padding: 20px;
+  font-size: 1em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+  border-radius: 10px;
+}
+
+.btn-outline-primary-paid{
+  margin: 1rem 0;
+  background-color: white;
+  opacity: .8;
+  padding: 20px;
+  font-size: 1em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+  border-radius: 10px;
+}
+
+.btn-outline-primary-paid:hover {
+    background-color: gray !important;
+}
+
+.btn-outline-primary-paid:focus, .btn-outline-primary-paid:active:focus, .btn.active-outline-primary-paid:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.btn-outline-primary-finances{
+  margin: 1rem 0;
+  background-color: white;
+  opacity: .8;
+  padding: 20px;
+  font-size: 1em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+  border-radius: 10px;
+}
+
+.btn-outline-primary-finances:hover {
+    background-color: gray !important;
+}
+
+.btn-outline-primary-finances:focus, .btn-outline-primary-finances:active:focus, .btn.active-outline-primary-paid:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.btn-outline-danger{
+  margin: 1px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+  font-size: 1.2em;
+  color: black !important;
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border-color: black !important;
+  background-color: rgb(222, 74, 72);
+  font-color: black !important;
+}
+
+.btn-outline-danger:hover {
+    background-color: rgb(191, 146, 112) !important;
+} 
+
+.btn-outline-primary:hover {
+    background-color: gray !important;
+}
+
+.btn-outline-primary:focus, .btn-outline-primary:active:focus, .btn.active-outline-primary:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.line {
+  border-top: 5px solid black;
+}
+
+.line-thin {
+  border-top: 1px solid black;
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+    font-size: .5em;
+}
+
+label {
+    text-align: left;
+    padding: 0.25rem 0;
+}
+
+input {
+    margin: 0.25rem 0;
+    padding: .5rem;
+}
+
+button:hover {
+    background-color: gray !important;
+}
+
+button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
+  outline: 0 none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.iti-calendar {
+  margin: 16px 0 20px;
+}
+
+.iti-dates {
+  display: flex;
+  margin-bottom: 6px;
+  gap: 3px;
+}
+
+.iti-date {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75em;
+  color: #333;
+  line-height: 1.4;
+  font-weight: bold;
+}
+
+.iti-sub {
+  font-size: 0.85em;
+  font-weight: normal;
+  color: #666;
+}
+
+.iti-bar {
+  display: flex;
+  height: 16px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.08);
+  margin-bottom: 5px;
+  gap: 3px;
+}
+
+.iti-segment {
+  flex: 1;
+  height: 100%;
+  background-color: transparent;
+  border-radius: 3px;
+}
+
+.iti-night-active {
+  background-color: #4a90d9;
+}
+
+.iti-round-active {
+  background-color: #e87f3a;
+}
+
+.iti-legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+  font-size: 0.8em;
+  color: #555;
+}
+
+.iti-legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+</style>
+
+<div class='trips'>
+    <% flash.each do |name, msg| %>
+            <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+            </div>
+        <% end %>
+    <div class='title'>
+        <h1>Welcome back, <%= @golfer.nickname.titleize.strip %>!</h1>
+    </div>
+    <br>
+    <% if @golfer.admin? %>
+      <% if @next_trip && !@next_trip.completed? %>
+        <div class="next-trip-cost">
+          <h2 style="text-align: center">KPC <%= @next_trip.number %></h2>
+          <div class="button-row">
+            <%= button_to "Attendance", attendance_path, method: :get, class: 'btn btn-outline-primary-finances', params: { trip_id: @next_trip.id } %>
+            <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] && @editable_trips.any? %>
+              <select class="trip-select" onchange="if(this.value) window.location='/trips/' + this.value + '/edit'">
+                <option value="">Edit Trip</option>
+                <% @editable_trips.each do |trip| %>
+                  <option value="<%= trip.id %>">KPC <%= trip.number %> (<%= trip.year %>)</option>
+                <% end %>
+              </select>
+            <% end %>
+            <%= button_to "Finances", "/finances", method: :get, class: 'btn btn-outline-primary-finances', params: { trip_id: @next_trip.id } %>
+          </div>
+        </div>
+      <% end %>
+      <div class="next-trip-cost">
+        <div class="button-row">
+          <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
+            <%= button_to "Broadcast", "/announcements/new", method: :get, class: 'btn btn-outline-primary-finances' %>
+            <%= button_to "Courses", courses_path, method: :get, class: 'btn btn-outline-primary-finances' %>
+            <%= button_to "Create Trip", new_trip_path, method: :get, class: 'btn btn-outline-primary-finances' %>
+          <% end %>
+          <%= button_to "Previous Trips", previous_trips_path, method: :get, class: 'btn btn-outline-primary-finances' %>
+          <%= button_to "Roster", "/roster", method: :get, class: 'btn btn-outline-primary-finances' %>
+        </div>
+      </div>
+    <% else %>
+      <% if @next_trip.nil? %>
+        <div class='next-trip-cost'>
+          <% if @last_completed_trip %>
+            <h3 style="text-align: center">Stay tuned for KPC <%= next_trip_number(@last_completed_trip.number) %>!</h3>
+          <% else %>
+            <h3 style="text-align: center">Stay tuned for the next KPC!</h3>
+          <% end %>
+        </div>
+      <% else %>
+      <% last_night = @next_trip.nights.order(:date).last %>
+      <% if last_night && last_night.date < Date.today %>
+        <div class='next-trip-cost'>
+          <h3 style="text-align: center">Stay tuned for KPC <%= next_trip_number(@next_trip.number) %>!</h3>
+        </div>
+      <% elsif @golfer_next_trip %>
+        <%
+          trip_nights = @next_trip.nights.order(:date).to_a
+          trip_rounds_by_date = @next_trip.rounds.order(:date).index_by(&:date)
+          golfer_night_ids = @golfer.nights.where(trip_id: @next_trip.id).pluck(:id).to_set
+          golfer_round_ids = @golfer.rounds.where(trip_id: @next_trip.id).pluck(:id).to_set
+          net_paid = @golfer_next_trip.payments.sum(:amount)
+        %>
+        <div class='next-trip-cost'>
+          <h2>KPC <%= @next_trip.number %></h2>
+          <h3><%= @next_trip.location %> &mdash; <%= @next_trip.year %></h3>
+          <hr class="line">
+          <div class="iti-calendar">
+            <div class="iti-dates">
+              <% trip_nights.each do |night| %>
+                <div class="iti-date">
+                  <%= night.date.strftime('%a') %><br>
+                  <span class="iti-sub"><%= night.date.strftime('%b %-d') %></span>
+                </div>
+              <% end %>
+            </div>
+            <div class="iti-bar">
+              <% trip_nights.each do |night| %>
+                <div class="iti-segment <%= 'iti-night-active' if golfer_night_ids.include?(night.id) %>"></div>
+              <% end %>
+            </div>
+            <div class="iti-bar">
+              <% trip_nights.each do |night| %>
+                <% round = trip_rounds_by_date[night.date] %>
+                <div class="iti-segment <%= 'iti-round-active' if round && golfer_round_ids.include?(round.id) %>"></div>
+              <% end %>
+            </div>
+            <div class="iti-legend">
+              <span><span class="iti-legend-dot" style="background:#4a90d9"></span>Nights</span>
+              <span><span class="iti-legend-dot" style="background:#e87f3a"></span>Rounds</span>
+            </div>
+          </div>
+          <% golfer_rounds = @golfer.rounds.where(trip_id: @next_trip.id).order(:date).includes(:course) %>
+          <% if golfer_rounds.any? %>
+            <hr class="line">
+            <h3>Golf Itinerary</h3>
+            <% golfer_rounds.each do |round| %>
+              <div class="date-card">
+                <h3><%= round.date.strftime('%A, %B %-d') %></h3>
+                <% if round.course.present? %>
+                  <h4><%= round.course.name %></h4>
+                  <h5><%= round.course.address %></h5>
+                <% end %>
+                <% if round.tee_time.present? %>
+                  <h4>Tee Time: <%= round.tee_time %></h4>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+          <hr class="line">
+          <h3>Your Balance</h3>
+          <div class="date-card">
+            <h4>Trip Cost: $<%= number_with_delimiter(@golfer_next_trip.cost) %></h4>
+            <h4>Amount Paid: $<%= number_with_delimiter(net_paid) %></h4>
+            <h4>Outstanding Balance: $<%= number_with_delimiter(@golfer_next_trip.balance) %></h4>
+            <% if @golfer_next_trip.is_paid %>
+              <h5 style="color: green; font-weight: bold;">PAID IN FULL</h5>
+            <% end %>
+          </div>
+          <hr class="line">
+          <h3>Payment Instructions</h3>
+          <div class="date-card">
+            <h4>Pay <%= ENV['TREASURER_NAME'] %></h4>
+            <h5>Venmo: <%= ENV['TREASURER_VENMO'] %></h5>
+            <h5>PayPal: <%= ENV['TREASURER_PAYPAL'] %></h5>
+          </div>
+        </div>
+      <% else %>
+        <div class='next-trip-cost'>
+          <%= button_to "Sign up for KPC #{@next_trip.number}", "/register_trip", method: :get, class: "btn btn-outline-primary" %>
+        </div>
+      <% end %>
+      <% end %>
+    <% end %>
+    <br>
+    <% unless @golfer.admin? %>
+      <%= button_to "EDIT PROFILE", "/profile/edit", method: :get, class: "btn btn-outline-primary", id: "dashboard_header" %>
+    <% end %>
+    <%= button_to "LOG OUT", "/logout", method: :delete, class: "btn btn-outline-primary", id: "dashboard_header" %>
+</div>

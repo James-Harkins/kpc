@@ -1,0 +1,165 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    flex-flow: column;
+    color: #fff;
+    font-size: 40px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_3.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.trips {
+    color: #fff;
+    text-align: center;
+    flex-flow: column;
+    font-size: 30px;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .8;
+    padding: 30px 40px;
+    margin: 20px auto;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    font-size: 30px;
+    text-align: left;
+    max-width: 900px;
+    width: 90%;
+}
+
+.next-trip-cost > h1 {
+    font-size: 80px;
+    text-align: center;
+}
+
+.next-trip-cost > h2 {
+    font-size: 55px;
+}
+
+.golfer-card {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin: 8px 0;
+}
+
+.golfer-card h4 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.line {
+    border-top: 5px solid black;
+}
+
+.line-thin {
+    border-top: 1px solid black;
+}
+
+.btn-outline-primary {
+    margin: 20px;
+    background-color: white;
+    opacity: .8;
+    padding: 20px;
+    font-size: 20px;
+    color: black !important;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+        'Lucida Sans', Arial, sans-serif;
+    border-radius: 10px;
+}
+
+.btn-outline-primary:hover {
+    background-color: gray !important;
+}
+
+.btn-outline-primary:focus, .btn-outline-primary:active:focus, .btn.active-outline-primary:focus {
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    font-size: .5em;
+}
+
+button:hover {
+    background-color: gray !important;
+}
+
+button:focus, button:active:focus {
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+@media (max-width: 800px) {
+    body {
+        align-items: stretch;
+    }
+}
+</style>
+
+<div class='trips'>
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+        </div>
+    <% end %>
+
+    <div class="next-trip-cost">
+        <h1>Roster</h1>
+        <hr class="line">
+
+        <h2>Committee Members</h2>
+        <hr class="line">
+        <% @admin_golfers.each do |golfer| %>
+            <div class="golfer-card">
+              <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
+            </div>
+        <% end %>
+
+        <br>
+        <h2>Normies: <%= @default_golfers.size %></h2>
+        <hr class="line">
+        <% @default_golfers.each do |golfer| %>
+            <div class="golfer-card">
+              <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
+            </div>
+        <% end %>
+
+        <br>
+        <form action="/dashboard">
+            <button type="submit" class="btn btn-outline-primary">DASHBOARD</button>
+        </form>
+        <%= button_to "LOG OUT", "/logout", method: :delete, class: "btn btn-outline-primary" %>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+KPC <%= @trip.number %> - Payment Received
+
+Hey <%= @golfer.nickname %>,
+
+We got your payment of $<%= number_with_delimiter(@payment.amount) %>.
+
+Remaining balance: $<%= number_with_delimiter(@golfer_trip.balance) %>
+
+That means you still owe money! Send the rest to <%= ENV["TREASURER_NAME"] %>:
+  Venmo:  <%= ENV["TREASURER_VENMO"] %>
+  PayPal: <%= ENV["TREASURER_PAYPAL"] %>
