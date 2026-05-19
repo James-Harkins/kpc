@@ -302,6 +302,4 @@ The app is containerized with Docker and deployed to [Fly.io](https://fly.io).
 flyctl deploy --remote-only
 ```
 
-Continuous deployment is handled by a GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) that triggers on every push to `main`.
-
 Database migrations run automatically as part of the Fly.io release command before the new version of the app goes live.
