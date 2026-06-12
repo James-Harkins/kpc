@@ -267,40 +267,4 @@ RSpec.describe Golfer, type: :model do
       end
     end
   end
-
-  describe 'class methods' do
-    before do
-      @admin_1 = Golfer.create!(first_name: 'Tony', last_name: 'Soprano', nickname: 'T',
-                                 email: 'tony@badabing.com', password: 'test1234',
-                                 password_confirmation: 'test1234', role: :admin, t_shirt_size: :m)
-      @admin_2 = Golfer.create!(first_name: 'Chris', last_name: 'Moltisanti', nickname: 'C',
-                                 email: 'chris@badabing.com', password: 'test1234',
-                                 password_confirmation: 'test1234', role: :admin, t_shirt_size: :m)
-    end
-
-    describe '.night_admin_count' do
-      it 'returns full admin count for non-excluded dates' do
-        expect(Golfer.night_admin_count('2026-04-20')).to eq(2)
-        expect(Golfer.night_admin_count('2026-04-21')).to eq(2)
-      end
-
-      it 'returns admin count minus 1 for excluded dates (2026-04-18 and 2026-04-19)' do
-        expect(Golfer.night_admin_count('2026-04-18')).to eq(1)
-        expect(Golfer.night_admin_count('2026-04-19')).to eq(1)
-      end
-    end
-
-    describe '.round_admin_count' do
-      it 'returns full admin count for non-excluded dates' do
-        expect(Golfer.round_admin_count('2026-04-21')).to eq(2)
-        expect(Golfer.round_admin_count('2026-04-22')).to eq(2)
-      end
-
-      it 'returns admin count minus 1 for excluded dates (2026-04-18, 2026-04-19, 2026-04-20)' do
-        expect(Golfer.round_admin_count('2026-04-18')).to eq(1)
-        expect(Golfer.round_admin_count('2026-04-19')).to eq(1)
-        expect(Golfer.round_admin_count('2026-04-20')).to eq(1)
-      end
-    end
-  end
 end

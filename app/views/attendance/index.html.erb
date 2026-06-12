@@ -224,7 +224,7 @@ body::before {
 
     <% adm_nights = @next_trip.nights.order(:date).to_a %>
     <% adm_rounds_by_date = @next_trip.rounds.order(:date).index_by(&:date) %>
-    <% adm_golfers = @next_trip.golfers.where(role: :default).order(:nickname) %>
+    <% adm_golfers = @next_trip.golfers.order(:nickname) %>
 
     <% if adm_nights.any? && adm_golfers.any? %>
         <div class="attendance-grid">
@@ -270,12 +270,10 @@ body::before {
     <% @next_trip.sort_by_calendar_admin.each do |date| %>
         <div class="date-card">
             <h3><%= date[:date] %></h3>
-            <h4>House Attendance: <%= date[:house_attendance] + Golfer.night_admin_count(date[:date]) %></h4>
-            <h5>Chrissy, Dog, Tortellini<%= ', Tony' if Date.parse(date[:date]) != Date.parse('2026-04-18') && Date.parse(date[:date]) != Date.parse('2026-04-19') %></h5>
+            <h4>House Attendance: <%= date[:house_attendance] %></h4>
             <h5><%= date[:house_attendance_list].join(', ') %></h5>
             <% if !date[:round_attendance].nil? %>
-                <h4>Round Attendance: <%= date[:round_attendance] + Golfer.round_admin_count(date[:date]) %></h4>
-                <h5>Chrissy, Dog, Tortellini<%= ', Tony' if Date.parse(date[:date]) != Date.parse('2026-04-19') && Date.parse(date[:date]) != Date.parse('2026-04-20') %></h5>
+                <h4>Round Attendance: <%= date[:round_attendance] %></h4>
                 <h5><%= date[:round_attendance_list].join(', ') %></h5>
             <% end %>
         </div>

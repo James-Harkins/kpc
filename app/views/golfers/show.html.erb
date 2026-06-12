@@ -489,6 +489,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               </select>
             <% end %>
             <%= button_to "Finances", "/finances", method: :get, class: 'btn btn-outline-primary-finances', params: { trip_id: @next_trip.id } %>
+            <% unless @golfer_next_trip %>
+              <%= button_to "Register for KPC #{@next_trip.number}", "/register_trip", method: :get, class: 'btn btn-outline-primary-finances' %>
+            <% end %>
           </div>
         </div>
       <% end %>

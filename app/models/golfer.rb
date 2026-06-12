@@ -60,22 +60,6 @@ class Golfer < ApplicationRecord
     registered
   end
 
-  def self.night_admin_count(date)
-    if Date.parse(date) != Date.parse('2026-04-18') && Date.parse(date) != Date.parse('2026-04-19')
-      where(role: :admin).count
-    else 
-      where(role: :admin).count - 1
-    end
-  end
-
-  def self.round_admin_count(date)
-    if Date.parse(date) != Date.parse('2026-04-18') && Date.parse(date) != Date.parse('2026-04-19') && Date.parse(date) != Date.parse('2026-04-20')
-      where(role: :admin).count
-    else 
-      where(role: :admin).count - 1
-    end
-  end
-
   def trip_night_calendar(trip_id)
     nights.where(trip_id: trip_id).map {|night| night.date.strftime('%A')}
   end

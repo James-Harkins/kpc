@@ -26,11 +26,16 @@ class GolferTripsController < ApplicationController
     golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
 
     if golfer_trip.save
-      cost = golfer.trip_net_total_cost(trip.id)
-      golfer_trip.cost = cost
-      golfer_trip.balance = cost
+      if golfer.admin?
+        golfer_trip.cost    = 0
+        golfer_trip.balance = 0
+        golfer_trip.is_paid = true
+      else
+        golfer_trip.cost    = golfer.trip_net_total_cost(trip.id)
+        golfer_trip.balance = golfer_trip.cost
+      end
       golfer_trip.save
-      GolferMailer.trip_signup(golfer, golfer_trip).deliver_now
+      GolferMailer.trip_signup(golfer, golfer_trip).deliver_now unless golfer.admin?
       redirect_to "/dashboard"
     else
       flash[:error] = golfer.errors.full_messages.to_sentence + "."
@@ -121,10 +126,17 @@ class GolferTripsController < ApplicationController
     new_balance = [new_cost - @total_paid, 0].max
     new_is_paid = new_balance == 0
 
-    @golfer_trip.cost = new_cost
-    @golfer_trip.balance = new_balance
-    @golfer_trip.is_full_trip = is_full_trip
-    @golfer_trip.is_paid = new_is_paid
+    if @golfer.admin?
+      @golfer_trip.cost         = 0
+      @golfer_trip.balance      = 0
+      @golfer_trip.is_full_trip = is_full_trip
+      @golfer_trip.is_paid      = true
+    else
+      @golfer_trip.cost         = new_cost
+      @golfer_trip.balance      = new_balance
+      @golfer_trip.is_full_trip = is_full_trip
+      @golfer_trip.is_paid      = new_is_paid
+    end
     @golfer_trip.save!
 
     redirect_to "/finances?trip_id=#{@trip.id}"

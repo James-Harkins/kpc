@@ -408,3 +408,13 @@ set_score(@sal,         @trip_5_course_4, 97)
 set_score(@carlo,       @trip_5_course_4, 98)
 set_score(@junior,      @trip_5_course_4, 106)
 set_score(@ralph,       @trip_5_course_4, 94)
+
+# Admin registrations for Trip 5 — zero cost (committee members)
+# Tony is intentionally left unregistered to test the register flow in dev
+[@silvio, @paulie].each do |admin|
+  admin.golfer_trips.create!(trip: @trip_5, is_full_trip: true, cost: 0, balance: 0, is_paid: true)
+  [@night_1_trip_5, @night_2_trip_5, @night_3_trip_5, @night_4_trip_5,
+   @night_5_trip_5, @night_6_trip_5, @night_7_trip_5].each { |n| admin.golfer_nights.create!(night: n) }
+  [@trip_5_course_1, @trip_5_course_2, @trip_5_course_3, @trip_5_course_4,
+   @trip_5_course_5, @trip_5_course_6].each { |r| admin.golfer_rounds.create!(round: r) }
+end

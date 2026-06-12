@@ -656,7 +656,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     <hr class="line">
     <% trip_nights = @next_trip.nights.order(:date).to_a %>
     <% trip_rounds_by_date = @next_trip.rounds.order(:date).index_by(&:date) %>
-    <% paid_trips = @next_trip.paid_golfer_trips %>
+    <% paid_trips = @next_trip.paid_golfer_trips.select { |gt| gt.golfer.default? } %>
     <% if paid_trips.any? %>
       <h3><u>Paid:</u></h3>
     <% else %>
@@ -712,7 +712,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         </div>
     <% end %>
     <hr class="line">
-    <% unpaid_trips = @next_trip.unpaid_golfer_trips %>
+    <% unpaid_trips = @next_trip.unpaid_golfer_trips.select { |gt| gt.golfer.default? } %>
     <% if unpaid_trips.any? %>
       <h3><u>Unpaid:</u></h3>
     <% else %>
