@@ -208,7 +208,7 @@ bundle exec rspec spec/models/
 bundle exec rspec spec/models/tournament_assignment_spec.rb
 ```
 
-Uses `shoulda-matchers` for one-liner relationship/validation assertions. Database is cleaned via transactional fixtures (`use_transactional_fixtures = true`). No FactoryBot factories — tests use direct `Model.create!` calls.
+Uses `shoulda-matchers` for one-liner relationship/validation assertions. Database is cleaned via transactional fixtures (`use_transactional_fixtures = true`). Existing tests use direct `Model.create!` calls; new tests should use FactoryBot factories for scalability.
 
 ---
 
