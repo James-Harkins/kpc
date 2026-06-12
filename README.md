@@ -18,7 +18,8 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 - **Return Processing** — Issue refunds when a golfer's cost is reduced after they've already paid; overpayment is flagged with a warning before processing
 - **Golfer Trip Editing** — Modify which nights and rounds a golfer is attending after registration; cost and balance recalculate automatically
 - **Expense Tracking** — Log and manage trip expenses
-- **Attendance Calendar** — Visual grid of which golfers are attending each night and playing each round
+- **Admin Trip Registration** — Admins register for trips like any other golfer (selecting nights and rounds), but their cost and balance are always forced to $0 and marked paid immediately; admin registrations are excluded from the finances paid/unpaid display and do not trigger a signup confirmation email
+- **Attendance Calendar** — Visual grid of all registered golfers (including admins) showing which nights and rounds each person is attending
 - **Course Management** — Maintain a database of golf courses with address information
 - **Trip Announcements** — Send announcements to all registered golfers via email
 - **Previous Trips** — Historical archive of past trips with attendance and financial records
@@ -35,7 +36,7 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 
 ### Automated Workflows
 - **Pre-trip reminder emails** — A GitHub Actions scheduled job runs daily starting in the weeks before the trip and sends reminder emails to golfers with outstanding balances; the workflow self-disables after March 1
-- **Transactional emails** — Trip signup confirmation, payment received, and balance paid emails fire automatically on the corresponding events
+- **Transactional emails** — Trip signup confirmation, payment received, and balance paid emails fire automatically on the corresponding events; trip signup emails are suppressed for admin golfers
 
 ---
 
@@ -262,7 +263,8 @@ The dashboard (`/dashboard`) derives its state from two independent signals: `Tr
 
 | Condition | Trip card (Attendance / Finances / Edit) | Global tools card |
 |---|---|---|
-| `Trip.current` exists, not completed | Shown | Always shown |
+| `Trip.current` exists, not completed, admin registered | Shown | Always shown |
+| `Trip.current` exists, not completed, admin not registered | Shown — includes "Register for KPC X" button | Always shown |
 | `Trip.current` exists, completed | Hidden | Always shown |
 | No current trip (`CURRENT_TRIP_NUMBER` unset or unmatched) | Hidden | Always shown |
 
