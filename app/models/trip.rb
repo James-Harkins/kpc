@@ -5,11 +5,17 @@ class Trip < ApplicationRecord
   has_many :golfers, through: :golfer_trips
   has_many :expenses
   has_one :trip_financial_summary
+  has_many :tournament_assignments
+  has_many :tournament_matchup_results, through: :rounds
+
+  belongs_to :captain_a, class_name: 'Golfer', optional: true, foreign_key: 'captain_a_id'
+  belongs_to :captain_b, class_name: 'Golfer', optional: true, foreign_key: 'captain_b_id'
 
   validates :year, presence: true
   validates :number, presence: true
   validates :location, presence: true
   validates :start_date, presence: true
+  validate :captains_must_be_different
 
   def self.current
     where(number: ENV['CURRENT_TRIP_NUMBER']).first
@@ -149,5 +155,12 @@ class Trip < ApplicationRecord
     end
 
     settlements
+  end
+
+  private
+
+  def captains_must_be_different
+    return unless captain_a_id.present? && captain_b_id.present?
+    errors.add(:base, "Team captains must be different golfers") if captain_a_id == captain_b_id
   end
 end

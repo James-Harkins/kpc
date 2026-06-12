@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_04_30_135025) do
+ActiveRecord::Schema.define(version: 2026_06_12_000002) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(version: 2026_04_30_135025) do
     t.bigint "round_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "score"
     t.index ["golfer_id", "round_id"], name: "index_golfer_rounds_on_golfer_id_and_round_id", unique: true
     t.index ["golfer_id"], name: "index_golfer_rounds_on_golfer_id"
     t.index ["round_id"], name: "index_golfer_rounds_on_round_id"
@@ -104,7 +105,33 @@ ActiveRecord::Schema.define(version: 2026_04_30_135025) do
     t.datetime "updated_at", null: false
     t.integer "course_id"
     t.string "tee_time"
+    t.boolean "is_tournament_round", default: false, null: false
     t.index ["trip_id"], name: "index_rounds_on_trip_id"
+  end
+
+  create_table "tournament_assignments", force: :cascade do |t|
+    t.bigint "trip_id", null: false
+    t.bigint "golfer_id", null: false
+    t.bigint "round_id", null: false
+    t.string "team", null: false
+    t.integer "matchup_group", null: false
+    t.string "match_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["golfer_id"], name: "index_tournament_assignments_on_golfer_id"
+    t.index ["round_id"], name: "index_tournament_assignments_on_round_id"
+    t.index ["trip_id", "golfer_id", "round_id"], name: "index_tournament_assignments_on_trip_golfer_round", unique: true
+    t.index ["trip_id"], name: "index_tournament_assignments_on_trip_id"
+  end
+
+  create_table "tournament_matchup_results", force: :cascade do |t|
+    t.bigint "round_id", null: false
+    t.integer "matchup_group", null: false
+    t.string "result", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["round_id", "matchup_group"], name: "index_tournament_matchup_results_on_round_and_group", unique: true
+    t.index ["round_id"], name: "index_tournament_matchup_results_on_round_id"
   end
 
   create_table "trip_financial_summaries", force: :cascade do |t|
@@ -127,6 +154,12 @@ ActiveRecord::Schema.define(version: 2026_04_30_135025) do
     t.datetime "updated_at", null: false
     t.datetime "start_date"
     t.boolean "completed", default: false, null: false
+    t.string "team_a_name"
+    t.string "team_b_name"
+    t.bigint "captain_a_id"
+    t.bigint "captain_b_id"
+    t.index ["captain_a_id"], name: "index_trips_on_captain_a_id"
+    t.index ["captain_b_id"], name: "index_trips_on_captain_b_id"
   end
 
   add_foreign_key "expenses", "golfers"
@@ -140,5 +173,11 @@ ActiveRecord::Schema.define(version: 2026_04_30_135025) do
   add_foreign_key "nights", "trips"
   add_foreign_key "payments", "golfer_trips"
   add_foreign_key "rounds", "trips"
+  add_foreign_key "tournament_assignments", "golfers"
+  add_foreign_key "tournament_assignments", "rounds"
+  add_foreign_key "tournament_assignments", "trips"
+  add_foreign_key "tournament_matchup_results", "rounds"
   add_foreign_key "trip_financial_summaries", "trips"
+  add_foreign_key "trips", "golfers", column: "captain_a_id"
+  add_foreign_key "trips", "golfers", column: "captain_b_id"
 end

@@ -501,7 +501,15 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% end %>
           <%= button_to "Previous Trips", previous_trips_path, method: :get, class: 'btn btn-outline-primary-finances' %>
           <%= button_to "Roster", "/roster", method: :get, class: 'btn btn-outline-primary-finances' %>
+          <%= button_to "Tournament", tournament_path, method: :get, class: 'btn btn-outline-primary-finances' %>
         </div>
+        <% if @next_trip %>
+          <div class="button-row">
+            <% @next_trip.rounds.non_tournament.order(:date).each do |round| %>
+              <%= button_to "Scores: #{round.date.strftime('%b %-d')}#{round.course ? ' — ' + round.course.name : ''}", edit_round_scores_path(round), method: :get, class: 'btn btn-outline-primary-finances' %>
+            <% end %>
+          </div>
+        <% end %>
       </div>
     <% else %>
       <% if @next_trip.nil? %>

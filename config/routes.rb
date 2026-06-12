@@ -60,4 +60,20 @@ Rails.application.routes.draw do
   # Golfer trip admin editing
   get   '/golfer_trips/:id/edit', to: 'golfer_trips#edit',         as: :edit_golfer_trip
   patch '/golfer_trips/:id',      to: 'golfer_trips#admin_update', as: :golfer_trip
+
+  # Tournament
+  get   '/tournament',          to: 'tournaments#index',       as: :tournament
+  post  '/tournament/generate', to: 'tournaments#generate',    as: :generate_tournament
+  post  '/tournament/redraw',   to: 'tournaments#redraw',      as: :redraw_tournament
+  patch '/tournament/captains', to: 'tournaments#update_captains', as: :tournament_captains
+
+  # Round score entry
+  get   '/rounds/:id/scores', to: 'golfer_rounds#edit',   as: :edit_round_scores
+  patch '/rounds/:id/scores', to: 'golfer_rounds#update', as: :round_scores
+
+  # Tournament assignment overrides
+  patch '/tournament_assignments/:id', to: 'tournament_assignments#update', as: :tournament_assignment
+
+  # Tournament matchup results
+  patch '/tournament_matchup_results/:round_id', to: 'tournament_matchup_results#update', as: :tournament_matchup_results
 end

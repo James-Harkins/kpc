@@ -1,0 +1,127 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.scores-container {
+    background-color: #fff;
+    opacity: .95;
+    padding: 30px;
+    margin: 20px auto;
+    color: black;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 700px;
+}
+
+.scores-container h1 { font-size: 32px; margin-bottom: 6px; }
+.scores-container h2 { font-size: 20px; margin-bottom: 16px; color: #555; font-weight: normal; }
+
+table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #ccc; }
+th { background-color: #f0f0f0; }
+
+input[type="number"] {
+    padding: 6px 8px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 80px;
+}
+
+.btn-save {
+    background-color: #2a6496;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1em;
+}
+
+.btn-save:hover { background-color: #1e4d73; }
+
+.btn-link {
+    background-color: white;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: black;
+    display: inline-block;
+    margin-top: 12px;
+}
+
+.btn-link:hover { background-color: #eee; }
+
+.flash-notice {
+    background-color: #dff0d8;
+    border: 1px solid #3c763d;
+    color: #3c763d;
+    padding: 10px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+</style>
+
+<div class="scores-container">
+  <h1>Enter Scores</h1>
+  <h2>
+    <%= @round.date.strftime('%A, %B %-d, %Y') %>
+    <% if @round.course.present? %>&mdash; <%= @round.course.name %><% end %>
+  </h2>
+
+  <% flash.each do |name, msg| %>
+    <div class="flash-notice"><%= msg %></div>
+  <% end %>
+
+  <% if @golfer_rounds.any? %>
+    <%= form_tag round_scores_path(@round), method: :patch do %>
+      <table>
+        <thead>
+          <tr>
+            <th>Golfer</th>
+            <th>Score (strokes)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @golfer_rounds.each do |gr| %>
+            <tr>
+              <td><%= gr.golfer.nickname.titleize.strip %></td>
+              <td>
+                <input type="number" name="scores[<%= gr.id %>]"
+                       value="<%= gr.score %>"
+                       min="50" max="150">
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <button type="submit" class="btn-save">Save Scores</button>
+    <% end %>
+  <% else %>
+    <p>No golfers are registered for this round.</p>
+  <% end %>
+
+  <br>
+  <%= link_to "← Dashboard", "/dashboard", class: "btn-link" %>
+  <%= link_to "Tournament", tournament_path, class: "btn-link" %>
+</div>

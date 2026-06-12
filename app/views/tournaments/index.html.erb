@@ -1,0 +1,329 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.tournament-container {
+    background-color: #fff;
+    opacity: .95;
+    padding: 30px;
+    margin: 20px auto;
+    color: black;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 1000px;
+}
+
+.tournament-container h1 { font-size: 40px; margin-bottom: 10px; }
+.tournament-container h2 { font-size: 28px; margin: 20px 0 10px; }
+.tournament-container h3 { font-size: 20px; margin: 16px 0 8px; }
+
+table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #ccc; }
+th { background-color: #f0f0f0; }
+
+.round-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    background-color: #fafafa;
+}
+
+.team-cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.team-card {
+    flex: 1;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.tournament-result {
+    text-align: center;
+    font-size: 1.6em;
+    font-weight: bold;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    background-color: #2a6496;
+    color: white;
+}
+
+.btn-action {
+    background-color: white;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    margin-right: 8px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-action:hover { background-color: #eee; }
+
+.btn-generate {
+    background-color: #2a6496;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1em;
+    margin-top: 10px;
+}
+
+.btn-generate:hover { background-color: #1e4d73; }
+
+select.result-select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+    font-size: 0.9em;
+}
+
+.flash-notice {
+    background-color: #dff0d8;
+    border: 1px solid #3c763d;
+    color: #3c763d;
+    padding: 10px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.flash-error {
+    background-color: #f2dede;
+    border: 1px solid #a94442;
+    color: #a94442;
+    padding: 10px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+</style>
+
+<div class="tournament-container">
+  <h1>Tournament</h1>
+
+  <% flash.each do |name, msg| %>
+    <div class="<%= name == 'notice' ? 'flash-notice' : 'flash-error' %>"><%= msg %></div>
+  <% end %>
+
+  <% if @trip.nil? %>
+    <p>No current trip found.</p>
+  <% else %>
+
+    <!-- Captain Selection -->
+    <h2>Team Captains</h2>
+    <%= form_tag tournament_captains_path, method: :patch, style: 'margin-bottom: 20px;' do %>
+      <div style="display:flex; gap:24px; align-items:flex-end; flex-wrap:wrap;">
+        <div>
+          <label style="font-weight:bold; display:block; margin-bottom:4px;"><%= @team_a_name %> Captain</label>
+          <select name="captain_a_id" style="padding:6px; border:1px solid #ccc; border-radius:4px; min-width:160px;">
+            <option value="">— none —</option>
+            <% @trip_golfers.each do |g| %>
+              <option value="<%= g.id %>" <%= 'selected' if @trip.captain_a_id == g.id %>><%= g.nickname.titleize %></option>
+            <% end %>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:bold; display:block; margin-bottom:4px;"><%= @team_b_name %> Captain</label>
+          <select name="captain_b_id" style="padding:6px; border:1px solid #ccc; border-radius:4px; min-width:160px;">
+            <option value="">— none —</option>
+            <% @trip_golfers.each do |g| %>
+              <option value="<%= g.id %>" <%= 'selected' if @trip.captain_b_id == g.id %>><%= g.nickname.titleize %></option>
+            <% end %>
+          </select>
+        </div>
+        <button type="submit" class="btn-action">Save Captains</button>
+      </div>
+    <% end %>
+
+    <!-- Section 4: Generate / Regenerate -->
+    <% if @trip.captain_a_id.present? && @trip.captain_b_id.present? %>
+      <% if @has_assignments %>
+        <%= form_tag generate_tournament_path, method: :post do %>
+          <button type="submit" class="btn-generate"
+                  onclick="return confirm('Regenerate all team assignments? This will overwrite all existing pairings for all tournament rounds.')">
+            Regenerate All Teams
+          </button>
+        <% end %>
+      <% else %>
+        <%= form_tag generate_tournament_path, method: :post do %>
+          <button type="submit" class="btn-generate">Generate Teams</button>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p style="color:#888; margin-top:8px;">Set both team captains above to enable team generation.</p>
+    <% end %>
+
+    <!-- Section 2: Team Standings -->
+    <% if @team_points %>
+      <h2>Team Standings</h2>
+      <div class="team-cards">
+        <div class="team-card"><%= @team_a_name %> &mdash; <%= @team_points["A"] %> pts</div>
+        <div class="team-card"><%= @team_b_name %> &mdash; <%= @team_points["B"] %> pts</div>
+      </div>
+      <% if @team_points["A"] > @team_points["B"] %>
+        <div class="tournament-result"><%= @team_a_name %> wins!</div>
+      <% elsif @team_points["B"] > @team_points["A"] %>
+        <div class="tournament-result"><%= @team_b_name %> wins!</div>
+      <% else %>
+        <div class="tournament-result">Tie</div>
+      <% end %>
+    <% end %>
+
+    <!-- Section 1: Player Rankings -->
+    <% if @ranked_players.any? %>
+      <h2>Player Rankings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Avg Score</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @ranked_players.each_with_index do |p, i| %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td>
+                <%= p[:golfer].nickname.titleize.strip %>
+                <% if p[:golfer].id == @trip.captain_a_id %>
+                  <small style="color:#2a6496;">(Captain, <%= @team_a_name %>)</small>
+                <% elsif p[:golfer].id == @trip.captain_b_id %>
+                  <small style="color:#2a6496;">(Captain, <%= @team_b_name %>)</small>
+                <% end %>
+              </td>
+              <td><%= p[:avg_score] ? "%.1f" % p[:avg_score] : "—" %></td>
+              <td><%= p[:source] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+
+    <!-- Section 3: Per-Round Matchups -->
+    <% if @tournament_rounds.any? %>
+      <h2>Tournament Rounds</h2>
+      <% @tournament_rounds.each do |round| %>
+        <div class="round-card">
+          <h3>
+            <%= round.date.strftime('%A, %B %-d') %>
+            <% if round.course.present? %>&mdash; <%= round.course.name %><% end %>
+          </h3>
+
+          <%= form_tag redraw_tournament_path(round_id: round.id), method: :post, style: 'display:inline' do %>
+            <button type="submit" class="btn-action"
+                    onclick="return confirm('Redraw pairings for this round?')">
+              Redraw Pairings
+            </button>
+          <% end %>
+
+          <% groups = @assignments_by_round[round.id] || {} %>
+          <% if groups.any? %>
+            <%= form_tag tournament_matchup_results_path(round_id: round.id), method: :patch do %>
+              <table style="margin-top: 12px;">
+                <thead>
+                  <tr>
+                    <th>Matchup #</th>
+                    <th>Type</th>
+                    <th><%= @team_a_name %></th>
+                    <th><%= @team_b_name %></th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% groups.sort_by { |g, _| g }.each do |group_num, assignments| %>
+                    <% team_a = assignments.select { |a| a.team == "A" } %>
+                    <% team_b = assignments.select { |a| a.team == "B" } %>
+                    <% match_type = assignments.first.match_type %>
+                    <% existing_result = (@results_by_round[round.id] || {})[group_num] %>
+                    <tr>
+                      <td><%= group_num %></td>
+                      <td><%= match_type %></td>
+                      <td>
+                        <% team_a.each do |a| %>
+                          <%= a.golfer.nickname.titleize.strip %>
+                          <small>(<%= link_to "edit", "#edit-#{a.id}", onclick: "toggleEdit('#{a.id}'); return false;" %>)</small><br>
+                          <div id="edit-<%= a.id %>" style="display:none; margin-top:4px;">
+                            <%= form_tag tournament_assignment_path(a), method: :patch do %>
+                              Team: <select name="team"><option value="A" selected><%= @team_a_name %></option><option value="B"><%= @team_b_name %></option></select>
+                              Group: <input type="number" name="matchup_group" value="<%= a.matchup_group %>" style="width:50px">
+                              <button type="submit" class="btn-action" style="padding:2px 8px">Save</button>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </td>
+                      <td>
+                        <% team_b.each do |a| %>
+                          <%= a.golfer.nickname.titleize.strip %>
+                          <small>(<%= link_to "edit", "#edit-#{a.id}", onclick: "toggleEdit('#{a.id}'); return false;" %>)</small><br>
+                          <div id="edit-<%= a.id %>" style="display:none; margin-top:4px;">
+                            <%= form_tag tournament_assignment_path(a), method: :patch do %>
+                              Team: <select name="team"><option value="A"><%= @team_a_name %></option><option value="B" selected><%= @team_b_name %></option></select>
+                              Group: <input type="number" name="matchup_group" value="<%= a.matchup_group %>" style="width:50px">
+                              <button type="submit" class="btn-action" style="padding:2px 8px">Save</button>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </td>
+                      <td>
+                        <select name="results[<%= group_num %>]" class="result-select">
+                          <option value="">—</option>
+                          <option value="A" <%= 'selected' if existing_result&.result == "A" %>><%= @team_a_name %> wins</option>
+                          <option value="tie" <%= 'selected' if existing_result&.result == "tie" %>>Tie</option>
+                          <option value="B" <%= 'selected' if existing_result&.result == "B" %>><%= @team_b_name %> wins</option>
+                        </select>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+              <button type="submit" class="btn-action" style="margin-top:8px">Save Results</button>
+            <% end %>
+          <% else %>
+            <p style="color:#888; margin-top:8px">No pairings generated for this round yet.</p>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <p>No tournament rounds have been marked on the current trip. Edit the trip to flag rounds as tournament rounds.</p>
+    <% end %>
+
+    <p style="margin-top: 20px;"><%= link_to "← Dashboard", "/dashboard" %></p>
+  <% end %>
+</div>
+
+<script>
+function toggleEdit(id) {
+  var el = document.getElementById('edit-' + id);
+  el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
+</script>

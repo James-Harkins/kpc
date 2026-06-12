@@ -5,6 +5,7 @@ class Golfer < ApplicationRecord
   has_many :nights, through: :golfer_nights
   has_many :golfer_rounds
   has_many :rounds, through: :golfer_rounds
+  has_many :tournament_assignments
 
   validates_presence_of :first_name
   validates_presence_of :last_name

@@ -127,6 +127,7 @@ input[type="text"], input[type="number"], input[type="date"], select {
                     <th>Cost ($)</th>
                     <th>Tee Time</th>
                     <th>Course</th>
+                    <th>Tournament Round</th>
                     <th></th>
                 </tr>
             </thead>
@@ -148,6 +149,9 @@ input[type="text"], input[type="number"], input[type="date"], select {
                             <input type="text" name="rounds[<%= round.id %>][new_course_name]" placeholder="Course name">
                             <input type="text" name="rounds[<%= round.id %>][new_course_address]" placeholder="Address">
                         </div>
+                    </td>
+                    <td style="text-align:center">
+                        <input type="checkbox" name="rounds[<%= round.id %>][is_tournament_round]" value="1" <%= 'checked' if round.is_tournament_round %>>
                     </td>
                     <td></td>
                 </tr>

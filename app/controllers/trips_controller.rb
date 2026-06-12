@@ -88,7 +88,8 @@ class TripsController < ApplicationController
         date: attrs[:date],
         cost: attrs[:cost].to_i,
         tee_time: attrs[:tee_time],
-        course: course
+        course: course,
+        is_tournament_round: attrs[:is_tournament_round] == "1"
       )
     end
   end

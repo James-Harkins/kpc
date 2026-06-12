@@ -3,10 +3,10 @@
 @silvio = Golfer.create!(first_name: 'Silvio', last_name: 'Dante', nickname: 'Sil', email: 'silvio@badabing.com', password: 'badabing5', password_confirmation: 'badabing5', role: :admin, t_shirt_size: :l)
 @paulie = Golfer.create!(first_name: 'Paulie', last_name: 'Gualtieri', nickname: 'Walnuts', email: 'paulie@gualtieri.net', password: 'badabing3', password_confirmation: 'badabing3', role: :admin, t_shirt_size: :l)
 
-@trip_1 = Trip.create!(year: 2013, number: 'XIII', location: 'Dewey Beach')
-@trip_2 = Trip.create!(year: 2014, number: 'XIV', location: 'Rehoboth Beach')
-@trip_3 = Trip.create!(year: 2015, number: 'XV', location: 'VA Beach')
-@trip_4 = Trip.create!(year: 2016, number: 'XVI', location: 'VA Beach')
+@trip_1 = Trip.create!(year: 2013, number: 'XIII', location: 'Dewey Beach',     start_date: Date.parse('2013-04-21'))
+@trip_2 = Trip.create!(year: 2014, number: 'XIV',  location: 'Rehoboth Beach', start_date: Date.parse('2014-04-20'))
+@trip_3 = Trip.create!(year: 2015, number: 'XV',   location: 'VA Beach',       start_date: Date.parse('2015-04-19'))
+@trip_4 = Trip.create!(year: 2016, number: 'XVI',  location: 'VA Beach',       start_date: Date.parse('2016-04-24'))
 
 @night_1_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-21'), cost: 70)
 @night_2_trip_1 = @trip_1.nights.create!(date: Date.parse('2013-04-22'), cost: 70)
@@ -130,8 +130,8 @@
 @trip_5_course_2 = @trip_5.rounds.create!(date: Date.parse('2026-04-20'), cost: 0)
 @trip_5_course_3 = @trip_5.rounds.create!(date: Date.parse('2026-04-21'), cost: 75)
 @trip_5_course_4 = @trip_5.rounds.create!(date: Date.parse('2026-04-22'), cost: 75)
-@trip_5_course_5 = @trip_5.rounds.create!(date: Date.parse('2026-04-23'), cost: 75)
-@trip_5_course_6 = @trip_5.rounds.create!(date: Date.parse('2026-04-24'), cost: 75)
+@trip_5_course_5 = @trip_5.rounds.create!(date: Date.parse('2026-04-23'), cost: 75, is_tournament_round: true)
+@trip_5_course_6 = @trip_5.rounds.create!(date: Date.parse('2026-04-24'), cost: 75, is_tournament_round: true)
 
 # ---------------------------------------------------------------------------
 # Sopranos golfers — 15 trip 5 registrations
@@ -345,3 +345,66 @@
 [@night_2_trip_5, @night_3_trip_5, @night_4_trip_5].each { |n| @jimmy.golfer_nights.create!(night: n) }
 [@trip_5_course_2, @trip_5_course_3].each { |r| @jimmy.golfer_rounds.create!(round: r) }
 @jimmy_trip.payments.create!(amount: 435)
+
+# ---------------------------------------------------------------------------
+# Tournament scoring — Trip 5 (XXVI)
+#
+# Rounds 5 (Apr 23) and 6 (Apr 24) are tournament rounds.
+# Rounds 1–4 are scoring rounds used to rank players before team generation.
+#
+# Tournament participants (golfers in rounds 5 and/or 6):
+#   Full-trip (8): Feech, Christopher, Eugene, Bobby, Vito, Sal, Carlo, Junior
+#   Partial:       Ralph (rounds 4–6), Artie (rounds 5–6)
+#
+# Artie has no non-tournament rounds this trip → demonstrates "no history" fallback.
+#
+# To use Trip 5 as the current trip, set in config/application.yml:
+#   CURRENT_TRIP_NUMBER: "XXVI"
+# ---------------------------------------------------------------------------
+
+def set_score(golfer, round, score)
+  GolferRound.find_by!(golfer: golfer, round: round).update!(score: score)
+end
+
+# Round 1 (Apr 19) — full-trip golfers, Richie, Hesh
+set_score(@feech,       @trip_5_course_1, 74)
+set_score(@christopher, @trip_5_course_1, 80)
+set_score(@eugene,      @trip_5_course_1, 84)
+set_score(@bobby,       @trip_5_course_1, 88)
+set_score(@vito,        @trip_5_course_1, 92)
+set_score(@sal,         @trip_5_course_1, 96)
+set_score(@carlo,       @trip_5_course_1, 99)
+set_score(@junior,      @trip_5_course_1, 103)
+
+# Round 2 (Apr 20) — full-trip golfers, Richie, Johnny, Jimmy
+set_score(@feech,       @trip_5_course_2, 72)
+set_score(@christopher, @trip_5_course_2, 78)
+set_score(@eugene,      @trip_5_course_2, 86)
+set_score(@bobby,       @trip_5_course_2, 90)
+set_score(@vito,        @trip_5_course_2, 94)
+set_score(@sal,         @trip_5_course_2, 98)
+set_score(@carlo,       @trip_5_course_2, 101)
+set_score(@junior,      @trip_5_course_2, 105)
+set_score(@johnny,      @trip_5_course_2, 87)
+
+# Round 3 (Apr 21) — full-trip golfers, Phil, Johnny, Jimmy
+set_score(@feech,       @trip_5_course_3, 76)
+set_score(@christopher, @trip_5_course_3, 82)
+set_score(@eugene,      @trip_5_course_3, 83)
+set_score(@bobby,       @trip_5_course_3, 87)
+set_score(@vito,        @trip_5_course_3, 90)
+set_score(@sal,         @trip_5_course_3, 95)
+set_score(@carlo,       @trip_5_course_3, 100)
+set_score(@junior,      @trip_5_course_3, 102)
+set_score(@johnny,      @trip_5_course_3, 88)
+
+# Round 4 (Apr 22) — full-trip golfers, Ralph, Phil, Johnny
+set_score(@feech,       @trip_5_course_4, 75)
+set_score(@christopher, @trip_5_course_4, 79)
+set_score(@eugene,      @trip_5_course_4, 85)
+set_score(@bobby,       @trip_5_course_4, 91)
+set_score(@vito,        @trip_5_course_4, 93)
+set_score(@sal,         @trip_5_course_4, 97)
+set_score(@carlo,       @trip_5_course_4, 98)
+set_score(@junior,      @trip_5_course_4, 106)
+set_score(@ralph,       @trip_5_course_4, 94)
