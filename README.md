@@ -1,6 +1,6 @@
 # KPC — Golf Trip Management App
 
-Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf trip. Members register for the trip, select which nights and rounds they'll attend, and track payments. Admins manage trip logistics, record payments, and monitor trip finances in real time.
+Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf trip. Members register for the trip, select which nights and rounds they'll attend, and track payments. Admins manage trip logistics, record payments, and monitor trip finances in real time. A built-in tournament system handles end-of-trip team generation, matchup pairings, score tracking, and standings.
 
 ---
 
@@ -24,6 +24,15 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 - **Previous Trips** — Historical archive of past trips with attendance and financial records
 - **Trip Finalization** — Lock in a trip financial summary snapshot (site admin only)
 
+### Tournament
+- **Score Entry** — Admins enter each golfer's stroke total for non-tournament rounds; these scores drive the ranking algorithm
+- **Player Rankings** — Golfers are ranked by average score across non-tournament rounds, with automatic fallback to the most recent prior trip for golfers who lack current-trip scores
+- **Captain Selection** — Two team captains are designated before team generation; their nicknames automatically set the team names (e.g., "Team Tony" / "Team Artie"); captains are guaranteed to end up on opposite teams regardless of where the ranking algorithm places them
+- **Team Generation** — A serpentine algorithm assigns golfers to Team A and Team B using rank-balanced groups of four, producing equal rank sums within every foursome
+- **Per-Round Pairings** — Matchup groups are generated independently for each tournament round; individual assignments can be overridden or an entire round's pairings can be redrawn
+- **Result Tracking** — Admins record the outcome of each matchup group (Team A wins / Tie / Team B wins); team standings aggregate automatically
+- **Live Standings** — Running point totals and a winner banner update as results are entered
+
 ### Automated Workflows
 - **Pre-trip reminder emails** — A GitHub Actions scheduled job runs daily starting in the weeks before the trip and sends reminder emails to golfers with outstanding balances; the workflow self-disables after March 1
 - **Transactional emails** — Trip signup confirmation, payment received, and balance paid emails fire automatically on the corresponding events
@@ -44,8 +53,7 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 | Rate Limiting | Rack::Attack |
 | Environment Config | Figaro |
 | Markdown Rendering | Redcarpet |
-| Testing | RSpec, FactoryBot, Faker, WebMock, VCR, SimpleCov |
-| Linting | StandardRB |
+| Testing | RSpec, Shoulda-Matchers, SimpleCov |
 | Containerization | Docker |
 | Hosting | Fly.io |
 | CI/CD | GitHub Actions |
@@ -75,6 +83,10 @@ erDiagram
         string location
         datetime start_date
         boolean completed
+        string team_a_name
+        string team_b_name
+        bigint captain_a_id FK
+        bigint captain_b_id FK
     }
     NIGHTS {
         bigint id PK
@@ -89,6 +101,7 @@ erDiagram
         date date
         integer cost
         string tee_time
+        boolean is_tournament_round
     }
     COURSES {
         bigint id PK
@@ -113,6 +126,7 @@ erDiagram
         bigint id PK
         bigint golfer_id FK
         bigint round_id FK
+        integer score
     }
     PAYMENTS {
         bigint id PK
@@ -136,6 +150,21 @@ erDiagram
         integer fair_share
         integer committee_count
     }
+    TOURNAMENT_ASSIGNMENTS {
+        bigint id PK
+        bigint trip_id FK
+        bigint golfer_id FK
+        bigint round_id FK
+        string team
+        integer matchup_group
+        string match_type
+    }
+    TOURNAMENT_MATCHUP_RESULTS {
+        bigint id PK
+        bigint round_id FK
+        integer matchup_group
+        string result
+    }
 
     GOLFERS ||--o{ GOLFER_TRIPS : ""
     TRIPS ||--o{ GOLFER_TRIPS : ""
@@ -144,12 +173,18 @@ erDiagram
     TRIPS ||--o{ ROUNDS : ""
     TRIPS ||--o{ EXPENSES : ""
     TRIPS ||--o| TRIP_FINANCIAL_SUMMARIES : ""
+    TRIPS ||--o{ TOURNAMENT_ASSIGNMENTS : ""
     GOLFERS ||--o{ GOLFER_NIGHTS : ""
     NIGHTS ||--o{ GOLFER_NIGHTS : ""
     GOLFERS ||--o{ GOLFER_ROUNDS : ""
     ROUNDS ||--o{ GOLFER_ROUNDS : ""
     GOLFERS ||--o{ EXPENSES : ""
     COURSES ||--o{ ROUNDS : ""
+    GOLFERS ||--o{ TOURNAMENT_ASSIGNMENTS : ""
+    ROUNDS ||--o{ TOURNAMENT_ASSIGNMENTS : ""
+    ROUNDS ||--o{ TOURNAMENT_MATCHUP_RESULTS : ""
+    GOLFERS ||--o| TRIPS : "captain_a"
+    GOLFERS ||--o| TRIPS : "captain_b"
 ```
 
 ### Key Models
@@ -157,16 +192,18 @@ erDiagram
 | Model | Description |
 |---|---|
 | `Golfer` | User accounts with roles (`default`, `admin`) |
-| `Trip` | A single annual golf trip with year, number, location, and dates |
+| `Trip` | A single annual golf trip with year, number, location, dates, and optional team captain references |
 | `Night` | An individual night of accommodation on a trip, with a per-night cost |
-| `Round` | An individual golf round on a trip, with a per-round cost |
+| `Round` | An individual golf round on a trip; flagged as a tournament round or a scoring round |
 | `GolferTrip` | Join table recording a golfer's registration for a trip; holds `cost`, `balance`, `is_paid`, and `is_full_trip` |
 | `GolferNight` | Records which nights a golfer is attending |
-| `GolferRound` | Records which rounds a golfer is playing |
+| `GolferRound` | Records which rounds a golfer is playing; holds an optional `score` used for tournament ranking |
 | `Payment` | A payment or return for a golfer trip; negative `amount` values represent returns |
 | `Expense` | A trip expense attributed to a golfer |
 | `Course` | A golf course with address info |
 | `TripFinancialSummary` | A finalized financial snapshot of a completed trip |
+| `TournamentAssignment` | Records a golfer's team, matchup group, and match type for a specific trip and round; contains the full team-generation algorithm |
+| `TournamentMatchupResult` | Records the outcome of a matchup group for a round (`A`, `B`, or `tie`); aggregates team point totals |
 
 ---
 
@@ -202,6 +239,64 @@ Two authorization levels are enforced via before-action filters throughout the c
 ### Password Reset Security
 
 Reset tokens are generated with `SecureRandom.urlsafe_base64`, immediately hashed with SHA256 before being stored in the database, and expire after 2 hours. The raw token is sent in the email link; the hashed version is what's stored — the database never holds a redeemable token.
+
+### Tournament Team Generation Algorithm
+
+Golfers are ranked by average stroke score across non-tournament rounds (lower = better). Golfers with no current-trip scores fall back to their average from the most recent prior trip; golfers with no history at all sort last.
+
+Ranked players are decomposed into groups:
+- **Groups of 4** fill the bulk of the field
+- A remainder of 3 becomes a single triple (2v1 match)
+- A remainder of 2 becomes a single pair (1v1 match)
+- A remainder of 1 produces one triple and one pair
+
+Within each group of 4, Team A receives positions 0 and 3 (best + worst) and Team B receives positions 1 and 2 (the two middle players). This guarantees equal rank sums for every complete foursome.
+
+**Captain placement** is enforced after the serpentine pass: the two designated captains are always placed on opposite teams. If the algorithm produces the wrong arrangement, the minimum necessary swap is made — preferring to swap within the same matchup group before reaching across groups.
+
+### Dashboard States by Role
+
+The dashboard (`/dashboard`) derives its state from two independent signals: `Trip.current` (driven by the `CURRENT_TRIP_NUMBER` env var) and the trip's `completed` boolean. These combine differently depending on the user's role.
+
+**Admins**
+
+| Condition | Trip card (Attendance / Finances / Edit) | Global tools card |
+|---|---|---|
+| `Trip.current` exists, not completed | Shown | Always shown |
+| `Trip.current` exists, completed | Hidden | Always shown |
+| No current trip (`CURRENT_TRIP_NUMBER` unset or unmatched) | Hidden | Always shown |
+
+Score entry buttons (for non-tournament rounds) appear in the global tools card whenever `Trip.current` exists, regardless of whether the trip is completed.
+
+Site-admin-only buttons — Broadcast, Courses, Create Trip — are nested inside the global tools card and only render when `current_user.email == SITE_ADMIN_EMAIL`.
+
+**Default (non-admin) golfers**
+
+The non-admin branch ignores the `completed` flag entirely and uses calendar date to determine whether the trip is "over":
+
+| Condition | Dashboard shows |
+|---|---|
+| No current trip | "Stay tuned for KPC [next number]" (predicted from last completed trip) |
+| Current trip exists, last night has passed (`last_night.date < Date.today`) | "Stay tuned for KPC [next number]" (regardless of `completed` flag) |
+| Current trip ongoing, golfer is registered | Full trip card: itinerary calendar, golf schedule, balance, payment instructions |
+| Current trip ongoing, golfer not yet registered | "Sign up for KPC X" button |
+
+**Completed vs. finalized**
+
+These are two distinct states:
+
+- **Completed** (`trips.completed = true`) — set by the site admin via the "Complete Trip" button. Hides the trip-specific admin card and moves the trip onto the Previous Trips page.
+- **Finalized** — a `TripFinancialSummary` record exists for the trip. Created separately after completion. The Previous Trips page shows the full financial table (revenue, expenses, deficit, committee fair share) for finalized trips; trips that are completed but not yet finalized show "No financial summary recorded."
+
+The Previous Trips page (`/previous_trips`) is admin-only and shows all `completed: true` trips regardless of finalization status.
+
+**`CURRENT_TRIP_NUMBER` as a staging gate**
+
+A trip can be created and fully configured in the database before any golfer can see it. Because `Trip.current` resolves entirely from `CURRENT_TRIP_NUMBER`, a new trip is invisible to non-admins until that env var is updated and the app is redeployed. This gives site admins a staging window to add nights, rounds, set costs, and flag tournament rounds without prematurely exposing the trip. The registration form at `/register_trip` is also gated on `@next_trip` being set, so even a golfer who guesses the URL directly cannot register until the env var is live.
+
+The intended sequence each year:
+1. Site admin creates the new trip record and configures it
+2. `CURRENT_TRIP_NUMBER` is updated in `config/application.yml` and the app is redeployed — the trip becomes visible and registration opens simultaneously
 
 ### Automated Email Scheduling
 
@@ -281,10 +376,6 @@ SimpleCov reports **100% line coverage** across all tracked files. Coverage is m
 | RSpec | Test framework |
 | Shoulda-Matchers | Concise association and validation matchers |
 | SimpleCov | Line coverage reporting |
-| FactoryBot | Test object factories |
-| Faker | Randomized test data |
-| WebMock | HTTP request stubbing |
-| VCR | Record/replay HTTP interactions |
 
 ```bash
 # Lint with StandardRB

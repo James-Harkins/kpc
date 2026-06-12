@@ -202,6 +202,7 @@ function addRound() {
                 '<input type="text" name="new_rounds[' + idx + '][new_course_address]" placeholder="Address">' +
             '</div>' +
         '</td>' +
+        '<td style="text-align:center"><input type="checkbox" name="new_rounds[' + idx + '][is_tournament_round]" value="1"></td>' +
         '<td><button type="button" class="btn-danger" onclick="removeRow(this)">Remove</button></td>';
     document.getElementById('rounds-body').appendChild(row);
 }
