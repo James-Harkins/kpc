@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   post "/trip_financial_summaries",  to: "trip_financial_summaries#create", as: :trip_financial_summaries
 
   get "/roster", to: "rosters#index"
+  get '/scoreboard', to: 'scoreboards#index', as: :scoreboard
 
   get  "/announcements/new", to: "announcements#new"
   post "/announcements",     to: "announcements#create"

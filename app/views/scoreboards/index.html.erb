@@ -1,0 +1,137 @@
+<meta http-equiv="refresh" content="30">
+
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    flex-flow: column;
+    color: #fff;
+    font-size: 40px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.scoreboard-container {
+    background-color: #fff;
+    opacity: .95;
+    padding: 30px 40px;
+    margin: 20px auto;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+    font-size: 18px;
+    text-align: left;
+    max-width: 1100px;
+    width: 95%;
+}
+
+.scoreboard-container h1 {
+    font-size: 48px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.btn-link {
+    margin: 20px;
+    background-color: white;
+    padding: 15px 25px;
+    font-size: 18px;
+    color: black;
+    border: 2px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+        'Lucida Sans', Arial, sans-serif;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    background-color: gray;
+    color: white;
+}
+</style>
+
+<div style="display:flex; justify-content:center; align-items:center; min-height:100vh; flex-direction:column;">
+  <div class="scoreboard-container">
+    <% if @trip.nil? %>
+      <h1>Scoreboard</h1>
+      <p style="text-align:center;">No active trip.</p>
+    <% else %>
+      <h1>KPC <%= @trip.number %> &mdash; Scoreboard</h1>
+      <hr>
+      <table>
+        <thead>
+          <tr>
+            <th>Golfer</th>
+            <% @rounds.each do |round| %>
+              <th>
+                <%= round.date.strftime('%a %b %-d') %>
+                <% if round.course %>
+                  <br><small><%= round.course.name %></small>
+                <% end %>
+              </th>
+            <% end %>
+            <th>Total</th>
+            <th>Avg</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @golfers.each do |golfer| %>
+            <tr>
+              <td><%= golfer.nickname.titleize %></td>
+              <% @rounds.each do |round| %>
+                <td>
+                  <% score = @scores.dig(golfer.id, round.id) %>
+                  <%= score.nil? ? '—' : score %>
+                </td>
+              <% end %>
+              <% golfer_scores = @scores[golfer.id]&.values&.compact || [] %>
+              <td><%= golfer_scores.any? ? golfer_scores.sum : '—' %></td>
+              <td><%= golfer_scores.any? ? (golfer_scores.sum.to_f / golfer_scores.size).round(1) : '' %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+
+    <div style="text-align:center; margin-top:20px;">
+      <%= button_to '← Dashboard', '/dashboard', method: :get, class: 'btn-link' %>
+    </div>
+  </div>
+</div>

@@ -15,7 +15,7 @@
  *   node .claude/workflows/feature_build.js "add golfer handicap tracking"
  *
  * Feature slug is the first three words of the description, snake_cased.
- * All artifacts land in .claude/specs/<slug>/.
+ * All artifacts land in tmp/claude_specs/<slug>/.
  */
 
 import { query } from "@anthropic-ai/claude-agent-sdk";
@@ -41,7 +41,7 @@ function featureSlug(description) {
 }
 
 function specsDir(slug) {
-  return path.join(CWD, ".claude", "specs", slug);
+  return path.join(CWD, "tmp", "claude_specs", slug);
 }
 
 function log(msg) {
@@ -568,7 +568,7 @@ async function main() {
   banner("KPC FEATURE BUILD WORKFLOW — TDD");
   log(`Feature : "${featureDescription}"`);
   log(`Slug    : ${slug}`);
-  log(`Specs   : .claude/specs/${slug}/`);
+  log(`Specs   : tmp/claude_specs/${slug}/`);
   log(`App root: ${CWD}`);
 
   try {
@@ -582,7 +582,7 @@ async function main() {
 
   banner("WORKFLOW COMPLETE");
   log("All phases finished.");
-  log(`Artifacts in .claude/specs/${slug}/:`);
+  log(`Artifacts in tmp/claude_specs/${slug}/:`);
   log("  design.md         — finalized feature design");
   log("  spec_files.json   — spec files written in Phase 2");
   log("  tasks.json        — implementation task breakdown");

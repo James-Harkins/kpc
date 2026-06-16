@@ -22,7 +22,7 @@ node .claude/workflows/feature_build.js "email reminders for unpaid balances"
 
 ## Artifacts
 
-Everything lands in `.claude/specs/<slug>/`:
+Everything lands in `tmp/claude_specs/<slug>/`:
 
 | File | Created by | Purpose |
 |---|---|---|
@@ -38,7 +38,7 @@ Everything lands in `.claude/specs/<slug>/`:
 ### Phase 1 — Analysis & Design
 
 A single agent reads the relevant parts of the codebase and writes a structured design
-document to `.claude/specs/<slug>/design.md`.
+document to `tmp/claude_specs/<slug>/design.md`.
 
 **The design doc contains:**
 - Plain English description of the feature
