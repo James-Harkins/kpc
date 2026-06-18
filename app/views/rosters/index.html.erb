@@ -60,11 +60,34 @@ body::before {
     border-radius: 10px;
     padding: 12px 20px;
     margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .golfer-card h4 {
     margin: 0;
     font-weight: bold;
+}
+
+.golfer-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    margin: 0;
+    padding: 6px 14px;
+    font-size: 14px;
+}
+
+.btn-action-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-action-danger:hover {
+    background-color: #a71d2a !important;
 }
 
 .line {
@@ -129,6 +152,7 @@ button:focus, button:active:focus {
 </style>
 
 <div class='trips'>
+    <% is_site_admin = current_user&.email == ENV["SITE_ADMIN_EMAIL"] %>
     <% flash.each do |name, msg| %>
         <div class="alert" role="alert">
             <%= content_tag :div, msg, class: name %>
@@ -144,6 +168,11 @@ button:focus, button:active:focus {
         <% @admin_golfers.each do |golfer| %>
             <div class="golfer-card">
               <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
+              <% if is_site_admin %>
+                <div class="golfer-actions">
+                  <%= button_to "Make Default", make_default_golfer_path(golfer), method: :patch, class: "btn-action" %>
+                </div>
+              <% end %>
             </div>
         <% end %>
 
@@ -153,6 +182,14 @@ button:focus, button:active:focus {
         <% @default_golfers.each do |golfer| %>
             <div class="golfer-card">
               <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
+              <% if is_site_admin %>
+                <div class="golfer-actions">
+                  <%= button_to "Make Admin", make_admin_golfer_path(golfer), method: :patch, class: "btn-action" %>
+                  <%= button_to "Delete", destroy_admin_golfer_path(golfer), method: :delete,
+                        class: "btn-action btn-action-danger",
+                        data: { confirm: "Delete #{golfer.first_name} #{golfer.last_name}? This cannot be undone." } %>
+                </div>
+              <% end %>
             </div>
         <% end %>
 

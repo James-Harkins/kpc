@@ -1,7 +1,7 @@
 class GolfersController < ApplicationController
   before_action :require_login, only: [:show]
   before_action :require_non_admin, only: [:edit, :update]
-  before_action :require_site_admin, only: [:admin_new, :admin_create]
+  before_action :require_site_admin, only: [:admin_new, :admin_create, :make_admin, :make_default, :destroy]
 
   def show
     @golfer = current_user
@@ -48,6 +48,27 @@ class GolfersController < ApplicationController
       flash[:error] = golfer.errors.full_messages.to_sentence
       redirect_to "/admin/golfer/new"
     end
+  end
+
+  def make_admin
+    golfer = Golfer.find(params[:id])
+    golfer.update!(role: :admin)
+    flash[:notice] = "#{golfer.first_name} #{golfer.last_name} is now a committee member."
+    redirect_to "/roster"
+  end
+
+  def make_default
+    golfer = Golfer.find(params[:id])
+    golfer.update!(role: :default)
+    flash[:notice] = "#{golfer.first_name} #{golfer.last_name} is now a normie."
+    redirect_to "/roster"
+  end
+
+  def destroy
+    golfer = Golfer.find(params[:id])
+    golfer.destroy
+    flash[:notice] = "#{golfer.first_name} #{golfer.last_name} has been deleted."
+    redirect_to "/roster"
   end
 
   def edit
