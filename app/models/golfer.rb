@@ -16,7 +16,7 @@ class Golfer < ApplicationRecord
   validates_presence_of :password_confirmation, on: :create
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
   has_secure_password
-  validates_presence_of :t_shirt_size, on: :create
+
   enum role: [:default, :admin]
   enum t_shirt_size: { s: 0, m: 1, l: 2, xl: 3, xxl: 4, xxxl: 5 }
 
