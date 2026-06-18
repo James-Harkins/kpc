@@ -1,11 +1,11 @@
 class Golfer < ApplicationRecord
-  has_many :golfer_trips
+  has_many :golfer_trips, dependent: :destroy
   has_many :trips, through: :golfer_trips
-  has_many :golfer_nights
+  has_many :golfer_nights, dependent: :destroy
   has_many :nights, through: :golfer_nights
-  has_many :golfer_rounds
+  has_many :golfer_rounds, dependent: :destroy
   has_many :rounds, through: :golfer_rounds
-  has_many :tournament_assignments
+  has_many :tournament_assignments, dependent: :destroy
 
   validates_presence_of :first_name
   validates_presence_of :last_name
