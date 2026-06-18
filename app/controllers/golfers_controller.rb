@@ -1,6 +1,7 @@
 class GolfersController < ApplicationController
   before_action :require_login, only: [:show]
   before_action :require_non_admin, only: [:edit, :update]
+  before_action :require_site_admin, only: [:admin_new, :admin_create]
 
   def show
     @golfer = current_user
@@ -28,6 +29,27 @@ class GolfersController < ApplicationController
     end
   end
 
+  def admin_new
+    @golfer = Golfer.new
+  end
+
+  def admin_create
+    golfer = Golfer.new(admin_golfer_params)
+    temp_password = SecureRandom.urlsafe_base64(24)
+    golfer.password = temp_password
+    golfer.password_confirmation = temp_password
+    if golfer.save
+      raw_token = golfer.generate_password_reset_token!
+      golfer.update_columns(welcome_token: true)
+      GolferMailer.welcome(golfer, raw_token).deliver_now
+      flash[:notice] = "Golfer account created. Welcome email sent to #{golfer.email}."
+      redirect_to "/dashboard"
+    else
+      flash[:error] = golfer.errors.full_messages.to_sentence
+      redirect_to "/admin/golfer/new"
+    end
+  end
+
   def edit
     @golfer = current_user
   end
@@ -49,5 +71,9 @@ class GolfersController < ApplicationController
 
   def profile_params
     params.permit(:email, :nickname, :t_shirt_size)
+  end
+
+  def admin_golfer_params
+    params.permit(:first_name, :last_name, :nickname, :email, :t_shirt_size)
   end
 end

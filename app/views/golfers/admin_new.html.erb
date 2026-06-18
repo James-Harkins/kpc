@@ -1,0 +1,118 @@
+<style>
+
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.auth-form-container, .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+    padding: 50px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;;
+    color: black;
+    background-color: white;
+    opacity: 0.8;
+    border-radius: 25px;
+  }
+
+label {
+    text-align: left;
+    padding: 0.25rem 0;
+}
+
+input, select {
+    margin: 0.25rem 0;
+    padding: .5rem;
+}
+
+button {
+    margin: 1rem 0;
+    background-color: #fff;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.redirect-link {
+    cursor: pointer;
+    margin: 0.5rem 0;
+    color: #fff;
+}
+
+.auth-form-container > h1 {
+    font-size: 80px;
+    text-align: center;
+  }
+
+@media (max-width: 800px) {
+    body {
+      align-items: stretch;
+    }
+}
+
+</style>
+
+
+    <div class="auth-form-container">
+        <% flash.each do |name, msg| %>
+            <div class="alert" role="alert">
+            <%= content_tag :div, msg, class: name %>
+            </div>
+        <% end %>
+        <br>
+        <h1>CREATE GOLFER</h1>
+        <div class="login-form">
+            <%= form_with url: admin_golfer_path, method: :post, local: true do |form| %>
+                <div class="label">
+                    <%= form.label :first_name %>
+                </div>
+                <div class="input">
+                    <%= form.text_field :first_name %><br>
+                </div>
+
+                <div class="label">
+                    <%= form.label :nickname %>
+                </div>
+                <div class="input">
+                    <%= form.text_field :nickname %><br>
+                </div>
+
+                <div class="label">
+                    <%= form.label :last_name %>
+                </div>
+                <div class="input">
+                    <%= form.text_field :last_name %><br>
+                </div>
+
+                <div class="label">
+                    <%= form.label :email %>
+                </div>
+                <div class="input">
+                    <%= form.text_field :email %><br>
+                </div>
+
+                <div class="button">
+                    <%= form.submit "Create Golfer" %>
+                </div>
+            <% end %>
+        </div>
+    </div>

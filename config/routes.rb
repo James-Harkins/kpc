@@ -36,6 +36,10 @@ Rails.application.routes.draw do
   get   "/password_resets/:token/edit", to: "password_resets#edit",   as: :edit_password_reset
   patch "/password_resets/:token",      to: "password_resets#update", as: :password_reset
 
+  # Golfer management (site admin)
+  get  '/admin/golfer/new', to: 'golfers#admin_new',    as: :admin_new_golfer
+  post '/admin/golfer',     to: 'golfers#admin_create', as: :admin_golfer
+
   # Trip management (admin)
   get   '/trips/new',          to: 'trips#new',      as: :new_trip
   post  '/trips',              to: 'trips#create'

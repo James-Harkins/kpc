@@ -18,14 +18,20 @@ class PasswordResetsController < ApplicationController
   end
 
   def update
-    if @golfer.password_reset_expired?
+    expired = @golfer.welcome_token ? @golfer.welcome_token_expired? : @golfer.password_reset_expired?
+    if expired
       flash[:error] = "That reset link has expired. Please request a new one."
       redirect_to "/forgot_password"
     else
+      was_welcome_token = @golfer.welcome_token
       updated = false
       ActiveRecord::Base.transaction do
         updated = @golfer.update(password_params)
-        @golfer.update_columns(password_reset_token: nil, password_reset_sent_at: nil) if updated
+        if updated
+          columns = { password_reset_token: nil, password_reset_sent_at: nil }
+          columns[:welcome_token] = false if was_welcome_token
+          @golfer.update_columns(columns)
+        end
       end
       if updated
         flash[:notice] = "Password updated! Please log in."

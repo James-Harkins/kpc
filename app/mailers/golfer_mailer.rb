@@ -1,4 +1,11 @@
 class GolferMailer < ApplicationMailer
+  def welcome(golfer, token)
+    @golfer           = golfer
+    @token            = token
+    @set_password_url = edit_password_reset_url(token)
+    mail(to: golfer.email, subject: "Welcome to Kitchen Pass Classic")
+  end
+
   def password_reset(golfer, token)
     @golfer = golfer
     @reset_url = edit_password_reset_url(token)

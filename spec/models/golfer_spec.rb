@@ -60,6 +60,13 @@ RSpec.describe Golfer, type: :model do
       expect(golfer).not_to be_valid
       expect(golfer.errors[:t_shirt_size]).to include("can't be blank")
     end
+
+    it 'initializes welcome_token to false' do
+      golfer = Golfer.create!(first_name: 'Tony', last_name: 'Soprano', nickname: 'T',
+                              email: 'welcome@test.com', password: 'test1234',
+                              password_confirmation: 'test1234', t_shirt_size: :m)
+      expect(golfer.welcome_token).to eq(false)
+    end
   end
 
   describe 'instance methods' do
@@ -264,6 +271,23 @@ RSpec.describe Golfer, type: :model do
       it 'returns true when token was sent more than 2 hours ago' do
         @golfer_1.update_columns(password_reset_sent_at: 3.hours.ago)
         expect(@golfer_1.password_reset_expired?).to eq(true)
+      end
+    end
+
+    describe '#welcome_token_expired?' do
+      it 'returns false when password_reset_sent_at is within 72 hours' do
+        @golfer_1.update_columns(password_reset_sent_at: 71.hours.ago)
+        expect(@golfer_1.welcome_token_expired?).to eq(false)
+      end
+
+      it 'returns true when password_reset_sent_at is more than 72 hours ago' do
+        @golfer_1.update_columns(password_reset_sent_at: 73.hours.ago)
+        expect(@golfer_1.welcome_token_expired?).to eq(true)
+      end
+
+      it 'returns false for a token sent 3 hours ago (within 72-hour window)' do
+        @golfer_1.update_columns(password_reset_sent_at: 3.hours.ago)
+        expect(@golfer_1.welcome_token_expired?).to eq(false)
       end
     end
   end

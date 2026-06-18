@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_06_12_000002) do
+ActiveRecord::Schema.define(version: 2026_06_18_000001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 2026_06_12_000002) do
     t.string "password_reset_token"
     t.datetime "password_reset_sent_at"
     t.integer "t_shirt_size"
+    t.boolean "welcome_token", default: false, null: false
     t.index ["password_reset_token"], name: "index_golfers_on_password_reset_token", unique: true, where: "(password_reset_token IS NOT NULL)"
   end
 
