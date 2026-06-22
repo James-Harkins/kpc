@@ -170,6 +170,7 @@ button:focus, button:active:focus {
               <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
               <% if is_site_admin %>
                 <div class="golfer-actions">
+                  <%= button_to "Edit Golfer", edit_admin_golfer_path(golfer), method: :get, class: "btn-action" %>
                   <%= button_to "Make Default", make_default_golfer_path(golfer), method: :patch, class: "btn-action" %>
                 </div>
               <% end %>
@@ -184,6 +185,7 @@ button:focus, button:active:focus {
               <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %></h4>
               <% if is_site_admin %>
                 <div class="golfer-actions">
+                  <%= button_to "Edit Golfer", edit_admin_golfer_path(golfer), method: :get, class: "btn-action" %>
                   <%= button_to "Make Admin", make_admin_golfer_path(golfer), method: :patch, class: "btn-action" %>
                   <%= button_to "Delete", destroy_admin_golfer_path(golfer), method: :delete,
                         class: "btn-action btn-action-danger",

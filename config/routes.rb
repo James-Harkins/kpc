@@ -39,6 +39,8 @@ Rails.application.routes.draw do
   # Golfer management (site admin)
   get    '/admin/golfer/new',              to: 'golfers#admin_new',    as: :admin_new_golfer
   post   '/admin/golfer',                  to: 'golfers#admin_create', as: :admin_golfer
+  get    '/admin/golfers/:id/edit',        to: 'golfers#admin_edit',   as: :edit_admin_golfer
+  patch  '/admin/golfers/:id',             to: 'golfers#admin_update', as: :update_admin_golfer
   patch  '/admin/golfers/:id/make_admin',  to: 'golfers#make_admin',   as: :make_admin_golfer
   patch  '/admin/golfers/:id/make_default', to: 'golfers#make_default', as: :make_default_golfer
   delete '/admin/golfers/:id',             to: 'golfers#destroy',      as: :destroy_admin_golfer
