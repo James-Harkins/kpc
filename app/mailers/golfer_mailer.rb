@@ -44,6 +44,17 @@ class GolferMailer < ApplicationMailer
     mail(to: golfer.email, subject: subject)
   end
 
+  def deposit_reminder(golfer, golfer_trip)
+    @golfer            = golfer
+    @golfer_trip       = golfer_trip
+    @trip              = golfer_trip.trip
+    @deposit_amount    = golfer_trip.deposit_amount
+    @paid_so_far       = golfer_trip.payments.sum(:amount)
+    @deposit_remaining = [@deposit_amount - @paid_so_far, 0].max
+    @due_date          = @trip.deposit_due_date
+    mail(to: golfer.email, subject: "KPC #{@trip.number} - Deposit Due #{@due_date.strftime('%B %-d')}")
+  end
+
   def trip_reminder_paid(golfer, golfer_trip)
     @golfer      = golfer
     @golfer_trip = golfer_trip

@@ -70,7 +70,7 @@ All set via Figaro in `config/application.yml` (not checked in).
 Core user. Has `role` (default/admin), `nickname`, `t_shirt_size`. Auth via `has_secure_password`. Password min 8 chars. Password reset tokens are SHA-256 hashed with 2-hour expiry.
 
 ### `Trip`
-One per year. `number` is a Roman numeral string (e.g. `"XXV"`). `Trip.current` looks up by `CURRENT_TRIP_NUMBER`. Has a `completed` boolean. `start_date` is a datetime.
+One per year. `number` is a Roman numeral string (e.g. `"XXV"`). `Trip.current` looks up by `CURRENT_TRIP_NUMBER`. Has a `completed` boolean. `start_date` is a datetime. Nullable `deposit_due_date` (date) — when set, registration requires acknowledging the non-refundable 50% deposit policy and drives bed-priority tiers. `bed_priority_order` returns golfer_trips sorted for bed assignment (tier, nights desc, deposit_met_at asc, registration asc).
 
 ### `Round`
 Belongs to a `Trip` and optionally a `Course`. Has `date`, `cost`, `tee_time`, `is_tournament_round`. Tournament rounds are excluded from ranking score calculations.
@@ -81,7 +81,10 @@ Scopes: `Round.tournament` / `Round.non_tournament`
 Belongs to a `Trip`. Represents one night at the house.
 
 ### `GolferTrip`
-Join between `Golfer` and `Trip`. Tracks `cost`, `balance`, `is_paid`, `is_full_trip`. A "full trip" gets the first night comped.
+Join between `Golfer` and `Trip`. Tracks `cost`, `balance`, `is_paid`, `is_full_trip`. A "full trip" gets the first night comped. Nullable `bed_id` FK holds the golfer's bed assignment (one bed for the whole stay; capacity-2 beds are two golfer_trips sharing a bed_id). Deposit logic is derived live from the payments ledger: `deposit_amount` (50% of cost, ceil), `deposit_met_at` (timestamp of the last upward crossing of the deposit; a later return un-meets it), `deposit_met_by_deadline?`, `bed_priority_tier` (1 = met by deadline, 2 = met late, 3 = not met). `deposit_policy_acknowledged_at` records acceptance of the non-refundable policy at registration.
+
+### `House` / `Bedroom` / `Bed`
+`House` belongs to a `Trip` (`name`, `address`, `url` — rental listing link shown to golfers on the dashboard). Multiple houses per trip (main + overflow). `Bedroom` belongs to a house. `Bed` belongs to a bedroom: `description`, `capacity` (1 or 2), `rank` (1 = best; unique per trip, enforced in the model). Beds `has_many :golfer_trips, dependent: :nullify`. House/bed structure is site-admin; the `/bed_assignments` page (admin) shows the computed priority order and per-bed slot dropdowns — assignment is manual, admins take the best beds at their discretion.
 
 ### `GolferRound`
 Join between `Golfer` and `Round`. Has a nullable `score` integer (total strokes — used for tournament ranking).
@@ -125,6 +128,7 @@ Located in `app/facades/`. Used in `GolferTripsController#create` to handle golf
 | `password_reset` | Password reset requested |
 | `announcement` | Admin broadcasts to all registered golfers |
 | `trip_reminder_paid` / `trip_reminder_unpaid` | Called manually from console ~1 month before trip |
+| `deposit_reminder` | `emails:send_deposit_reminder` rake task (daily GitHub Actions cron; sends 1 week before `deposit_due_date` to golfers who haven't met their 50% deposit) |
 
 ---
 
@@ -162,6 +166,12 @@ PATCH     /trips/:id/complete
 
 # Expense mgmt (admin)
 /expenses (index/new/create/edit/update/destroy)
+
+# House mgmt (site admin)
+/houses (index/new/create/edit/update/destroy)   # ?trip_id=X
+
+# Bed assignments (admin)
+GET/PATCH /bed_assignments    # ?trip_id=X
 
 # Tournament (admin)
 GET  /tournament

@@ -48,7 +48,7 @@ class TripsController < ApplicationController
   private
 
   def trip_params
-    params.require(:trip).permit(:year, :number, :location, :start_date)
+    params.require(:trip).permit(:year, :number, :location, :start_date, :deposit_due_date)
   end
 
   def build_nights(trip, array)

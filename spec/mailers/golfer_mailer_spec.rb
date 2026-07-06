@@ -31,4 +31,30 @@ RSpec.describe GolferMailer, type: :mailer do
       expect(mail.body.encoded).to include(golfer.nickname)
     end
   end
+
+  describe '#deposit_reminder' do
+    let(:trip) { create(:trip, deposit_due_date: Date.new(2026, 6, 1)) }
+    let(:golfer_trip) { create(:golfer_trip, golfer: golfer, trip: trip, cost: 400) }
+    let(:mail) do
+      create(:payment, golfer_trip: golfer_trip, amount: 50)
+      GolferMailer.deposit_reminder(golfer, golfer_trip)
+    end
+
+    it 'sends to the golfer email' do
+      expect(mail.to).to eq([golfer.email])
+    end
+
+    it 'has the deadline in the subject' do
+      expect(mail.subject).to eq("KPC #{trip.number} - Deposit Due June 1")
+    end
+
+    it 'includes the remaining deposit amount in the body' do
+      expect(mail.body.encoded).to include('150')
+    end
+
+    it 'mentions the non-refundable policy and bed incentive' do
+      expect(mail.text_part.body.encoded).to include('NON-REFUNDABLE')
+      expect(mail.text_part.body.encoded).to include('best beds')
+    end
+  end
 end

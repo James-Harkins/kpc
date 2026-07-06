@@ -178,13 +178,28 @@ body::before {
         </ul>
     </div>
 
+    <% deposit_policy_required = @next_trip.deposit_due_date.present? && !current_user.admin? %>
+    <% if deposit_policy_required %>
+        <div class="info-box" id="deposit-policy-box">
+            <strong>Deposit policy:</strong> Your 50% deposit is <u>non-refundable</u> and due by
+            <strong><%= @next_trip.deposit_due_date.strftime('%B %-d, %Y') %></strong>.
+            The best beds go to the guys who stay the most nights and pay their deposit earliest &mdash;
+            deposits received after the deadline drop a priority tier.
+            <div class="checkbox-item">
+                <input type="checkbox" id="deposit-ack" onchange="updateDepositAck()">
+                <span>I understand and accept the non-refundable deposit policy.</span>
+            </div>
+        </div>
+    <% end %>
+
     <div class="enchilada-section">
-        <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id}, class: 'btn-outline-primary' %>
+        <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id, deposit_policy_acknowledged: '0'}, class: 'btn-outline-primary' %>
     </div>
 
     <hr class="line">
 
     <%= form_with url: "/register_trip", method: :post, params: {trip_id: @next_trip.id}, local: true do |form| %>
+        <%= hidden_field_tag 'deposit_policy_acknowledged', '0', id: nil %>
         <div class="cost-summary">
             <strong>Your total: $<span id="running-total">0</span></strong>
             <div class="discount-note" id="discount-note">Full trip discount applied — Saturday night is free!</div>
@@ -233,4 +248,18 @@ function updateTotal() {
     document.getElementById('running-total').textContent = total;
     document.getElementById('discount-note').style.display = isFullTrip ? 'block' : 'none';
 }
+
+function updateDepositAck() {
+    var ackBox = document.getElementById('deposit-ack');
+    if (!ackBox) return;
+    var acknowledged = ackBox.checked;
+    document.querySelectorAll('.trip-register-container input[name="deposit_policy_acknowledged"]').forEach(function(input) {
+        input.value = acknowledged ? '1' : '0';
+    });
+    document.querySelectorAll('.trip-register-container input[type="submit"]').forEach(function(button) {
+        button.disabled = !acknowledged;
+    });
+}
+
+updateDepositAck();
 </script>

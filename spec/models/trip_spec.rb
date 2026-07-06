@@ -8,6 +8,59 @@ RSpec.describe Trip, type: :model do
     it { should have_many(:golfers).through(:golfer_trips) }
     it { should have_many(:expenses) }
     it { should have_one(:trip_financial_summary) }
+    it { should have_many(:houses).dependent(:destroy) }
+    it { should have_many(:bedrooms).through(:houses) }
+    it { should have_many(:beds).through(:bedrooms) }
+  end
+
+  describe '#bed_priority_order' do
+    let(:trip) { create(:trip, deposit_due_date: Date.new(2026, 6, 1)) }
+
+    def register(cost:, nights: 0, registered_at: Time.utc(2026, 4, 1))
+      golfer_trip = create(:golfer_trip, trip: trip, cost: cost, created_at: registered_at)
+      nights.times do
+        create(:golfer_night, golfer: golfer_trip.golfer, night: create(:night, trip: trip))
+      end
+      golfer_trip
+    end
+
+    it 'orders tier 1 (met by deadline) before tier 2 (met late) before tier 3 (not met)' do
+      unmet = register(cost: 400)
+      late = register(cost: 400)
+      create(:payment, golfer_trip: late, amount: 200, created_at: Time.utc(2026, 6, 10))
+      on_time = register(cost: 400)
+      create(:payment, golfer_trip: on_time, amount: 200, created_at: Time.utc(2026, 5, 10))
+
+      expect(trip.bed_priority_order).to eq([on_time, late, unmet])
+    end
+
+    it 'ranks more nights first within a tier' do
+      short_stay = register(cost: 400, nights: 2)
+      create(:payment, golfer_trip: short_stay, amount: 200, created_at: Time.utc(2026, 5, 1))
+      long_stay = register(cost: 600, nights: 4)
+      create(:payment, golfer_trip: long_stay, amount: 300, created_at: Time.utc(2026, 5, 20))
+
+      expect(trip.bed_priority_order).to eq([long_stay, short_stay])
+    end
+
+    it 'breaks night ties by earlier deposit, then earlier registration' do
+      second_payer = register(cost: 400, nights: 2)
+      create(:payment, golfer_trip: second_payer, amount: 200, created_at: Time.utc(2026, 5, 15))
+      first_payer = register(cost: 400, nights: 2)
+      create(:payment, golfer_trip: first_payer, amount: 200, created_at: Time.utc(2026, 5, 5))
+      late_registrant = register(cost: 400, nights: 2, registered_at: Time.utc(2026, 4, 20))
+      early_registrant = register(cost: 400, nights: 2, registered_at: Time.utc(2026, 4, 10))
+
+      expect(trip.bed_priority_order).to eq([first_payer, second_payer, early_registrant, late_registrant])
+    end
+
+    it 'places cost-zero (admin-registered) golfers in tier 1 at their registration time' do
+      payer = register(cost: 400, registered_at: Time.utc(2026, 4, 1))
+      create(:payment, golfer_trip: payer, amount: 200, created_at: Time.utc(2026, 5, 10))
+      admin_registered = register(cost: 0, registered_at: Time.utc(2026, 4, 15))
+
+      expect(trip.bed_priority_order).to eq([admin_registered, payer])
+    end
   end
 
   describe 'validations' do

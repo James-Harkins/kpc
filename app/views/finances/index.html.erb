@@ -703,7 +703,8 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               <h5 class="overpaid-warning">Overpaid by $<%= number_with_delimiter(net_paid - golfer_trip.cost) %> — return needed</h5>
             <% end %>
             <%= button_to "Edit Trip", edit_golfer_trip_path(golfer_trip), method: :get, class: 'btn btn-outline-primary' %>
-            <%= form_with url: "/returns", method: :post, local: true do |form| %>
+            <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
+            <%= form_with url: "/returns", method: :post, local: true, html: return_form_options do |form| %>
               <h5><%= form.label :amount, 'Process Return' %></h5>
               <%= form.number_field :amount %>
               <%= form.button "Return", name: :golfer_trip_id, value: golfer_trip.id, class: 'btn-outline-danger' %>
@@ -765,7 +766,8 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% end %>
           <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
             <%= button_to "Edit Trip", edit_golfer_trip_path(golfer_trip), method: :get, class: 'btn btn-outline-primary' %>
-            <%= form_with url: "/returns", method: :post, local: true do |form| %>
+            <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
+            <%= form_with url: "/returns", method: :post, local: true, html: return_form_options do |form| %>
               <h5><%= form.label :amount, 'Process Return' %></h5>
               <%= form.number_field :amount %>
               <%= form.button "Return", name: :golfer_trip_id, value: golfer_trip.id, class: 'btn-outline-danger' %>
@@ -774,6 +776,17 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         </div>
     <% end %>
     <hr class="line">
+
+    <script>
+    function checkDepositDip(form, refundableExcess) {
+        var amount = parseInt(form.querySelector('input[name="amount"]').value, 10) || 0;
+        if (amount > refundableExcess) {
+            return confirm('This return dips into the non-refundable 50% deposit ($' +
+                           (amount - refundableExcess) + ' below the deposit floor). Continue?');
+        }
+        return true;
+    }
+    </script>
 
     <form action="/dashboard">
         <button id="dashboard_header" type="submit" class="btn btn-outline-primary">DASHBOARD</button>

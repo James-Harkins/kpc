@@ -10,10 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_06_18_000001) do
+ActiveRecord::Schema.define(version: 2026_07_06_000006) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "bedrooms", force: :cascade do |t|
+    t.bigint "house_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["house_id"], name: "index_bedrooms_on_house_id"
+  end
+
+  create_table "beds", force: :cascade do |t|
+    t.bigint "bedroom_id", null: false
+    t.string "description"
+    t.integer "capacity", default: 1, null: false
+    t.integer "rank", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bedroom_id"], name: "index_beds_on_bedroom_id"
+  end
 
   create_table "courses", force: :cascade do |t|
     t.string "name"
@@ -60,6 +78,9 @@ ActiveRecord::Schema.define(version: 2026_06_18_000001) do
     t.integer "cost"
     t.boolean "is_paid", default: false
     t.integer "balance"
+    t.bigint "bed_id"
+    t.datetime "deposit_policy_acknowledged_at"
+    t.index ["bed_id"], name: "index_golfer_trips_on_bed_id"
     t.index ["golfer_id", "trip_id"], name: "index_golfer_trips_on_golfer_id_and_trip_id", unique: true
     t.index ["golfer_id"], name: "index_golfer_trips_on_golfer_id"
     t.index ["trip_id"], name: "index_golfer_trips_on_trip_id"
@@ -79,6 +100,16 @@ ActiveRecord::Schema.define(version: 2026_06_18_000001) do
     t.integer "t_shirt_size"
     t.boolean "welcome_token", default: false, null: false
     t.index ["password_reset_token"], name: "index_golfers_on_password_reset_token", unique: true, where: "(password_reset_token IS NOT NULL)"
+  end
+
+  create_table "houses", force: :cascade do |t|
+    t.bigint "trip_id", null: false
+    t.string "name", null: false
+    t.string "address"
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trip_id"], name: "index_houses_on_trip_id"
   end
 
   create_table "nights", force: :cascade do |t|
@@ -159,18 +190,23 @@ ActiveRecord::Schema.define(version: 2026_06_18_000001) do
     t.string "team_b_name"
     t.bigint "captain_a_id"
     t.bigint "captain_b_id"
+    t.date "deposit_due_date"
     t.index ["captain_a_id"], name: "index_trips_on_captain_a_id"
     t.index ["captain_b_id"], name: "index_trips_on_captain_b_id"
   end
 
+  add_foreign_key "bedrooms", "houses"
+  add_foreign_key "beds", "bedrooms"
   add_foreign_key "expenses", "golfers"
   add_foreign_key "expenses", "trips"
   add_foreign_key "golfer_nights", "golfers"
   add_foreign_key "golfer_nights", "nights"
   add_foreign_key "golfer_rounds", "golfers"
   add_foreign_key "golfer_rounds", "rounds"
+  add_foreign_key "golfer_trips", "beds"
   add_foreign_key "golfer_trips", "golfers"
   add_foreign_key "golfer_trips", "trips"
+  add_foreign_key "houses", "trips"
   add_foreign_key "nights", "trips"
   add_foreign_key "payments", "golfer_trips"
   add_foreign_key "rounds", "trips"

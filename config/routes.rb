@@ -67,6 +67,18 @@ Rails.application.routes.draw do
   patch  '/expenses/:id',      to: 'expenses#update',  as: :expense
   delete '/expenses/:id',      to: 'expenses#destroy'
 
+  # House management (site admin)
+  get    '/houses',          to: 'houses#index',  as: :houses
+  get    '/houses/new',      to: 'houses#new',    as: :new_house
+  post   '/houses',          to: 'houses#create'
+  get    '/houses/:id/edit', to: 'houses#edit',   as: :edit_house
+  patch  '/houses/:id',      to: 'houses#update', as: :house
+  delete '/houses/:id',      to: 'houses#destroy'
+
+  # Bed assignments (admin)
+  get   '/bed_assignments', to: 'bed_assignments#index', as: :bed_assignments
+  patch '/bed_assignments', to: 'bed_assignments#update'
+
   # Golfer trip admin editing
   get   '/golfer_trips/:id/edit', to: 'golfer_trips#edit',         as: :edit_golfer_trip
   patch '/golfer_trips/:id',      to: 'golfer_trips#admin_update', as: :golfer_trip

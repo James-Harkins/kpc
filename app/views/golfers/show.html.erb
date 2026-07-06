@@ -502,12 +502,16 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <%= button_to "Courses", courses_path, method: :get, class: 'btn btn-outline-primary-finances' %>
             <%= button_to "Create Trip", new_trip_path, method: :get, class: 'btn btn-outline-primary-finances' %>
             <%= button_to "Create Golfer", admin_new_golfer_path, method: :get, class: 'btn btn-outline-primary-finances' %>
+            <% if @next_trip %>
+              <%= button_to "Houses", houses_path, method: :get, class: 'btn btn-outline-primary-finances', params: { trip_id: @next_trip.id } %>
+            <% end %>
           <% end %>
           <%= button_to "Previous Trips", previous_trips_path, method: :get, class: 'btn btn-outline-primary-finances' %>
           <%= button_to "Roster", "/roster", method: :get, class: 'btn btn-outline-primary-finances' %>
           <% if @next_trip %>
             <%= button_to "Tournament", tournament_path, method: :get, class: 'btn btn-outline-primary-finances' %>
             <%= button_to "Scoreboard", scoreboard_path, method: :get, class: 'btn btn-outline-primary-finances' %>
+            <%= button_to "Beds", bed_assignments_path, method: :get, class: 'btn btn-outline-primary-finances', params: { trip_id: @next_trip.id } %>
           <% end %>
         </div>
         <% if @next_trip %>
@@ -544,6 +548,18 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <div class='next-trip-cost'>
           <h2>KPC <%= @next_trip.number %></h2>
           <h3><%= @next_trip.location %> &mdash; <%= @next_trip.year %></h3>
+          <% if @next_trip.houses.any? %>
+            <h4>
+              <% @next_trip.houses.each_with_index do |house, index| %>
+                <%= ' &middot; '.html_safe if index > 0 %>
+                <% if house.url.present? %>
+                  <%= link_to house.name, house.url, target: '_blank', rel: 'noopener' %>
+                <% else %>
+                  <%= house.name %>
+                <% end %>
+              <% end %>
+            </h4>
+          <% end %>
           <hr class="line">
           <div class="iti-calendar">
             <div class="iti-dates">

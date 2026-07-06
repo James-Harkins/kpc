@@ -7,6 +7,9 @@ class Trip < ApplicationRecord
   has_one :trip_financial_summary
   has_many :tournament_assignments
   has_many :tournament_matchup_results, through: :rounds
+  has_many :houses, dependent: :destroy
+  has_many :bedrooms, through: :houses
+  has_many :beds, through: :bedrooms
 
   belongs_to :captain_a, class_name: 'Golfer', optional: true, foreign_key: 'captain_a_id'
   belongs_to :captain_b, class_name: 'Golfer', optional: true, foreign_key: 'captain_b_id'
@@ -59,6 +62,18 @@ class Trip < ApplicationRecord
     end
   
     calendar
+  end
+
+  # Suggested bed-assignment priority. Tier 1: deposit met by deposit_due_date;
+  # Tier 2: met after the deadline; Tier 3: not met. Within a tier:
+  # nights attending desc, then deposit_met_at asc, then registration asc.
+  def bed_priority_order
+    golfer_trips.includes(:golfer, :payments).sort_by do |golfer_trip|
+      [golfer_trip.bed_priority_tier,
+       -golfer_trip.nights_attending,
+       golfer_trip.deposit_met_at || golfer_trip.created_at,
+       golfer_trip.created_at]
+    end
   end
 
   def paid_golfer_trips

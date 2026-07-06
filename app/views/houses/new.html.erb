@@ -1,0 +1,144 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .9;
+    padding: 30px;
+    margin: 20px;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    width: 90%;
+    max-width: 900px;
+}
+
+.next-trip-cost h1 { font-size: 50px; }
+.next-trip-cost h2 { font-size: 35px; }
+
+table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #ccc; }
+th { background-color: #f0f0f0; }
+
+input[type="text"], input[type="number"], input[type="date"], select {
+    padding: 6px 10px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-outline-primary-finances {
+    margin: 10px 5px;
+    background-color: white;
+    opacity: .8;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: black !important;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.btn-outline-primary-finances:hover { background-color: gray !important; }
+
+.btn-danger {
+    background-color: rgb(222, 74, 72);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+</style>
+
+<div class="next-trip-cost">
+    <h1>New House: KPC <%= @trip.number %></h1>
+
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert"><%= content_tag :div, msg, class: name %></div>
+    <% end %>
+
+    <%= form_with model: @house, url: houses_path(trip_id: @trip.id), method: :post, local: true do |form| %>
+
+        <h2>House Details</h2>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Listing URL</th>
+            </tr>
+            <tr>
+                <td><%= form.text_field :name, placeholder: 'e.g. Main House' %></td>
+                <td><%= form.text_field :address %></td>
+                <td><%= form.text_field :url, placeholder: 'https://...' %></td>
+            </tr>
+        </table>
+
+        <h2>Beds</h2>
+        <table id="beds-table">
+            <thead>
+                <tr>
+                    <th>Bedroom</th>
+                    <th>Bed Description</th>
+                    <th>Capacity</th>
+                    <th>Rank (1 = best)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="beds-body">
+            </tbody>
+        </table>
+        <button type="button" class="btn-outline-primary-finances" onclick="addBed()">+ Add Bed</button>
+
+        <br><br>
+        <input type="submit" value="Create House" class="btn-outline-primary-finances">
+        <button type="button" class="btn-outline-primary-finances" onclick="window.location='/houses?trip_id=<%= @trip.id %>'">Cancel</button>
+
+    <% end %>
+</div>
+
+<script>
+var bedIndex = 0;
+
+function addBed() {
+    var idx = bedIndex++;
+    var row = document.createElement('tr');
+    row.innerHTML =
+        '<td><input type="text" name="new_beds[' + idx + '][bedroom_name]" list="bedroom-names" placeholder="e.g. Master"></td>' +
+        '<td><input type="text" name="new_beds[' + idx + '][description]" placeholder="e.g. King"></td>' +
+        '<td><select name="new_beds[' + idx + '][capacity]"><option value="1">1</option><option value="2">2</option></select></td>' +
+        '<td><input type="number" name="new_beds[' + idx + '][rank]" min="1"></td>' +
+        '<td><button type="button" class="btn-danger" onclick="removeRow(this)">Remove</button></td>';
+    document.getElementById('beds-body').appendChild(row);
+}
+
+function removeRow(btn) {
+    btn.closest('tr').remove();
+}
+</script>
+
+<datalist id="bedroom-names">
+    <% @trip.bedrooms.pluck(:name).uniq.each do |name| %>
+        <option value="<%= name %>"></option>
+    <% end %>
+</datalist>

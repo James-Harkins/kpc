@@ -1,0 +1,115 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.next-trip-cost {
+    background-color: #fff;
+    opacity: .9;
+    padding: 30px;
+    margin: 20px;
+    color: black;
+    border-radius: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    width: 90%;
+    max-width: 900px;
+}
+
+.next-trip-cost h1 { font-size: 50px; }
+.next-trip-cost h2 { font-size: 35px; }
+
+table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #ccc; }
+th { background-color: #f0f0f0; }
+
+.btn-outline-primary-finances {
+    margin: 10px 5px;
+    background-color: white;
+    opacity: .8;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: black !important;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.btn-outline-primary-finances:hover { background-color: gray !important; }
+
+.house-actions { display: flex; }
+</style>
+
+<div class="next-trip-cost">
+    <h1>Houses: KPC <%= @trip.number %></h1>
+
+    <% flash.each do |name, msg| %>
+        <div class="alert" role="alert"><%= content_tag :div, msg, class: name %></div>
+    <% end %>
+
+    <% if @houses.empty? %>
+        <p>No houses have been added for this trip yet.</p>
+    <% end %>
+
+    <% @houses.each do |house| %>
+        <h2>
+            <% if house.url.present? %>
+                <%= link_to house.name, house.url, target: '_blank', rel: 'noopener' %>
+            <% else %>
+                <%= house.name %>
+            <% end %>
+        </h2>
+        <% if house.address.present? %>
+            <p><%= house.address %></p>
+        <% end %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Bedroom</th>
+                    <th>Bed</th>
+                    <th>Capacity</th>
+                    <th>Rank</th>
+                    <th>Assigned To</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% house.bedrooms.each do |bedroom| %>
+                    <% bedroom.beds.sort_by(&:rank).each do |bed| %>
+                        <tr>
+                            <td><%= bedroom.name %></td>
+                            <td><%= bed.description %></td>
+                            <td><%= bed.capacity %></td>
+                            <td><%= bed.rank %></td>
+                            <td><%= bed.golfer_trips.map { |gt| gt.golfer.nickname.strip.titleize }.join(', ') %></td>
+                        </tr>
+                    <% end %>
+                <% end %>
+            </tbody>
+        </table>
+        <div class="house-actions">
+            <%= button_to 'Edit', edit_house_path(house), method: :get, class: 'btn-outline-primary-finances' %>
+            <%= button_to 'Delete', "/houses/#{house.id}", method: :delete, class: 'btn-outline-primary-finances',
+                  data: { confirm: "Delete #{house.name}? Any golfers assigned to its beds will become unassigned." } %>
+        </div>
+    <% end %>
+
+    <br>
+    <%= button_to '+ Add House', new_house_path, method: :get, params: { trip_id: @trip.id }, class: 'btn-outline-primary-finances' %>
+    <%= button_to 'Bed Assignments', bed_assignments_path, method: :get, params: { trip_id: @trip.id }, class: 'btn-outline-primary-finances' %>
+    <%= button_to 'Dashboard', '/dashboard', method: :get, class: 'btn-outline-primary-finances' %>
+</div>

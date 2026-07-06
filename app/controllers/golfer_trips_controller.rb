@@ -23,6 +23,10 @@ class GolferTripsController < ApplicationController
     if trip.nil?
       redirect_to '/dashboard' and return
     end
+    if trip.deposit_due_date.present? && !golfer.admin? && params[:deposit_policy_acknowledged] != "1"
+      flash[:error] = "You must acknowledge the non-refundable deposit policy."
+      redirect_to "/register_trip" and return
+    end
     golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
 
     if golfer_trip.save
@@ -33,6 +37,7 @@ class GolferTripsController < ApplicationController
       else
         golfer_trip.cost    = golfer.trip_net_total_cost(trip.id)
         golfer_trip.balance = golfer_trip.cost
+        golfer_trip.deposit_policy_acknowledged_at = Time.current if trip.deposit_due_date.present?
       end
       golfer_trip.save
       GolferMailer.trip_signup(golfer, golfer_trip).deliver_now unless golfer.admin?

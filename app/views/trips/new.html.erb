@@ -89,12 +89,14 @@ input[type="text"], input[type="number"], input[type="date"], select {
                 <th>Number (Roman)</th>
                 <th>Location</th>
                 <th>Start Date</th>
+                <th>Deposit Due Date</th>
             </tr>
             <tr>
                 <td><%= form.text_field :year %></td>
                 <td><%= form.text_field :number %></td>
                 <td><%= form.text_field :location %></td>
                 <td><%= form.text_field :start_date, placeholder: 'YYYY-MM-DD' %></td>
+                <td><%= form.text_field :deposit_due_date, placeholder: 'YYYY-MM-DD' %></td>
             </tr>
         </table>
 
