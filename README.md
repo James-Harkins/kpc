@@ -47,7 +47,7 @@ The best beds go to the golfers who stay the most nights and pay their 50% depos
 - **Live Standings** — Running point totals and a winner banner update as results are entered
 
 ### Automated Workflows
-- **Pre-trip reminder emails** — A GitHub Actions scheduled job runs daily starting in the weeks before the trip and sends reminder emails to golfers with outstanding balances; the workflow self-disables after March 1
+- **Pre-trip reminder emails** — A GitHub Actions scheduled job runs daily and fires exactly one month before the trip's start date, sending reminder emails to every registered golfer (paid and unpaid variants)
 - **Deposit reminder emails** — A second daily GitHub Actions job fires exactly one week before the trip's deposit deadline, emailing only golfers who haven't met their 50% deposit (admins and paid-up golfers are skipped); no-ops on all other days
 - **Transactional emails** — Trip signup confirmation, payment received, and balance paid emails fire automatically on the corresponding events; trip signup emails are suppressed for admin golfers
 
@@ -349,15 +349,22 @@ The Previous Trips page (`/previous_trips`) is admin-only and shows all `complet
 
 A trip can be created and fully configured in the database before any golfer can see it. Because `Trip.current` resolves entirely from `CURRENT_TRIP_NUMBER`, a new trip is invisible to non-admins until that env var is updated and the app is redeployed. This gives site admins a staging window to add nights, rounds, set costs, and flag tournament rounds without prematurely exposing the trip. The registration form at `/register_trip` is also gated on `@next_trip` being set, so even a golfer who guesses the URL directly cannot register until the env var is live.
 
-The intended sequence each year:
-1. Site admin creates the new trip record and configures it
+**Annual trip-setup checklist:**
+1. Site admin creates the new trip record and configures it — nights, rounds, courses, tee times, tournament rounds, and the **deposit due date** (which activates the deposit acknowledgment and bed-priority tiers)
 2. `CURRENT_TRIP_NUMBER` is updated in `config/application.yml` and the app is redeployed — the trip becomes visible and registration opens simultaneously
+3. Re-enable both scheduled email workflows in GitHub Actions (they're disabled between seasons):
+   ```bash
+   gh workflow enable trip_reminder.yml
+   gh workflow enable deposit_reminder.yml
+   ```
+4. Add the houses (with bedrooms, beds, and ranks) under `/houses` once they're booked — this can happen after registration opens
+5. After the trip: disable both workflows again (`gh workflow disable ...`)
 
 ### Automated Email Scheduling
 
-A GitHub Actions workflow runs on a daily cron schedule and fires pre-trip reminder emails via a Fly.io one-off machine running `rails emails:send_pre_trip_reminder`. The workflow includes a dry-run input for testing and self-disables on March 1 each year so it doesn't continue running after the relevant window.
+A GitHub Actions workflow runs on a daily cron schedule and fires pre-trip reminder emails via a Fly.io one-off machine running `rails emails:send_pre_trip_reminder`. The rake task self-gates on the date — it only sends when today is exactly one month before the current trip's `start_date` — so the daily cron is a no-op on every other day.
 
-A second workflow follows the same pattern for deposit reminders (`rails emails:send_deposit_reminder`). Its rake task self-gates on the date — it only sends when today is exactly one week before the current trip's `deposit_due_date` — so the daily cron is a no-op on every other day. Because the gate depends on a per-trip database value rather than a fixed calendar date, this workflow doesn't self-disable.
+A second workflow follows the same pattern for deposit reminders (`rails emails:send_deposit_reminder`), gated to exactly one week before the current trip's `deposit_due_date`. Both workflows include a dry-run input for manual testing. Because both send dates are derived from the trip record rather than fixed calendar dates, neither workflow self-disables — they are enabled/disabled by hand as part of the annual trip-setup checklist above.
 
 ---
 

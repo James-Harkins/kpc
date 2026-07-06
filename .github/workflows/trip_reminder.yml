@@ -2,7 +2,7 @@ name: Pre-Trip Reminder Emails
 
 on:
   schedule:
-    - cron: '0 14 * * *'  # Daily at 2pm UTC
+    - cron: '0 14 * * *'  # Daily at 2pm UTC; the rake task no-ops except one month before the trip start date
   workflow_dispatch:
     inputs:
       dry_run:
@@ -15,7 +15,6 @@ jobs:
   send_reminders:
     runs-on: ubuntu-latest
     permissions:
-      actions: write
       contents: read
     steps:
       - uses: actions/checkout@v4
@@ -35,13 +34,3 @@ jobs:
             --restart no \
             --env DRY_RUN=${{ github.event.inputs.dry_run || 'false' }} \
             -- bin/rails emails:send_pre_trip_reminder
-
-      - name: Disable workflow after March 1 send
-        if: github.event_name == 'schedule'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ "$(date +%m-%d)" = "03-01" ]; then
-            gh workflow disable trip_reminder.yml --repo ${{ github.repository }}
-            echo "Workflow disabled after March 1 send."
-          fi

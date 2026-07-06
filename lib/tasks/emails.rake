@@ -7,8 +7,9 @@ namespace :emails do
     abort "No current trip found. Set CURRENT_TRIP_NUMBER env var." if trip.nil?
     abort "Trip has no start_date set." if trip.start_date.nil?
 
-    unless dry_run || (Date.today.month == 3 && Date.today.day == 1)
-      puts "Today (#{Date.today}) is not March 1. No emails sent."
+    send_date = trip.start_date.to_date - 1.month
+    unless dry_run || Date.today == send_date
+      puts "Today (#{Date.today}) is not one month before the trip start date (#{send_date}). No emails sent."
       exit
     end
 
