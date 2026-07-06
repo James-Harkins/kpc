@@ -128,7 +128,9 @@ Located in `app/facades/`. Used in `GolferTripsController#create` to handle golf
 | `password_reset` | Password reset requested |
 | `announcement` | Admin broadcasts to all registered golfers |
 | `trip_reminder_paid` / `trip_reminder_unpaid` | `emails:send_pre_trip_reminder` rake task (daily GitHub Actions cron; sends 1 month before `trip.start_date`) |
+| `balance_final_notice` | Same rake task, 1 week before `trip.start_date` — unpaid balances only |
 | `deposit_reminder` | `emails:send_deposit_reminder` rake task (daily GitHub Actions cron; sends 1 week before `deposit_due_date` to golfers who haven't met their 50% deposit) |
+| `deposit_final_call` | Same rake task, on `deposit_due_date` itself — last-day warning that late deposits drop a priority tier |
 
 ---
 

@@ -47,8 +47,8 @@ The best beds go to the golfers who stay the most nights and pay their 50% depos
 - **Live Standings** — Running point totals and a winner banner update as results are entered
 
 ### Automated Workflows
-- **Pre-trip reminder emails** — A GitHub Actions scheduled job runs daily and fires exactly one month before the trip's start date, sending reminder emails to every registered golfer (paid and unpaid variants)
-- **Deposit reminder emails** — A second daily GitHub Actions job fires exactly one week before the trip's deposit deadline, emailing only golfers who haven't met their 50% deposit (admins and paid-up golfers are skipped); no-ops on all other days
+- **Pre-trip reminder emails** — A GitHub Actions scheduled job runs daily and fires exactly one month before the trip's start date, sending reminder emails to every registered golfer (paid and unpaid variants); a second send one week before the trip goes only to golfers with an outstanding balance
+- **Deposit reminder emails** — A second daily GitHub Actions job fires one week before the trip's deposit deadline and again on deadline day (a "final call" warning that late deposits drop a priority tier), emailing only golfers who haven't met their 50% deposit (admins and paid-up golfers are skipped); no-ops on all other days
 - **Transactional emails** — Trip signup confirmation, payment received, and balance paid emails fire automatically on the corresponding events; trip signup emails are suppressed for admin golfers
 
 ---
@@ -362,9 +362,9 @@ A trip can be created and fully configured in the database before any golfer can
 
 ### Automated Email Scheduling
 
-A GitHub Actions workflow runs on a daily cron schedule and fires pre-trip reminder emails via a Fly.io one-off machine running `rails emails:send_pre_trip_reminder`. The rake task self-gates on the date — it only sends when today is exactly one month before the current trip's `start_date` — so the daily cron is a no-op on every other day.
+A GitHub Actions workflow runs on a daily cron schedule and fires pre-trip reminder emails via a Fly.io one-off machine running `rails emails:send_pre_trip_reminder`. The rake task self-gates on the date and sends twice per trip: one month before `start_date` (all registered golfers, paid/unpaid variants) and one week before (a balance-due final notice to unpaid golfers only). Every other day is a no-op.
 
-A second workflow follows the same pattern for deposit reminders (`rails emails:send_deposit_reminder`), gated to exactly one week before the current trip's `deposit_due_date`. Both workflows include a dry-run input for manual testing. Because both send dates are derived from the trip record rather than fixed calendar dates, neither workflow self-disables — they are enabled/disabled by hand as part of the annual trip-setup checklist above.
+A second workflow follows the same pattern for deposit reminders (`rails emails:send_deposit_reminder`), which also sends twice: one week before the current trip's `deposit_due_date` (reminder) and on the deadline day itself (final call — last chance to keep top-tier bed priority). Both workflows include a dry-run input for manual testing (`FINAL_NOTICE=true` / `FINAL_CALL=true` select the second variant in dry runs). Because all send dates are derived from the trip record rather than fixed calendar dates, neither workflow self-disables — they are enabled/disabled by hand as part of the annual trip-setup checklist above.
 
 ---
 
