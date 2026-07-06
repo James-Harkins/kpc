@@ -148,5 +148,10 @@ RSpec.describe GolferTrip, type: :model do
     it 'is 3 when the deposit is not met' do
       expect(golfer_trip.bed_priority_tier).to eq(3)
     end
+
+    it 'is 0 for admins regardless of deposit status' do
+      admin_trip = create(:golfer_trip, golfer: create(:golfer, :admin), trip: trip, cost: 400)
+      expect(admin_trip.bed_priority_tier).to eq(0)
+    end
   end
 end

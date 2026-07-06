@@ -9,7 +9,8 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 ### For Golfers
 - **Registration & Authentication** — Account creation with invite token, secure login/logout, and password reset via tokenized email link
 - **Trip Registration** — Select individual nights and golf rounds, or register for the full trip (which applies a first-night discount)
-- **Personal Dashboard** — View trip itinerary, cost breakdown, payment history, and outstanding balance
+- **Deposit Policy Acknowledgment** — When a trip has a deposit deadline, registration requires acknowledging the non-refundable 50% deposit policy (timestamped, enforced server-side with inline error feedback)
+- **Personal Dashboard** — View trip itinerary, cost breakdown, payment history, outstanding balance, and links to the trip's rental house listings
 - **Profile Management** — Update name, email, password, and t-shirt size
 
 ### For Admins
@@ -25,6 +26,17 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 - **Previous Trips** — Historical archive of past trips with attendance and financial records
 - **Trip Finalization** — Lock in a trip financial summary snapshot (site admin only)
 
+### Bed Assignments & Payment Incentives
+
+The best beds go to the golfers who stay the most nights and pay their 50% deposit earliest — a first-come, first-serve incentive to drive on-time payment.
+
+- **House Management** — Site admins model each trip's rental houses (main + overflow), bedrooms, and beds; each bed has a description, a capacity of 1 or 2 (guys double up in kings and queens), and an explicit quality rank (1 = best, unique across the trip's houses). Houses carry a listing URL shown to golfers on the dashboard, and can be added after registration opens since houses are often booked late
+- **Deposit Tracking** — A trip-level deposit deadline plus a derived per-golfer deposit status: the deposit (50% of cost) counts as met at the timestamp of the payment that crossed the threshold, computed live from the payments ledger so cost edits and returns can never leave a stale flag
+- **Priority Board** — Admins see every registrant ranked into tiers: admins first (tier 0), then deposit met by the deadline (tier 1), met late (tier 2), not met (tier 3); within a tier, most nights first, then earliest deposit, then earliest registration
+- **Bed Assignment** — A one-click **Autofill by Priority** fills the board (best bed to highest priority, one golfer per bed, then remaining golfers double into the lowest-ranked shared beds); admins rearrange via per-slot dropdowns before saving. Saves are transactional and all-or-nothing — duplicate or over-capacity submissions are rejected whole
+- **Non-Refundable Deposit Support** — Returns that would dip below a golfer's 50% deposit trigger a confirmation warning (warn, don't block); the registration acknowledgment is stored with a timestamp
+- **Deposit Reminder Emails** — One week before the deadline, golfers who haven't met their deposit get an email with their remaining deposit math, payment instructions, and the bed-priority incentive
+
 ### Tournament
 - **Score Entry** — Admins enter each golfer's stroke total for non-tournament rounds; these scores drive the ranking algorithm
 - **Player Rankings** — Golfers are ranked by average score across non-tournament rounds, with automatic fallback to the most recent prior trip for golfers who lack current-trip scores
@@ -36,6 +48,7 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 
 ### Automated Workflows
 - **Pre-trip reminder emails** — A GitHub Actions scheduled job runs daily starting in the weeks before the trip and sends reminder emails to golfers with outstanding balances; the workflow self-disables after March 1
+- **Deposit reminder emails** — A second daily GitHub Actions job fires exactly one week before the trip's deposit deadline, emailing only golfers who haven't met their 50% deposit (admins and paid-up golfers are skipped); no-ops on all other days
 - **Transactional emails** — Trip signup confirmation, payment received, and balance paid emails fire automatically on the corresponding events; trip signup emails are suppressed for admin golfers
 
 ---
@@ -83,6 +96,7 @@ erDiagram
         string number
         string location
         datetime start_date
+        date deposit_due_date
         boolean completed
         string team_a_name
         string team_b_name
@@ -113,10 +127,12 @@ erDiagram
         bigint id PK
         bigint golfer_id FK
         bigint trip_id FK
+        bigint bed_id FK
         integer cost
         integer balance
         boolean is_paid
         boolean is_full_trip
+        datetime deposit_policy_acknowledged_at
     }
     GOLFER_NIGHTS {
         bigint id PK
@@ -166,6 +182,25 @@ erDiagram
         integer matchup_group
         string result
     }
+    HOUSES {
+        bigint id PK
+        bigint trip_id FK
+        string name
+        string address
+        string url
+    }
+    BEDROOMS {
+        bigint id PK
+        bigint house_id FK
+        string name
+    }
+    BEDS {
+        bigint id PK
+        bigint bedroom_id FK
+        string description
+        integer capacity
+        integer rank
+    }
 
     GOLFERS ||--o{ GOLFER_TRIPS : ""
     TRIPS ||--o{ GOLFER_TRIPS : ""
@@ -186,6 +221,10 @@ erDiagram
     ROUNDS ||--o{ TOURNAMENT_MATCHUP_RESULTS : ""
     GOLFERS ||--o| TRIPS : "captain_a"
     GOLFERS ||--o| TRIPS : "captain_b"
+    TRIPS ||--o{ HOUSES : ""
+    HOUSES ||--o{ BEDROOMS : ""
+    BEDROOMS ||--o{ BEDS : ""
+    BEDS ||--o{ GOLFER_TRIPS : ""
 ```
 
 ### Key Models
@@ -196,7 +235,7 @@ erDiagram
 | `Trip` | A single annual golf trip with year, number, location, dates, and optional team captain references |
 | `Night` | An individual night of accommodation on a trip, with a per-night cost |
 | `Round` | An individual golf round on a trip; flagged as a tournament round or a scoring round |
-| `GolferTrip` | Join table recording a golfer's registration for a trip; holds `cost`, `balance`, `is_paid`, and `is_full_trip` |
+| `GolferTrip` | Join table recording a golfer's registration for a trip; holds `cost`, `balance`, `is_paid`, `is_full_trip`, an optional `bed_id` assignment, and derived deposit logic (`deposit_amount`, `deposit_met_at`, `bed_priority_tier`) |
 | `GolferNight` | Records which nights a golfer is attending |
 | `GolferRound` | Records which rounds a golfer is playing; holds an optional `score` used for tournament ranking |
 | `Payment` | A payment or return for a golfer trip; negative `amount` values represent returns |
@@ -205,6 +244,9 @@ erDiagram
 | `TripFinancialSummary` | A finalized financial snapshot of a completed trip |
 | `TournamentAssignment` | Records a golfer's team, matchup group, and match type for a specific trip and round; contains the full team-generation algorithm |
 | `TournamentMatchupResult` | Records the outcome of a matchup group for a round (`A`, `B`, or `tie`); aggregates team point totals |
+| `House` | A rental house for a trip (main or overflow), with address and listing URL |
+| `Bedroom` | A bedroom within a house |
+| `Bed` | A bed within a bedroom; holds `capacity` (1–2) and a trip-unique quality `rank` (1 = best) |
 
 ---
 
@@ -230,12 +272,23 @@ A golfer's cost is computed from the nights and rounds they selected:
 - **Full trip discount** — if the golfer attends every night and every round, the first night is free
 - `is_full_trip` is detected automatically during registration by comparing selected counts against total trip counts, or via an explicit "whole enchilada" registration option
 
+### Deposit Tracking & Bed Priority
+
+The deposit is never stored as a flag — it is derived live from the payments ledger:
+
+- **`deposit_amount`** = 50% of the golfer's trip cost, rounded up
+- **`deposit_met_at`** walks the golfer's payments in order and returns the timestamp of the **last upward crossing** of the deposit threshold, or `nil` if the current net total no longer meets it. A return that dips below the deposit un-meets it, and a refund-then-repay sequence yields the *later* crossing — a golfer can't bank an early timestamp, get refunded, and keep their priority
+
+Because everything is derived at read time, admin cost edits, backdated payments, and returns can never leave a stale deposit status.
+
+The priority board sorts every registrant by `[tier, nights attending (desc), deposit_met_at (asc), registration time (asc)]`, where tier 0 = admins (always first), tier 1 = deposit met by the trip's `deposit_due_date`, tier 2 = met late, tier 3 = not met. Bed assignment itself is a nullable `golfer_trips.bed_id` — one bed per golfer for their whole stay, with capacity-2 beds simply holding two golfer_trips. Assignment saves are wrapped in a transaction and validated against bed capacity and cross-trip beds; the whole submission is rejected if any slot is invalid. An Autofill button seeds the board client-side (best bed → highest priority, then overflow doubles into the worst-ranked shared beds) without touching the database until saved.
+
 ### Role-Based Authorization
 
 Two authorization levels are enforced via before-action filters throughout the controllers:
 
-- **`require_admin`** — any golfer with `role: :admin`; gates payment recording, the finances page, and attendance views
-- **`require_site_admin`** — a single designated golfer identified by matching `SITE_ADMIN_EMAIL`; gates return processing, golfer trip editing, and trip finalization
+- **`require_admin`** — any golfer with `role: :admin`; gates payment recording, the finances page, attendance views, and bed assignments
+- **`require_site_admin`** — a single designated golfer identified by matching `SITE_ADMIN_EMAIL`; gates return processing, golfer trip editing, trip finalization, and house/bedroom/bed management
 
 ### Password Reset Security
 
@@ -270,7 +323,7 @@ The dashboard (`/dashboard`) derives its state from two independent signals: `Tr
 
 Score entry buttons (for non-tournament rounds) appear in the global tools card whenever `Trip.current` exists, regardless of whether the trip is completed.
 
-Site-admin-only buttons — Broadcast, Courses, Create Trip — are nested inside the global tools card and only render when `current_user.email == SITE_ADMIN_EMAIL`.
+Site-admin-only buttons — Broadcast, Courses, Create Trip, Create Golfer, Houses — are nested inside the global tools card and only render when `current_user.email == SITE_ADMIN_EMAIL`. The Beds button (bed assignments) renders for any admin whenever `Trip.current` exists.
 
 **Default (non-admin) golfers**
 
@@ -280,7 +333,7 @@ The non-admin branch ignores the `completed` flag entirely and uses calendar dat
 |---|---|
 | No current trip | "Stay tuned for KPC [next number]" (predicted from last completed trip) |
 | Current trip exists, last night has passed (`last_night.date < Date.today`) | "Stay tuned for KPC [next number]" (regardless of `completed` flag) |
-| Current trip ongoing, golfer is registered | Full trip card: itinerary calendar, golf schedule, balance, payment instructions |
+| Current trip ongoing, golfer is registered | Full trip card: itinerary calendar, golf schedule, balance, payment instructions, and links to the trip's house listings |
 | Current trip ongoing, golfer not yet registered | "Sign up for KPC X" button |
 
 **Completed vs. finalized**
@@ -303,6 +356,8 @@ The intended sequence each year:
 ### Automated Email Scheduling
 
 A GitHub Actions workflow runs on a daily cron schedule and fires pre-trip reminder emails via a Fly.io one-off machine running `rails emails:send_pre_trip_reminder`. The workflow includes a dry-run input for testing and self-disables on March 1 each year so it doesn't continue running after the relevant window.
+
+A second workflow follows the same pattern for deposit reminders (`rails emails:send_deposit_reminder`). Its rake task self-gates on the date — it only sends when today is exactly one week before the current trip's `deposit_due_date` — so the daily cron is a no-op on every other day. Because the gate depends on a per-trip database value rather than a fixed calendar date, this workflow doesn't self-disable.
 
 ---
 
@@ -333,7 +388,11 @@ cp config/application.yml.example config/application.yml
 # Create and migrate the database
 rails db:create db:migrate
 
-# (Optional) Seed with demo data — Sopranos-themed golfers
+# (Optional) Seed with demo data — Sopranos-themed golfers, a current trip
+# with courses/tee times, two houses with ranked beds, and backdated payments
+# that spread golfers across all deposit-priority tiers. Includes one
+# unregistered golfer (furio@giunta.it) for testing the registration flow.
+# Rerun anytime with: rails db:reset
 rails db:seed
 
 # Start the server
@@ -360,16 +419,17 @@ rails server
 bundle exec rspec
 ```
 
-SimpleCov reports **100% line coverage** across all tracked files. Coverage is measured on the application's business logic layer — models, helpers, and facades. Controllers are excluded from the SimpleCov metric; they are thin orchestration layers (find a record, call a model method, redirect) that are better verified by integration/request specs than by unit tests. A representative set of request specs covers the sessions controller to demonstrate the pattern. Full controller and routing coverage is the intended next step.
+SimpleCov reports **99%+ line coverage** across all tracked files. Coverage is measured on the application's business logic layer — models, helpers, mailers, and facades. Controllers are excluded from the SimpleCov metric; they are thin orchestration layers (find a record, call a model method, redirect) that are better verified by integration/request specs than by unit tests. Request specs cover the sessions, golfers, houses, and bed assignments controllers. Full controller and routing coverage is the intended next step.
 
 ### What's tested
 
 | Layer | Approach | Coverage |
 |---|---|---|
-| Models | RSpec unit specs | 100% |
+| Models | RSpec unit specs (including the deposit-ledger and bed-priority edge cases) | ~100% |
 | `ApplicationHelper` | RSpec helper specs | 100% |
 | `GolferTripFacade` | RSpec unit specs | 100% |
-| Controllers | RSpec request specs (sessions) | Representative |
+| Mailers | RSpec mailer specs | Representative |
+| Controllers | RSpec request specs (sessions, golfers, houses, bed assignments) | Representative |
 
 ### Test tooling
 
@@ -377,6 +437,7 @@ SimpleCov reports **100% line coverage** across all tracked files. Coverage is m
 |---|---|
 | RSpec | Test framework |
 | Shoulda-Matchers | Concise association and validation matchers |
+| FactoryBot | Test data factories (newer specs; older specs use direct `create!`) |
 | SimpleCov | Line coverage reporting |
 
 ```bash

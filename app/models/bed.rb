@@ -12,10 +12,6 @@ class Bed < ApplicationRecord
     bedroom.house.trip
   end
 
-  def occupants
-    golfer_trips.includes(:golfer)
-  end
-
   private
 
   def rank_unique_within_trip

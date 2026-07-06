@@ -181,13 +181,16 @@ body::before {
     <% deposit_policy_required = @next_trip.deposit_due_date.present? && !current_user.admin? %>
     <% if deposit_policy_required %>
         <div class="info-box" id="deposit-policy-box">
-            <strong>Deposit policy:</strong> Your 50% deposit is <u>non-refundable</u> and due by
+            <strong>Deposit policy:</strong><br> Your 50% deposit is <u>non-refundable</u> and due by
             <strong><%= @next_trip.deposit_due_date.strftime('%B %-d, %Y') %></strong>.
-            The best beds go to the guys who stay the most nights and pay their deposit earliest &mdash;
-            deposits received after the deadline drop a priority tier.
+            The best beds go to the guys who stay the most nights and pay their deposit earliest.
+            Deposits received after the deadline drop a priority tier.
             <div class="checkbox-item">
                 <input type="checkbox" id="deposit-ack" onchange="updateDepositAck()">
                 <span>I understand and accept the non-refundable deposit policy.</span>
+            </div>
+            <div id="deposit-ack-error" style="display: none; color: rgb(222, 74, 72); font-weight: bold; margin-top: 8px;">
+                You must check the box to acknowledge the non-refundable deposit policy before signing up.
             </div>
         </div>
     <% end %>
@@ -256,10 +259,22 @@ function updateDepositAck() {
     document.querySelectorAll('.trip-register-container input[name="deposit_policy_acknowledged"]').forEach(function(input) {
         input.value = acknowledged ? '1' : '0';
     });
-    document.querySelectorAll('.trip-register-container input[type="submit"]').forEach(function(button) {
-        button.disabled = !acknowledged;
-    });
+    if (acknowledged) {
+        document.getElementById('deposit-ack-error').style.display = 'none';
+    }
 }
+
+document.querySelectorAll('.trip-register-container form').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+        var ackBox = document.getElementById('deposit-ack');
+        if (ackBox && !ackBox.checked) {
+            event.preventDefault();
+            var error = document.getElementById('deposit-ack-error');
+            error.style.display = 'block';
+            error.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+});
 
 updateDepositAck();
 </script>

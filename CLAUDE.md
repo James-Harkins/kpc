@@ -4,7 +4,7 @@
 
 A golf trip management app for an annual golf outing. Golfers register for trips, select which rounds and nights they're attending, and costs are calculated accordingly. "Kitchen Pass" = permission slip from the family to go.
 
-Admins manage trips, courses, expenses, and financials. There's a two-day end-of-trip tournament where golfers split into teams and compete in 2v2 (and occasionally 1v1 or 2v1) matchups — the app handles team generation, pairing, score entry, and result tracking.
+Admins manage trips, courses, expenses, financials, and bed assignments. There's an end-of-trip tournament (currently the last three rounds) where golfers split into teams and compete in 2v2 (and occasionally 1v1 or 2v1) matchups — the app handles team generation, pairing, score entry, and result tracking. Beds in the rental houses are awarded by payment incentive: golfers who stay the most nights and pay their 50% deposit earliest get the best beds.
 
 ---
 
@@ -81,7 +81,7 @@ Scopes: `Round.tournament` / `Round.non_tournament`
 Belongs to a `Trip`. Represents one night at the house.
 
 ### `GolferTrip`
-Join between `Golfer` and `Trip`. Tracks `cost`, `balance`, `is_paid`, `is_full_trip`. A "full trip" gets the first night comped. Nullable `bed_id` FK holds the golfer's bed assignment (one bed for the whole stay; capacity-2 beds are two golfer_trips sharing a bed_id). Deposit logic is derived live from the payments ledger: `deposit_amount` (50% of cost, ceil), `deposit_met_at` (timestamp of the last upward crossing of the deposit; a later return un-meets it), `deposit_met_by_deadline?`, `bed_priority_tier` (1 = met by deadline, 2 = met late, 3 = not met). `deposit_policy_acknowledged_at` records acceptance of the non-refundable policy at registration.
+Join between `Golfer` and `Trip`. Tracks `cost`, `balance`, `is_paid`, `is_full_trip`. A "full trip" gets the first night comped. Nullable `bed_id` FK holds the golfer's bed assignment (one bed for the whole stay; capacity-2 beds are two golfer_trips sharing a bed_id). Deposit logic is derived live from the payments ledger: `deposit_amount` (50% of cost, ceil), `deposit_met_at` (timestamp of the last upward crossing of the deposit; a later return un-meets it), `deposit_met_by_deadline?`, `bed_priority_tier` (0 = admin, always first; 1 = met by deadline; 2 = met late; 3 = not met). `deposit_policy_acknowledged_at` records acceptance of the non-refundable policy at registration.
 
 ### `House` / `Bedroom` / `Bed`
 `House` belongs to a `Trip` (`name`, `address`, `url` — rental listing link shown to golfers on the dashboard). Multiple houses per trip (main + overflow). `Bedroom` belongs to a house. `Bed` belongs to a bedroom: `description`, `capacity` (1 or 2), `rank` (1 = best; unique per trip, enforced in the model). Beds `has_many :golfer_trips, dependent: :nullify`. House/bed structure is site-admin; the `/bed_assignments` page (admin) shows the computed priority order and per-bed slot dropdowns — assignment is manual, admins take the best beds at their discretion.
@@ -188,7 +188,7 @@ PATCH /tournament_matchup_results/:round_id
 
 ### How it works
 
-1. Admin marks 2 rounds as `is_tournament_round: true` on the trip edit page
+1. Admin marks the tournament rounds (currently the last three) as `is_tournament_round: true` on the trip edit page
 2. Admin enters stroke scores for golfers on non-tournament rounds via `/rounds/:id/scores`
 3. Admin visits `/tournament` and clicks "Generate Teams"
 4. Algorithm ranks players by average score (ascending — lower = better), then uses serpentine assignment into groups of 4 to produce balanced teams
@@ -208,6 +208,31 @@ If a golfer has no scores on the current trip's non-tournament rounds, the algor
 
 ---
 
+## Bed Assignment Feature
+
+### How it works
+
+1. Site admin sets `deposit_due_date` on the trip (new/edit form). This activates the whole feature: the registration form requires acknowledging the non-refundable 50% deposit policy (checkbox, JS-gated with inline error, server-enforced, timestamped in `deposit_policy_acknowledged_at`)
+2. Site admin adds houses under `/houses` (often after registration has opened) — bedrooms and beds entered as dynamic rows; each bed gets capacity (1–2) and a trip-unique rank (1 = best)
+3. Admins visit `/bed_assignments`: a priority table plus per-bed slot dropdowns
+4. "Autofill by Priority" (client-side JS) fills slots: pass 1 gives one golfer per bed, best bed to highest priority; pass 2 doubles remaining golfers into the lowest-ranked capacity-2 beds. Admin rearranges, then saves — full-replace PATCH in a transaction, rejected whole on duplicate golfers or over-capacity
+5. House names link to their rental listing (`houses.url`) on every golfer's dashboard; bed assignments themselves are admin-only
+
+### Priority order (`Trip#bed_priority_order`)
+
+Sort key: `[tier, -nights_attending, deposit_met_at, created_at]`.
+Tiers via `GolferTrip#bed_priority_tier`: **0** admin (always first), **1** deposit met by deadline, **2** met after deadline, **3** not met.
+
+### Deposit derivation (no stored flag)
+
+`deposit_amount` = 50% of cost, ceil. `deposit_met_at` walks the payments ledger in order and returns the **last upward crossing** of the deposit — nil if the current net total is below it. So returns can un-meet a deposit, refund-then-repay yields the later timestamp, and cost edits move the threshold automatically. Cost-0 (admin-registered) golfers are trivially met at registration.
+
+### Returns warning
+
+On the finances page, a return that would drop a golfer's net paid below their deposit triggers a JS `confirm` (warn, don't block — site admin can proceed).
+
+---
+
 ## Tests
 
 RSpec. Run with:
@@ -218,7 +243,9 @@ bundle exec rspec spec/models/
 bundle exec rspec spec/models/tournament_assignment_spec.rb
 ```
 
-Uses `shoulda-matchers` for one-liner relationship/validation assertions. Database is cleaned via transactional fixtures (`use_transactional_fixtures = true`). Existing tests use direct `Model.create!` calls; new tests should use FactoryBot factories for scalability.
+Uses `shoulda-matchers` for one-liner relationship/validation assertions. Database is cleaned via transactional fixtures (`use_transactional_fixtures = true`). Older tests use direct `Model.create!` calls; new tests should use the FactoryBot factories in `spec/factories/factories.rb` (`FactoryBot::Syntax::Methods` is included in `rails_helper.rb`).
+
+Seeds (`db/seeds.rb`) build a full manual-testing scenario: Sopranos-themed golfers, a current trip (KPC XXVI) with courses/tee times and three tournament rounds, two houses with ranked beds, and backdated payments spreading golfers across all bed-priority tiers. `furio@giunta.it` is seeded unregistered for testing the registration flow. Rerun with `rails db:reset`.
 
 ---
 

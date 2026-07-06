@@ -42,7 +42,10 @@ class GolferTrip < ApplicationRecord
     met_at.to_date <= trip.deposit_due_date
   end
 
+  # Tier 0: admins always pick first. Tier 1: deposit met by the deadline.
+  # Tier 2: met late. Tier 3: not met.
   def bed_priority_tier
+    return 0 if golfer.admin?
     return 3 unless deposit_met?
     deposit_met_by_deadline? ? 1 : 2
   end

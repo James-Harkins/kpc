@@ -61,6 +61,14 @@ RSpec.describe Trip, type: :model do
 
       expect(trip.bed_priority_order).to eq([admin_registered, payer])
     end
+
+    it 'always places admins first, regardless of nights or deposit timing' do
+      early_payer = register(cost: 400, nights: 4)
+      create(:payment, golfer_trip: early_payer, amount: 400, created_at: Time.utc(2026, 5, 1))
+      admin_trip = create(:golfer_trip, golfer: create(:golfer, :admin), trip: trip, cost: 400)
+
+      expect(trip.bed_priority_order).to eq([admin_trip, early_payer])
+    end
   end
 
   describe 'validations' do

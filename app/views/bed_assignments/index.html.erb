@@ -72,6 +72,7 @@ select {
     vertical-align: middle;
 }
 
+.tier-0 { color: #6c757d; font-weight: bold; }
 .tier-1 { color: #1e7e34; }
 .tier-2 { color: #b8860b; }
 .tier-3 { color: rgb(222, 74, 72); }
@@ -87,10 +88,11 @@ select {
     <h2>Suggested Priority Order</h2>
     <% if @trip.deposit_due_date.present? %>
         <p>Deposit deadline: <strong><%= @trip.deposit_due_date.strftime('%B %-d, %Y') %></strong>.
-           Tier 1 met their 50% deposit by the deadline, Tier 2 met it late, Tier 3 haven't met it.
+           Admins always pick first. Then Tier 1 met their 50% deposit by the deadline,
+           Tier 2 met it late, Tier 3 haven't met it.
            Within a tier: most nights first, then earliest deposit, then earliest registration.</p>
     <% else %>
-        <p>No deposit deadline is set for this trip — any met deposit counts as Tier 1.</p>
+        <p>No deposit deadline is set for this trip — admins pick first, and any met deposit counts as Tier 1.</p>
     <% end %>
 
     <table>
@@ -115,6 +117,8 @@ select {
                     <td><%= golfer_trip.nights_attending %></td>
                     <td class="tier-<%= golfer_trip.bed_priority_tier %>">
                         <% case golfer_trip.bed_priority_tier %>
+                        <% when 0 %>
+                            Admin &mdash; first pick
                         <% when 1 %>
                             Tier 1 &mdash; met <%= golfer_trip.deposit_met_at.strftime('%-m/%-d') %>
                         <% when 2 %>
@@ -163,7 +167,7 @@ select {
                                     <td><%= bed.rank %></td>
                                     <td>
                                         <% (1..bed.capacity).each do |slot| %>
-                                            <select name="beds[<%= bed.id %>][]">
+                                            <select name="beds[<%= bed.id %>][]" data-bed-id="<%= bed.id %>" data-bed-rank="<%= bed.rank %>" data-slot="<%= slot %>">
                                                 <option value="">&mdash; Unassigned &mdash;</option>
                                                 <% @priority.each_with_index do |golfer_trip, index| %>
                                                     <option value="<%= golfer_trip.id %>" <%= 'selected' if occupants[slot - 1]&.id == golfer_trip.id %>>
@@ -179,10 +183,52 @@ select {
                     </tbody>
                 </table>
             <% end %>
+            <button type="button" class="btn-outline-primary-finances" onclick="autofillAssignments()">Autofill by Priority</button>
             <input type="submit" value="Save Assignments" class="btn-outline-primary-finances">
+            <p style="font-size: 0.85em; color: #555;">
+                Autofill gives each golfer their own bed &mdash; best bed to highest priority &mdash; then
+                doubles the remaining golfers into the lowest-ranked shared beds. Nothing is saved
+                until you click Save Assignments, so rearrange freely first.
+            </p>
         <% end %>
     <% end %>
 
     <br>
     <%= button_to 'Dashboard', '/dashboard', method: :get, class: 'btn-outline-primary-finances' %>
 </div>
+
+<script>
+function autofillAssignments() {
+    var selects = Array.prototype.slice.call(document.querySelectorAll('select[data-bed-id]'));
+    if (selects.length === 0) return;
+
+    // Group slot selects by bed, keeping bed rank
+    var beds = {};
+    selects.forEach(function(select) {
+        var id = select.dataset.bedId;
+        if (!beds[id]) beds[id] = { rank: parseInt(select.dataset.bedRank, 10), slots: [] };
+        beds[id].slots[parseInt(select.dataset.slot, 10) - 1] = select;
+    });
+    var bedList = Object.keys(beds).map(function(id) { return beds[id]; });
+
+    // Golfer trip ids in priority order — the dropdown options are already sorted
+    var golfers = Array.prototype.slice.call(selects[0].options)
+        .map(function(option) { return option.value; })
+        .filter(function(value) { return value !== ''; });
+
+    selects.forEach(function(select) { select.value = ''; });
+
+    // Pass 1: one golfer per bed, best bed (rank 1) to highest priority
+    var next = 0;
+    bedList.sort(function(a, b) { return a.rank - b.rank; });
+    bedList.forEach(function(bed) {
+        if (next < golfers.length) bed.slots[0].value = golfers[next++];
+    });
+
+    // Pass 2: double the remaining golfers into shared beds, worst rank first
+    bedList.sort(function(a, b) { return b.rank - a.rank; });
+    bedList.forEach(function(bed) {
+        if (next < golfers.length && bed.slots.length > 1) bed.slots[1].value = golfers[next++];
+    });
+}
+</script>
