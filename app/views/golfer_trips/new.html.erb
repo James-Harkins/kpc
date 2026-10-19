@@ -184,7 +184,6 @@ body::before {
             <strong>Deposit policy:</strong><br> Your 50% deposit is <u>non-refundable</u> and due by
             <strong><%= @next_trip.deposit_due_date.strftime('%B %-d, %Y') %></strong>.
             The best beds go to the guys who stay the most nights and pay their deposit earliest.
-            Deposits received after the deadline drop a priority tier.
             <div class="checkbox-item">
                 <input type="checkbox" id="deposit-ack" onchange="updateDepositAck()">
                 <span>I understand and accept the non-refundable deposit policy.</span>
