@@ -57,6 +57,12 @@ body::before {
     margin: 16px 0;
 }
 
+.bed-count-card h3,
+.bed-count-card h4,
+.bed-count-card h5 {
+    text-align: center;
+}
+
 .bed-count-grid {
     width: 100%;
     table-layout: fixed;
@@ -251,7 +257,7 @@ body::before {
     <h1>Attendance - KPC <%= @next_trip.number %></h1>
 
     <% if @show_open_beds %>
-        <div class="date-card">
+        <div class="date-card bed-count-card">
             <h3>Open Bed Count</h3>
             <% if @total_bed_spots.zero? %>
                 <h4>No beds have been entered for this trip yet.</h4>
