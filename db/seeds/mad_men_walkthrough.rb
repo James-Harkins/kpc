@@ -1,11 +1,12 @@
-# Blank-trip walkthrough scenario: KPC XXVII with a house, beds, 4 admins and a
-# 25-golfer roster, nobody registered, registration closed.
+# Walkthrough scenario: KPC XXVII with one house of 25 bed slots, 4 admins already
+# registered (reserved all week) and a 25-golfer roster nobody has registered yet.
+# Registration is closed.
 #
 #   bin/rails runner db/seeds/mad_men_walkthrough.rb
 #
 # WIPES the development database first. Needs CURRENT_TRIP_NUMBER=XXVII and
 # SITE_ADMIN_EMAIL=don@sterlingcooper.com in config/application.yml.
-abort "Development only." unless Rails.env.development?
+abort "Development only." unless Rails.env.development? || ENV["WALKTHROUGH_SEED_ALLOW"] == "1"
 
 PASSWORD = "oldfashioned".freeze
 
@@ -14,17 +15,17 @@ ActiveRecord::Base.connection.execute(
   "TRUNCATE TABLE #{tables.map { |t| ActiveRecord::Base.connection.quote_table_name(t) }.join(', ')} RESTART IDENTITY CASCADE"
 )
 
-def golfer!(first, last, nickname, email, role: :default)
-  Golfer.create!(first_name: first, last_name: last, nickname: nickname, email: "#{email}@sterlingcooper.com",
+def golfer!(first, last, email, role: :default)
+  Golfer.create!(first_name: first, last_name: last, nickname: first, email: "#{email}@sterlingcooper.com",
                  password: PASSWORD, password_confirmation: PASSWORD, role: role, t_shirt_size: :l)
 end
 
-admins = [
-  ["Don",   "Draper",   "don"],
-  ["Roger", "Sterling", "roger"],
-  ["Burt",  "Cooper",   "burt"],
-  ["Lane",  "Pryce",    "lane"]
-].map { |first, last, key| golfer!(first, last, first, key, role: :admin) }
+admins = {
+  "don"   => golfer!("Don",   "Draper",   "don",   role: :admin),
+  "roger" => golfer!("Roger", "Sterling", "roger", role: :admin),
+  "burt"  => golfer!("Burt",  "Cooper",   "burt",  role: :admin),
+  "lane"  => golfer!("Lane",  "Pryce",    "lane",  role: :admin)
+}
 
 roster = [
   ["Pete", "Campbell"], ["Ken", "Cosgrove"], ["Harry", "Crane"], ["Paul", "Kinsey"],
@@ -34,7 +35,7 @@ roster = [
   ["Jimmy", "Barrett"], ["Lou", "Avery"], ["Bobby", "Draper"], ["Arnold", "Rosen"],
   ["Kurt", "Kurtzman"], ["Joey", "Baird"], ["Ed", "Baxter"], ["Smitty", "Smith"],
   ["Gene", "Hofstadt"]
-].map { |first, last| golfer!(first, last, first, first.downcase) }
+].map { |first, last| golfer!(first, last, first.downcase) }
 
 trip = Trip.create!(year: 2027, number: "XXVII", location: "Virginia Beach", start_date: Date.new(2027, 4, 24),
                     deposit_due_date: Date.new(2027, 1, 1), registration_open: false)
@@ -44,20 +45,36 @@ trip = Trip.create!(year: 2027, number: "XXVII", location: "Virginia Beach", sta
   trip.rounds.create!(date: Date.new(2027, 4, day), cost: cost, is_tournament_round: tournament)
 end
 
+# One house, 25 bed slots (a slot is one sleeper, so a capacity-2 bed is two slots).
 house = trip.houses.create!(name: "Main House", address: "1 Ocean Drive, Virginia Beach", url: "https://example.com/main-house")
 [
-  ["Primary Suite", [["King", 2, 1]]],
-  ["Ocean Queen",   [["Queen", 1, 2]]],
-  ["Garden Queen",  [["Queen", 1, 3]]],
-  ["Twin Room",     [["Twin A", 1, 4], ["Twin B", 1, 5]]],
-  ["Bunk Room",     [["Bunk Top", 1, 6], ["Bunk Bottom", 1, 7]]],
-  ["Den",           [["Shared Queen", 2, 8]]],
-  ["Loft",          [["Sofa Bed", 2, 9], ["Air Mattress", 1, 10]]]
+  ["Primary Suite", [["King", 2]]],
+  ["Ocean Suite",   [["King", 2]]],
+  ["Garden Room",   [["Queen", 1]]],
+  ["Sunroom",       [["Queen", 1]]],
+  ["Den",           [["Shared Queen", 2]]],
+  ["Twin Room A",   [["Twin A", 1], ["Twin B", 1]]],
+  ["Twin Room B",   [["Twin C", 1], ["Twin D", 1]]],
+  ["Bunk Room",     [["Bunk 1 Top", 1], ["Bunk 1 Bottom", 1], ["Bunk 2 Top", 1], ["Bunk 2 Bottom", 1]]],
+  ["Loft",          [["Sofa Bed", 2], ["Daybed", 1], ["Air Mattress", 1], ["Air Mattress 2", 1]]],
+  ["Basement",      [["Pullout Couch", 2], ["Futon", 2]]]
 ].each do |room_name, beds|
   room = house.bedrooms.create!(name: room_name)
-  beds.each { |description, capacity, rank| room.beds.create!(description: description, capacity: capacity, rank: rank) }
+  beds.each { |description, capacity| room.beds.create!(description: description, capacity: capacity, rank: (Bed.maximum(:rank) || 0) + 1) }
 end
 
-puts "Seeded KPC #{trip.number}: #{admins.size} admins, #{roster.size} golfers, #{trip.nights.count} nights, " \
-     "#{trip.rounds.count} rounds, #{trip.total_bed_spots} bed spots. Nobody registered; registration closed."
+# Admins are already registered: no cost, bed reserved all week. Don is Mon-Fri, the rest attend every night.
+nights = trip.nights.order(:date).to_a
+rounds = trip.rounds.order(:date).to_a
+{ "don" => nights[2..6], "roger" => nights, "burt" => nights, "lane" => nights }.each do |key, stay|
+  admin = admins.fetch(key)
+  stay.each { |night| admin.golfer_nights.create!(night: night) }
+  rounds.select { |round| stay.map(&:date).include?(round.date) }.each { |round| admin.golfer_rounds.create!(round: round) }
+  admin.golfer_trips.create!(trip: trip, is_full_trip: stay.length == nights.length, cost: 0, balance: 0,
+                             is_paid: true, reserved_all_week: true)
+end
+
+puts "Seeded KPC #{trip.number}: #{admins.size} admins (registered), #{roster.size} golfers (not registered), " \
+     "#{trip.nights.count} nights, #{trip.rounds.count} rounds, #{trip.total_bed_spots} bed slots, " \
+     "#{trip.open_bed_spots} open all week. Registration closed."
 puts "Password for everyone: #{PASSWORD}"
