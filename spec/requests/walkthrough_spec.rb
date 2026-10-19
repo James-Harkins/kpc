@@ -205,6 +205,10 @@ RSpec.describe 'Registration walkthrough', type: :request do
     patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved,
                                          beds: { @beds['Ocean QueenQueen'].id.to_s => [harry_trip.id.to_s, paul_trip.id.to_s] } }
     expect([harry_trip, paul_trip].map { |gt| gt.reload.bed_id }).to eq([@beds['Ocean QueenQueen'].id] * 2)
+    get "/bed_assignments/week", params: { trip_id: @trip.id }
+    shared_row = response.body[/<tr>\s*<td class="bed-col">\s*<strong>#2<\/strong>.*?<\/tr>/m]
+    expect(shared_row).to include('Harry', 'Paul')   # one one-person bed, Harry Sat-Mon, Paul Wed-Fri
+    expect(shared_row.scan('>open</td>').length).to eq(1)   # Tuesday
 
     patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved,
                                          beds: { @beds['Garden QueenQueen'].id.to_s => [pete_trip.id.to_s, ken_trip.id.to_s] } }

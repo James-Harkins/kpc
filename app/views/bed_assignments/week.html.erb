@@ -99,26 +99,23 @@ body::before {
                     </thead>
                     <tbody>
                         <% bedroom.beds.sort_by(&:rank).each do |bed| %>
-                            <% occupants = bed.golfer_trips.sort_by(&:id) %>
-                            <% (1..bed.capacity).each do |slot| %>
-                                <% occupant = occupants[slot - 1] %>
+                            <% @slot_grids[bed.id].each_with_index do |slot_nights, index| %>
                                 <tr>
                                     <td class="bed-col">
                                         <strong>#<%= bed.rank %></strong> <%= bed.description %>
-                                        <% if bed.capacity > 1 %><small>(sleeps <%= bed.capacity %> &mdash; slot <%= slot %>)</small><% end %>
+                                        <% if bed.capacity > 1 %><small>(sleeps <%= bed.capacity %> &mdash; slot <%= index + 1 %>)</small><% end %>
                                     </td>
                                     <% @nights.each do |night| %>
+                                        <% occupant = slot_nights[night.id] %>
                                         <% if occupant.nil? %>
                                             <td class="cell-open">open</td>
                                         <% elsif @attending.include?([occupant.golfer_id, night.id]) %>
                                             <td class="tier-<%= occupant.bed_priority_tier %>"><%= occupant.golfer.nickname.strip.titleize %></td>
-                                        <% elsif occupant.reserved_all_week? %>
+                                        <% else %>
                                             <td class="cell-away tier-<%= occupant.bed_priority_tier %>">
                                                 <%= occupant.golfer.nickname.strip.titleize %>
                                                 <span class="away-label">away &mdash; reserved</span>
                                             </td>
-                                        <% else %>
-                                            <td class="cell-open">open</td>
                                         <% end %>
                                     <% end %>
                                 </tr>

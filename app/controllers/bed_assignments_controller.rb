@@ -18,6 +18,7 @@ class BedAssignmentsController < ApplicationController
     @attending_by_night = attending.group_by(&:last).transform_values(&:count)
     @unassigned = @trip.golfer_trips.where(bed_id: nil).includes(:golfer).sort_by { |golfer_trip| golfer_trip.golfer.nickname.to_s }
     @total_spots = @trip.beds.sum(:capacity)
+    @slot_grids = @houses.flat_map { |house| house.bedrooms.flat_map(&:beds) }.index_by(&:id).transform_values { |bed| slot_grid(bed) }
   end
 
   def update
@@ -44,5 +45,19 @@ class BedAssignmentsController < ApplicationController
     end
 
     redirect_to bed_assignments_path(trip_id: trip.id)
+  end
+
+  private
+
+  # One hash per sleeping slot of the bed: night_id => the golfer_trip in it that night.
+  # Golfers whose nights don't overlap (or who are away and not reserved) share a slot.
+  def slot_grid(bed)
+    slots = Array.new(bed.capacity) { {} }
+    bed.golfer_trips.sort_by(&:id).each do |golfer_trip|
+      held = @nights.select { |night| golfer_trip.reserved_all_week? || @attending.include?([golfer_trip.golfer_id, night.id]) }.map(&:id)
+      slot = slots.find { |taken| (taken.keys & held).empty? }
+      held.each { |night_id| slot[night_id] = golfer_trip } if slot
+    end
+    slots
   end
 end

@@ -65,6 +65,20 @@ RSpec.describe 'BedAssignments week view', type: :request do
       expect(response.body.scan('>open</td>').length).to eq(3)
     end
 
+    it 'shows two golfers with non-overlapping nights in the same one-person bed' do
+      queen = create(:bed, bedroom: room, description: 'Queen', capacity: 1, rank: 2)
+      early = create(:golfer, nickname: 'harry')
+      late  = create(:golfer, nickname: 'paul')
+      early_trip = create(:golfer_trip, golfer: early, trip: trip, bed: queen)
+      late_trip  = create(:golfer_trip, golfer: late, trip: trip, bed: queen)
+      attend(early_trip, nights[0])
+      attend(late_trip, nights[2])
+      get '/bed_assignments/week', params: { trip_id: trip.id }
+      row = response.body[/<tr>\s*<td class="bed-col">\s*<strong>#2<\/strong>.*?<\/tr>/m]
+      expect(row).to include('Harry', 'Paul')
+      expect(row.scan('>open</td>').length).to eq(1)
+    end
+
     it 'lists unassigned golfers on the nights they need a bed' do
       king
       other = create(:golfer, nickname: 'late')
