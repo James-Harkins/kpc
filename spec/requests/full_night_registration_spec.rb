@@ -45,18 +45,25 @@ RSpec.describe 'Registration on full nights', type: :request do
     expect { post '/register_trip', params: { full_trip: '1' } }.to change(GolferTrip, :count).by(1)
   end
 
-  it 'disables full nights and hides the whole-trip button on the form' do
+  it 'counts every night on the trip, full or not, when deciding what the whole trip is' do
     get '/register_trip'
-    expect(response.body).to include('House full', "can't be booked")
+    expect(response.body).to include("var totalNights = #{trip.nights.count};")
+  end
+
+  it 'removes the checkbox for full nights and hides the whole-trip button on the form' do
+    get '/register_trip'
+    expect(response.body).to include('(House Full)', "can't be booked")
     expect(response.body).not_to include('Give me the whole enchilada, bud!')
-    expect(response.body).to match(/<input[^>]*value="#{nights[1].id}"[^>]*disabled/)
+    expect(response.body).not_to match(/<input[^>]*name="nights\[\]"[^>]*value="#{nights[1].id}"/)   # no checkbox at all
+    expect(response.body).to match(/<input[^>]*name="nights\[\]"[^>]*value="#{nights[0].id}"/)       # open nights keep theirs
+    expect(response.body).to include('class="house-full">(House Full)')
   end
 
   it 'leaves the form alone when nothing is full' do
     GolferNight.destroy_all
     get '/register_trip'
     expect(response.body).to include('Give me the whole enchilada, bud!')
-    expect(response.body).not_to include('House full')
+    expect(response.body).not_to include('(House Full)')
   end
 
   it 'blocks nothing before any beds are entered' do

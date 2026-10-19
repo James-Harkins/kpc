@@ -153,6 +153,10 @@ body::before {
         align-items: stretch;
     }
 }
+.house-full {
+    color: rgb(222, 74, 72);
+    font-weight: bold;
+}
 </style>
 
 <div class='trip-register-container'>
@@ -218,9 +222,12 @@ body::before {
             <div class="date-card">
                 <h3><%= date[:date] %></h3>
                 <div class="checkbox-item">
-                    <% night_full = @full_night_ids.include?(date[:night][:id]) %>
-                    <%= check_box_tag 'nights[]', date[:night][:id], false, data: { cost: date[:night][:cost] }, onchange: 'updateTotal()', disabled: night_full %>
-                    <span>Night at House - $<%= date[:night][:cost] %><%= ' (House full)' if night_full %></span>
+                    <% if @full_night_ids.include?(date[:night][:id]) %>
+                        <span>Night at House - $<%= date[:night][:cost] %> <span class="house-full">(House Full)</span></span>
+                    <% else %>
+                        <%= check_box_tag 'nights[]', date[:night][:id], false, data: { cost: date[:night][:cost] }, onchange: 'updateTotal()' %>
+                        <span>Night at House - $<%= date[:night][:cost] %></span>
+                    <% end %>
                 </div>
                 <% if date[:round].values.any? %>
                     <div class="checkbox-item">
@@ -242,7 +249,7 @@ body::before {
 <script>
 var isAdmin = <%= current_user.admin? %>;
 var firstNightCost = <%= @next_trip.nights.order(:date).first&.cost || 0 %>;
-var totalNights = document.querySelectorAll('input[name="nights[]"]').length;
+var totalNights = <%= @next_trip.nights.count %>;   // every night on the trip, including ones with no checkbox because the house is full
 var totalRounds = document.querySelectorAll('input[name="rounds[]"]').length;
 
 function updateTotal() {

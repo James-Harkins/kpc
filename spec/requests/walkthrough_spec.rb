@@ -196,7 +196,7 @@ RSpec.describe 'Registration walkthrough', type: :request do
     log_in_as(@g[:bobby])
     get '/register_trip'
     expect(response.body).not_to include('Give me the whole enchilada, bud!')
-    expect(response.body.scan('House full').length).to eq(6)
+    expect(response.body.scan('(House Full)').length).to eq(6)
     expect { post '/register_trip', params: { full_trip: '1', deposit_policy_acknowledged: '1' } }.not_to change(GolferTrip, :count)
     expect { post '/register_trip', params: { nights: [@nights[0].id.to_s, @nights[4].id.to_s], deposit_policy_acknowledged: '1' } }
       .not_to change(GolferTrip, :count)
