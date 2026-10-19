@@ -8,7 +8,6 @@ class GolfersController < ApplicationController
     @next_trip = Trip.current
     @golfer_next_trip = @next_trip && @golfer.golfer_trips.where(trip_id: @next_trip.id).first
     @last_completed_trip = @next_trip.nil? ? Trip.where(completed: true).order(id: :desc).first : nil
-    @editable_trips = Trip.where('start_date >= ?', Date.today).order(:start_date)
   end
 
   def new

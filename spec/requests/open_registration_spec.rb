@@ -55,6 +55,20 @@ RSpec.describe 'Open trip registration', type: :request do
       expect(body[0...button]).to match(/Finances.*<\/div>\s*<div class="button-row">\s*<form/m)
     end
 
+    it 'gives the site admin a plain Edit Trip button to the current trip, not a dropdown' do
+      log_in_as(site_admin)
+      get '/dashboard'
+      expect(response.body).to include('value="Edit Trip"')
+      expect(response.body).to include(%(action="/trips/#{trip.id}/edit"))
+      expect(response.body).not_to include('trip-select')
+    end
+
+    it 'does not show other admins an Edit Trip button' do
+      log_in_as(create(:golfer, :admin))
+      get '/dashboard'
+      expect(response.body).not_to include('value="Edit Trip"')
+    end
+
     it 'goes away once registration is open' do
       trip.update!(registration_open: true)
       log_in_as(site_admin)
