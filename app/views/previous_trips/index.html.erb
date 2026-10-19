@@ -92,9 +92,7 @@ body::before {
     padding-top: 4px;
 }
 
-.all-time-attendance { text-align: center; }
-.all-time-attendance h3 { margin: 0 0 4px; }
-.all-time-attendance p { margin: 0; color: #555; }
+.trip-attendance { text-align: center; font-size: 20px; margin: 0 0 12px; }
 
 .expenses-heading { margin: 24px 0 0; }
 .expenses-list .expense-meta { display: block; font-size: 13px; color: #666; }
@@ -250,14 +248,32 @@ body::before {
 </style>
 
 <% if @trips.any? %>
-  <div class="next-trip-cost all-time-attendance">
-    <h3><%= number_with_delimiter(@all_time_attendance) %> different <%= 'golfer'.pluralize(@all_time_attendance) %> across <%= @trips.size %> <%= 'trip'.pluralize(@trips.size) %></h3>
-    <p>Unique attendance, committee included.</p>
+  <div class="next-trip-cost">
+    <h1>All Trips</h1>
+    <table class="finances-summary">
+      <tbody>
+        <tr>
+          <td>Unique Attendance Across <%= @trips.size %> <%= 'Trip'.pluralize(@trips.size) %></td>
+          <td><%= number_with_delimiter(@all_time_attendance) %></td>
+        </tr>
+        <% if @average_revenue %>
+          <tr>
+            <td>Average Revenue per Trip</td>
+            <td>$<%= number_with_delimiter(@average_revenue.round) %></td>
+          </tr>
+          <tr>
+            <td>Average Expenses per Trip</td>
+            <td>$<%= number_with_delimiter(@average_expenses.round) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
   <% @trips.each do |trip| %>
     <div class="next-trip-cost">
       <h1>KPC <%= trip.number %></h1>
       <h3><%= trip.location %> - <%= trip.year %></h3>
+      <p class="trip-attendance">Attendance: <strong><%= trip.unique_attendance %></strong></p>
 
       <% summary = trip.trip_financial_summary %>
       <% if summary %>
@@ -276,10 +292,6 @@ body::before {
               <td>Total Deficit</td>
               <td>$<%= number_with_delimiter(summary.total_deficit) %></td>
             </tr>
-            <tr>
-              <td>Attendance (unique golfers, committee included)</td>
-              <td><%= trip.unique_attendance %></td>
-            </tr>
             <tr class="summary-section-header">
               <td colspan="2">Committee</td>
             </tr>
@@ -295,14 +307,6 @@ body::before {
         </table>
       <% else %>
         <p class="no-summary">No financial summary recorded.</p>
-        <table class="finances-summary">
-          <tbody>
-            <tr>
-              <td>Attendance (unique golfers, committee included)</td>
-              <td><%= trip.unique_attendance %></td>
-            </tr>
-          </tbody>
-        </table>
       <% end %>
 
       <% expenses = trip.expenses_by_amount.to_a %>
