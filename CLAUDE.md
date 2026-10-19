@@ -159,7 +159,7 @@ PUT /update_golfer_payment    golfer_trips#update
 GET  /finances                finances#index (admin)
 GET  /attendance              attendance#index (admin; shows a live Open Bed Count for the current, uncompleted trip)
 GET  /roster                  rosters#index
-GET  /previous_trips          previous_trips#index
+GET  /previous_trips          previous_trips#index (admin; per trip: unique attendance incl. admins and expenses largest first; all-time unique count at the top)
 POST /trip_financial_summaries
 
 GET/POST /announcements/new   announcements (site admin)
