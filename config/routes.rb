@@ -78,6 +78,7 @@ Rails.application.routes.draw do
   # Bed assignments (admin)
   get   '/bed_assignments', to: 'bed_assignments#index', as: :bed_assignments
   patch '/bed_assignments', to: 'bed_assignments#update'
+  get   '/bed_assignments/week', to: 'bed_assignments#week', as: :bed_assignments_week
 
   # Golfer trip admin editing
   get   '/golfer_trips/:id/edit', to: 'golfer_trips#edit',         as: :edit_golfer_trip

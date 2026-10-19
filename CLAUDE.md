@@ -174,6 +174,7 @@ PATCH     /trips/:id/complete
 
 # Bed assignments (admin)
 GET/PATCH /bed_assignments    # ?trip_id=X
+GET       /bed_assignments/week  # read-only week grid, admin only
 
 # Tournament (admin)
 GET  /tournament
@@ -218,7 +219,8 @@ If a golfer has no scores on the current trip's non-tournament rounds, the algor
 2. Site admin adds houses under `/houses` (often after registration has opened) — bedrooms and beds entered as dynamic rows; each bed gets capacity (1–2) and a trip-unique rank (1 = best)
 3. Admins visit `/bed_assignments`: a priority table plus per-bed slot dropdowns
 4. "Autofill by Priority" (client-side JS) fills slots: pass 1 gives one golfer per bed, best bed to highest priority; pass 2 doubles remaining golfers into the lowest-ranked capacity-2 beds. Admin rearranges, then saves — full-replace PATCH in a transaction, rejected whole on duplicate golfers or over-capacity
-5. House names link to their rental listing (`houses.url`) on every golfer's dashboard; bed assignments themselves are admin-only
+5. `/bed_assignments/week` is a read-only grid of the whole stay: one table per bedroom (grouped by house), a row per bed slot, a column per night. A bed stays reserved for its assigned golfer all week — nights they don't attend show "away", never "open". Capacity-2 beds get two rows. Below the bedrooms: golfers with no bed (and the nights they need one) and attending-vs-spots per night. Admin only; golfers never see beds.
+6. House names link to their rental listing (`houses.url`) on every golfer's dashboard; bed assignments themselves are admin-only
 
 ### Priority order (`Trip#bed_priority_order`)
 

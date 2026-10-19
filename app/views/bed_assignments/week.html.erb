@@ -1,0 +1,169 @@
+<style>
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: url(<%= asset_path 'course_1.jpg' %>) center/cover no-repeat;
+    z-index: -1;
+}
+
+.week-card {
+    background-color: #fff;
+    opacity: .95;
+    padding: 30px;
+    margin: 20px;
+    color: black;
+    border-radius: 10px;
+    width: 96%;
+    max-width: 1400px;
+}
+
+.week-card h1 { font-size: 40px; }
+.week-card h2 { font-size: 28px; margin: 24px 0 4px; }
+.week-card h3 { font-size: 20px; margin: 16px 0 4px; }
+
+.week-grid { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
+.week-grid th, .week-grid td { padding: 6px 8px; border: 1px solid #ccc; font-size: 0.9em; text-align: center; overflow-wrap: anywhere; }
+.week-grid th { background-color: #f0f0f0; }
+.week-grid th.bed-col, .week-grid td.bed-col { width: 200px; text-align: left; }
+.week-grid td.bed-col small { color: #666; }
+
+.tier-0 { color: #6c757d; font-weight: bold; }
+.tier-1 { color: #1e7e34; font-weight: bold; }
+.tier-2 { color: #b8860b; font-weight: bold; }
+.tier-3 { color: rgb(222, 74, 72); font-weight: bold; }
+
+.cell-away { background-color: #f3f3f3; }
+.cell-away .away-label { display: block; font-size: 0.75em; font-weight: normal; color: #888; font-style: italic; }
+.cell-open { color: #aaa; font-style: italic; }
+.cell-unassigned { background-color: #fff8e1; }
+.row-total td { background-color: #f0f0f0; font-weight: bold; }
+.over { color: rgb(222, 74, 72); }
+
+.legend { font-size: 0.85em; color: #555; margin: 4px 0 12px; }
+
+.btn-outline-primary-finances {
+    margin: 10px 5px;
+    background-color: white;
+    opacity: .8;
+    padding: 12px 20px;
+    font-size: 1em;
+    color: black !important;
+    outline: 0 none !important;
+    box-shadow: none !important;
+    border-color: black !important;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.btn-outline-primary-finances:hover { background-color: gray !important; }
+</style>
+
+<div class="week-card">
+    <h1>Bed Week: KPC <%= @trip.number %></h1>
+    <p class="legend">
+        Names are colored by deposit tier:
+        <span class="tier-0">admin</span>,
+        <span class="tier-1">met by deadline</span>,
+        <span class="tier-2">met late</span>,
+        <span class="tier-3">not met</span>.
+        A bed stays reserved for its golfer all week &mdash; nights they're away show <em>away</em>, never open.
+    </p>
+
+    <% if @houses.empty? %>
+        <p>No houses have been added for this trip yet.</p>
+    <% else %>
+        <% @houses.each do |house| %>
+            <h2><%= house.name %></h2>
+            <% house.bedrooms.each do |bedroom| %>
+                <h3><%= bedroom.name %></h3>
+                <table class="week-grid">
+                    <thead>
+                        <tr>
+                            <th class="bed-col">Bed</th>
+                            <% @nights.each do |night| %>
+                                <th><%= night.date.strftime('%a %-m/%-d') %></th>
+                            <% end %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% bedroom.beds.sort_by(&:rank).each do |bed| %>
+                            <% occupants = bed.golfer_trips.sort_by(&:id) %>
+                            <% (1..bed.capacity).each do |slot| %>
+                                <% occupant = occupants[slot - 1] %>
+                                <tr>
+                                    <td class="bed-col">
+                                        <strong>#<%= bed.rank %></strong> <%= bed.description %>
+                                        <% if bed.capacity > 1 %><small>(sleeps <%= bed.capacity %> &mdash; slot <%= slot %>)</small><% end %>
+                                    </td>
+                                    <% @nights.each do |night| %>
+                                        <% if occupant.nil? %>
+                                            <td class="cell-open">open</td>
+                                        <% elsif @attending.include?([occupant.golfer_id, night.id]) %>
+                                            <td class="tier-<%= occupant.bed_priority_tier %>"><%= occupant.golfer.nickname.strip.titleize %></td>
+                                        <% else %>
+                                            <td class="cell-away tier-<%= occupant.bed_priority_tier %>">
+                                                <%= occupant.golfer.nickname.strip.titleize %>
+                                                <span class="away-label">away</span>
+                                            </td>
+                                        <% end %>
+                                    <% end %>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </tbody>
+                </table>
+            <% end %>
+        <% end %>
+
+        <h2>Not Yet Assigned a Bed</h2>
+        <table class="week-grid">
+            <thead>
+                <tr>
+                    <th class="bed-col">Golfer</th>
+                    <% @nights.each do |night| %>
+                        <th><%= night.date.strftime('%a %-m/%-d') %></th>
+                    <% end %>
+                </tr>
+            </thead>
+            <tbody>
+                <% if @unassigned.empty? %>
+                    <tr><td class="bed-col cell-open" colspan="<%= @nights.length + 1 %>">Everyone registered has a bed.</td></tr>
+                <% end %>
+                <% @unassigned.each do |golfer_trip| %>
+                    <tr>
+                        <td class="bed-col tier-<%= golfer_trip.bed_priority_tier %>"><%= golfer_trip.golfer.nickname.strip.titleize %></td>
+                        <% @nights.each do |night| %>
+                            <% if @attending.include?([golfer_trip.golfer_id, night.id]) %>
+                                <td class="cell-unassigned">needs bed</td>
+                            <% else %>
+                                <td class="cell-open">&mdash;</td>
+                            <% end %>
+                        <% end %>
+                    </tr>
+                <% end %>
+                <tr class="row-total">
+                    <td class="bed-col">Attending / bed spots</td>
+                    <% @nights.each do |night| %>
+                        <% count = @attending_by_night.fetch(night.id, 0) %>
+                        <td class="<%= 'over' if count > @total_spots %>"><%= count %> / <%= @total_spots %></td>
+                    <% end %>
+                </tr>
+            </tbody>
+        </table>
+    <% end %>
+
+    <br>
+    <%= button_to 'Edit Assignments', bed_assignments_path, method: :get, params: { trip_id: @trip.id }, class: 'btn-outline-primary-finances' %>
+    <%= button_to 'Dashboard', '/dashboard', method: :get, class: 'btn-outline-primary-finances' %>
+</div>

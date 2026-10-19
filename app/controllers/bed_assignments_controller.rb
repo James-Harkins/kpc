@@ -7,6 +7,19 @@ class BedAssignmentsController < ApplicationController
     @houses = @trip.houses.includes(bedrooms: { beds: { golfer_trips: :golfer } })
   end
 
+  # Read-only grid of every bed across the whole stay. A bed stays reserved for
+  # its assigned golfer all week, so nights they're away show as "away", not open.
+  def week
+    @trip = params[:trip_id] ? Trip.find(params[:trip_id]) : Trip.current
+    @nights = @trip.nights.order(:date).to_a
+    @houses = @trip.houses.includes(bedrooms: { beds: { golfer_trips: :golfer } })
+    attending = GolferNight.where(night_id: @nights.map(&:id)).pluck(:golfer_id, :night_id)
+    @attending = attending.to_set
+    @attending_by_night = attending.group_by(&:last).transform_values(&:count)
+    @unassigned = @trip.golfer_trips.where(bed_id: nil).includes(:golfer).sort_by { |golfer_trip| golfer_trip.golfer.nickname.to_s }
+    @total_spots = @trip.beds.sum(:capacity)
+  end
+
   def update
     trip = Trip.find(params[:trip_id])
     submitted = params[:beds].present? ? params[:beds].to_unsafe_h : {}

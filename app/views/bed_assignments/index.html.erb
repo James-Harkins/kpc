@@ -85,6 +85,8 @@ select {
         <div class="alert" role="alert"><%= content_tag :div, msg, class: name %></div>
     <% end %>
 
+    <%= button_to 'View Week Grid', bed_assignments_week_path, method: :get, params: { trip_id: @trip.id }, class: 'btn-outline-primary-finances' %>
+
     <h2>Suggested Priority Order</h2>
     <% if @trip.deposit_due_date.present? %>
         <p>Deposit deadline: <strong><%= @trip.deposit_due_date.strftime('%B %-d, %Y') %></strong>.
