@@ -105,93 +105,113 @@ RSpec.describe 'Registration walkthrough', type: :request do
     expect { register(@g[:ken], full: true) }.not_to have_enqueued_job(BulkMailJob)
     expect(open_counts).to eq([19] * 7)
 
-    # --- re-arm, 3. Harry Sat-Mon (early leaver): email to 21 (no Arnold)
+    # --- re-arm. 3. Harry arrives one night late (Sun-Fri): email goes out BEFORE Don flags him, so Saturday still shows 19
     rearm
-    expect { register(@g[:harry], nights: [0, 1, 2]) }.to blast_without(@g[:harry])
-    expect(open_counts).to eq([18, 18, 18, 19, 19, 19, 19])
+    expect { register(@g[:harry], nights: [1, 2, 3, 4, 5, 6]) }.to blast_without(@g[:harry])
+    expect(open_counts).to eq([19, 18, 18, 18, 18, 18, 18])
     expect(recipients_without(@g[:harry]).count).to eq(21)
-
-    # --- 4. Paul Wed-Fri (late arriver) shares Harry's spot; no email
-    expect { register(@g[:paul], nights: [4, 5, 6]) }.not_to have_enqueued_job(BulkMailJob)
-    expect(open_counts).to eq([18, 18, 18, 19, 18, 18, 18])
-    expect(@trip.open_bed_spots).to eq(18)   # tightest night; Tuesday's extra spot is not a full-week bed
-
-    # --- 5. Henry Thu-Fri, then Don reserves him all week on /bed_assignments
-    register(@g[:henry], nights: [5, 6])
-    expect(open_counts).to eq([18, 18, 18, 19, 18, 17, 17])
-    henry_trip = @g[:henry].golfer_trips.first
+    harry_trip = @g[:harry].golfer_trips.first
+    flagged = admin_trips.pluck(:id).map(&:to_s)
     log_in_as(@don)
-    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: admin_trips.pluck(:id).map(&:to_s) + [henry_trip.id.to_s] }
-    expect(henry_trip.reload.reserved_all_week).to be(true)
-    expect(admin_trips.reload.pluck(:reserved_all_week).uniq).to eq([true])
-    expect(open_counts).to eq([17, 17, 17, 18, 17, 17, 17])
+    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: flagged + [harry_trip.id.to_s] }
+    expect(open_counts).to eq([18] * 7)   # one open night is not worth a bed, so Don holds it all week
+
+    # --- 4. Paul leaves one night early (Sat-Thu): no email, then Don flags him too
+    expect { register(@g[:paul], nights: [0, 1, 2, 3, 4, 5]) }.not_to have_enqueued_job(BulkMailJob)
+    expect(open_counts).to eq([17, 17, 17, 17, 17, 17, 18])
+    paul_trip = @g[:paul].golfer_trips.first
+    log_in_as(@don)
+    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: flagged + [harry_trip.id.to_s, paul_trip.id.to_s] }
+    expect(open_counts).to eq([17] * 7)
+    expect([harry_trip, paul_trip].map { |gt| gt.reload.reserved_all_week }).to eq([true, true])
+
+    # --- 5-7. A real gap is worth opening: Sal Sat-Mon, Duck Tue-Wed and Henry Thu-Fri share ONE spot, none flagged
+    expect { register(@g[:sal], nights: [0, 1, 2]) }.not_to have_enqueued_job(BulkMailJob)
+    expect(open_counts).to eq([16, 16, 16, 17, 17, 17, 17])
+    expect { register(@g[:duck], nights: [3, 4]) }.not_to have_enqueued_job(BulkMailJob)
+    expect(open_counts).to eq([16, 16, 16, 16, 16, 17, 17])
+    expect { register(@g[:henry], nights: [5, 6]) }.not_to have_enqueued_job(BulkMailJob)
+    expect(open_counts).to eq([16] * 7)
+    expect([:sal, :duck, :henry].map { |n| @g[n].golfer_trips.first.reserved_all_week }).to eq([false] * 3)
+    log_in_as(@don)
     get '/attendance', params: { trip_id: @trip.id }
-    expect(response.body).to include('17 of 25 open all week')
+    expect(response.body).to include('16 of 25 open all week')
 
-    # --- re-arm, 6. Sal (full): email "16 Beds Left" to 18
+    # --- re-arm, 8. Freddy (full): email "15 Beds Left" to 16
     rearm
-    expect { register(@g[:sal], full: true) }.to blast_without(@g[:sal])
-    expect(open_counts).to eq([16, 16, 16, 17, 16, 16, 16])
-    expect(recipients_without(@g[:sal]).count).to eq(18)
+    expect { register(@g[:freddy], full: true) }.to blast_without(@g[:freddy])
+    expect(open_counts).to eq([15] * 7)
+    expect(recipients_without(@g[:freddy]).count).to eq(16)
 
-    # --- 7. fast-forward: 13 golfers registered quietly, no email and no blast
-    expect { fill(*%w[freddy duck ted jim bob stan michael greg abe lee jimmy lou bobby]) }.not_to have_enqueued_job(BulkMailJob)
-    expect(open_counts).to eq([3, 3, 3, 4, 3, 3, 3])
-    expect(registered.count).to eq(4 + 6 + 13)
+    # --- 9. fast-forward: 9 golfers registered quietly, no email and no blast
+    expect { fill(*%w[ted jim bob stan michael greg abe lee jimmy]) }.not_to have_enqueued_job(BulkMailJob)
+    expect(open_counts).to eq([6] * 7)
+    expect(registered.count).to eq(4 + 8 + 9)
 
-    # --- re-arm, 8. Kurt (full): "2 Beds Left" to the 4 still unregistered and not opted out
+    # --- re-arm, 10. Kurt Sat-Tue: "5 Beds Left" to the 6 still unregistered and not opted out
     rearm
-    expect { register(@g[:kurt], full: true) }.to blast_without(@g[:kurt])
-    expect(open_counts).to eq([2, 2, 2, 3, 2, 2, 2])
-    expect(recipients_without(@g[:kurt]).map(&:first_name)).to match_array(%w[Joey Ed Smitty Gene])
+    expect { register(@g[:kurt], nights: [0, 1, 2, 3]) }.to blast_without(@g[:kurt])
+    expect(open_counts).to eq([5, 5, 5, 5, 6, 6, 6])
+    expect(recipients_without(@g[:kurt]).map(&:first_name)).to match_array(%w[Bobby Lou Joey Ed Smitty Gene])
 
-    # --- re-arm, 9. Joey (full): "1 Bed Left", Tuesday shows 2 open
+    # --- 11. Joey Thu-Fri leaves a one-night gap on Wednesday; no email
+    expect { register(@g[:joey], nights: [5, 6]) }.not_to have_enqueued_job(BulkMailJob)
+    expect(open_counts).to eq([5, 5, 5, 5, 6, 5, 5])
+
+    # --- re-arm, 12. Ed (full): "4 Beds Left" to 4, Wednesday shows 5 open
     rearm
-    expect { register(@g[:joey], full: true) }.to blast_without(@g[:joey])
-    expect(open_counts).to eq([1, 1, 1, 2, 1, 1, 1])
-    mail = GolferMailer.bed_availability(@g[:gene], @trip)
+    expect { register(@g[:ed], full: true) }.to blast_without(@g[:ed])
+    expect(open_counts).to eq([4, 4, 4, 4, 5, 4, 4])
+    expect(recipients_without(@g[:ed]).map(&:first_name)).to match_array(%w[Bobby Lou Smitty Gene])
+
+    # --- 13. Smitty (full), 14. Arnold (opted out of emails, but changes his mind and signs up): no email
+    expect { register(@g[:smitty], full: true) }.not_to have_enqueued_job(BulkMailJob)
+    expect { register(@g[:arnold], full: true) }.not_to have_enqueued_job(BulkMailJob)
+    expect(open_counts).to eq([2, 2, 2, 2, 3, 2, 2])
+
+    # --- re-arm, 15. Gene (full): "1 Bed Left" to Bobby and Lou, Wednesday shows 2 open
+    rearm
+    expect { register(@g[:gene], full: true) }.to blast_without(@g[:gene])
+    expect(open_counts).to eq([1, 1, 1, 1, 2, 1, 1])
+    mail = GolferMailer.bed_availability(@g[:bobby], @trip)
     expect(mail.subject).to eq('KPC XXVII - 1 Bed Left')
-    expect(mail.text_part.body.encoded).to include('Tuesday, April 27: 2 open')
+    expect(mail.text_part.body.encoded).to include('Wednesday, April 28: 2 open')
 
-    # --- 10. Ed (full): full-week zero. Admin alert AND a forced blast despite the cooldown
-    expect { register(@g[:ed], full: true) }
+    # --- 16. Lou (full): full-week zero. Admin alert AND a forced blast despite the cooldown
+    expect { register(@g[:lou], full: true) }
       .to have_enqueued_job(BulkMailJob).with('bed_capacity_reached', a_collection_containing_exactly(@don.id, @roger.id, @burt.id, @lane.id), @trip)
-      .and blast_without(@g[:ed])
-    expect(open_counts).to eq([0, 0, 0, 1, 0, 0, 0])
+      .and blast_without(@g[:lou])
+    expect(open_counts).to eq([0, 0, 0, 0, 1, 0, 0])
     expect(@trip.open_bed_spots).to eq(0)
+    expect(recipients_without(@g[:lou]).map(&:first_name)).to eq(['Bobby'])
     alert = GolferMailer.bed_capacity_reached(@don, @trip)
     expect(alert.subject).to eq('KPC XXVII - No Full-Week Beds Left')
-    expect(alert.text_part.body.encoded).to include('Tue 4/27 (1)')
-    expect(GolferMailer.bed_availability(@g[:gene], @trip).subject).to eq('KPC XXVII - No Full-Week Beds Left')
+    expect(alert.text_part.body.encoded).to include('Wed 4/28 (1)')
+    expect(GolferMailer.bed_availability(@g[:bobby], @trip).subject).to eq('KPC XXVII - No Full-Week Beds Left')
     log_in_as(@don)
     get '/attendance', params: { trip_id: @trip.id }
     expect(response.body).to include('0 of 25 open all week', 'No full-week beds left')
 
-    # --- 11. Smitty: full-week blocked in the UI and on the server; Tuesday only works
-    log_in_as(@g[:smitty])
+    # --- 17. Bobby: only Wednesday is open. Full week is blocked, an empty submit gets a friendly error, Wednesday works
+    log_in_as(@g[:bobby])
     get '/register_trip'
     expect(response.body).not_to include('Give me the whole enchilada, bud!')
     expect(response.body.scan('House full').length).to eq(6)
     expect { post '/register_trip', params: { full_trip: '1', deposit_policy_acknowledged: '1' } }.not_to change(GolferTrip, :count)
-    expect { post '/register_trip', params: { nights: [@nights[0].id.to_s, @nights[3].id.to_s], deposit_policy_acknowledged: '1' } }
+    expect { post '/register_trip', params: { nights: [@nights[0].id.to_s, @nights[4].id.to_s], deposit_policy_acknowledged: '1' } }
       .not_to change(GolferTrip, :count)
-    rearm
-    ActiveJob::Base.queue_adapter.enqueued_jobs.clear
-    register(@g[:smitty], nights: [3])
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.map { |job| job[:args].first }).to eq(['bed_availability'])   # house-full blast, no second admin alert
-    expect(open_counts).to eq([0] * 7)
-    expect(recipients_without(@g[:smitty]).map(&:first_name)).to eq(['Gene'])
-    expect(GolferMailer.bed_availability(@g[:gene], @trip).subject).to eq('KPC XXVII - The House Is Full')
-
-    # --- 12. Gene: nothing is open; an empty submit gets a friendly error, not a 500
-    log_in_as(@g[:gene])
-    get '/register_trip'
-    expect(response.body.scan('House full').length).to eq(7)
     expect { post '/register_trip', params: { deposit_policy_acknowledged: '1' } }.not_to change(GolferTrip, :count)
     expect(flash[:error]).to include('Pick at least one night or round')
-    expect { post '/register_trip', params: { nights: [@nights[0].id.to_s], deposit_policy_acknowledged: '1' } }.not_to change(GolferTrip, :count)
+    rearm
+    ActiveJob::Base.queue_adapter.enqueued_jobs.clear
+    register(@g[:bobby], nights: [4])
+    expect(open_counts).to eq([0] * 7)
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.map { |job| job[:args].first }).to eq(['bed_availability'])   # job queued, but nobody is left to receive it
+    expect(recipients_without(@g[:bobby]).count).to eq(0)
+    expect(GolferMailer.bed_availability(@g[:lou], @trip).subject).to eq('KPC XXVII - The House Is Full')
+    expect(registered.count).to eq(4 + 25)   # 29 registered for 25 slots, because the stays above share spots
 
-    # --- 13. Don trims Ken's stay (drops Thu-Fri): beds reopen on those nights, no email
+    # --- 18. Don trims Ken's stay (drops Thu-Fri): beds reopen on those nights, no email
     ken_trip = @g[:ken].golfer_trips.first
     keep_nights = @nights[0..4].map { |n| n.id.to_s }
     keep_rounds = @trip.rounds.where(date: @nights[0..4].map(&:date)).pluck(:id).map(&:to_s)
@@ -201,42 +221,42 @@ RSpec.describe 'Registration walkthrough', type: :request do
     get '/attendance', params: { trip_id: @trip.id }
     expect(response.body).to include('0 of 25 open all week', 'No full-week beds left')
 
-    # --- 14. Gene takes the reopened Thu-Fri
-    expect { register(@g[:gene], nights: [5, 6]) }.to change(GolferTrip, :count).by(1)
-    expect(open_counts).to eq([0] * 7)
-    expect(registered.count).to eq(28)   # 28 registered for 25 slots, because partial stays (Harry/Paul, Ken/Gene) share spots
-
-    # --- bed assignments: non-overlapping golfers share a one-person bed; overlapping ones can't
-    harry_trip, paul_trip, pete_trip = [:harry, :paul, :pete].map { |n| @g[n].golfer_trips.first }
+    # --- bed assignments
+    sal_trip, duck_trip, henry_trip, pete_trip = [:sal, :duck, :henry, :pete].map { |n| @g[n].golfer_trips.first }
     ken_trip.reload
-    reserved = (admin_trips.pluck(:id) + [henry_trip.id]).map(&:to_s)
+    reserved = (admin_trips.pluck(:id) + [harry_trip.id, paul_trip.id]).map(&:to_s)
     garden = bed_in('Garden Room', 'Queen')
-    log_in_as(@don)
-
-    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved, beds: { garden.id.to_s => [harry_trip.id.to_s, paul_trip.id.to_s] } }
-    expect([harry_trip, paul_trip].map { |gt| gt.reload.bed_id }).to eq([garden.id] * 2)
-    get '/bed_assignments/week', params: { trip_id: @trip.id }
-    shared_row = response.body[/<tr>\s*<td class="bed-col">\s*<strong>##{garden.rank}<\/strong>.*?<\/tr>/m]
-    expect(shared_row).to include('Harry', 'Paul')   # one one-person bed, Harry Sat-Mon, Paul Wed-Fri
-    expect(shared_row.scan('>open</td>').length).to eq(1)   # Tuesday
-
     sunroom = bed_in('Sunroom', 'Queen')
-    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved, beds: { sunroom.id.to_s => [pete_trip.id.to_s, ken_trip.id.to_s] } }
-    expect(flash[:error]).to include('already at capacity')
-    expect([harry_trip, paul_trip].map { |gt| gt.reload.bed_id }).to eq([garden.id] * 2)   # nothing changed
-
+    twin = bed_in('Twin Room A', 'Twin A')
     primary = bed_in('Primary Suite', 'King')
     ocean = bed_in('Ocean Suite', 'King')
+    log_in_as(@don)
+
+    # Sal, Duck and Henry have no nights in common, so all three fit one one-person bed
+    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved, beds: { garden.id.to_s => [sal_trip, duck_trip, henry_trip].map { |gt| gt.id.to_s } } }
+    expect([sal_trip, duck_trip, henry_trip].map { |gt| gt.reload.bed_id }).to eq([garden.id] * 3)
+
+    # Harry is reserved all week, so he overlaps Sal on Saturday even though he arrives Sunday
+    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved, beds: { sunroom.id.to_s => [harry_trip.id.to_s, sal_trip.id.to_s] } }
+    expect(flash[:error]).to include('already at capacity')
+    expect([sal_trip, duck_trip, henry_trip].map { |gt| gt.reload.bed_id }).to eq([garden.id] * 3)   # nothing changed
+
+    # Pete and Ken overlap every night, so a one-person bed rejects them
+    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved, beds: { sunroom.id.to_s => [pete_trip.id.to_s, ken_trip.id.to_s] } }
+    expect(flash[:error]).to include('already at capacity')
+
     patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved,
                                          beds: { primary.id.to_s => [pete_trip.id.to_s, ken_trip.id.to_s],
                                                  ocean.id.to_s => [@don.golfer_trips.first.id.to_s, @roger.golfer_trips.first.id.to_s],
-                                                 garden.id.to_s => [harry_trip.id.to_s, paul_trip.id.to_s] } }
+                                                 garden.id.to_s => [sal_trip, duck_trip, henry_trip].map { |gt| gt.id.to_s },
+                                                 sunroom.id.to_s => [harry_trip.id.to_s],
+                                                 twin.id.to_s => [paul_trip.id.to_s] } }
     expect([pete_trip, ken_trip].map { |gt| gt.reload.bed_id }).to eq([primary.id] * 2)
     get '/bed_assignments/week', params: { trip_id: @trip.id }
-    expect(response.body.scan('away (reserved)</span>').length).to eq(2)   # Don's Sat and Sun, held for him all week
-
-    twin = bed_in('Twin Room A', 'Twin A')
-    patch '/bed_assignments', params: { trip_id: @trip.id, reserved_all_week: reserved, beds: { twin.id.to_s => [henry_trip.id.to_s, paul_trip.id.to_s] } }
-    expect(flash[:error]).to include('already at capacity')   # Henry is reserved all week, so he overlaps Paul
+    shared_row = response.body[/<tr>\s*<td class="bed-col">\s*<strong>##{garden.rank}<\/strong>.*?<\/tr>/m]
+    expect(shared_row).to include('Sal', 'Duck', 'Henry')   # three golfers, one bed, every night covered
+    expect(shared_row.scan('>open</td>').length).to eq(0)
+    # held-but-away nights: Don Sat+Sun, Harry Sat, Paul Fri
+    expect(response.body.scan('away (reserved)</span>').length).to eq(4)
   end
 end
