@@ -57,6 +57,34 @@ body::before {
     margin: 16px 0;
 }
 
+.bed-count-grid {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 6px;
+    margin-top: 6px;
+}
+
+.bed-count-grid th {
+    font-size: 13px;
+    font-weight: normal;
+    color: #555;
+    text-align: center;
+    line-height: 1.25;
+}
+
+.bed-count-grid td {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    padding: 10px 4px;
+    border-radius: 8px;
+}
+
+.bed-count-grid td.bed-open { background-color: #e3f1e6; color: #1e6b34; }
+.bed-count-grid td.bed-low  { background-color: #fff1cc; color: #8a5a00; }
+.bed-count-grid td.bed-full { background-color: #e6e6e6; color: #777; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+
 .date-card h3 {
     margin: 0 0 10px 0;
     font-weight: bold;
@@ -229,9 +257,26 @@ body::before {
                 <h4>No beds have been entered for this trip yet.</h4>
             <% else %>
                 <h4><%= @open_bed_spots %> of <%= @total_bed_spots %> open all week</h4>
-                <h5>
-                    <%= @open_beds_by_night.map { |night, open| "#{night.date.strftime('%a %-m/%-d')}: #{open}" }.join(' &bull; ').html_safe %>
-                </h5>
+                <table class="bed-count-grid">
+                    <thead>
+                        <tr>
+                            <% @open_beds_by_night.each do |night, _open| %>
+                                <th><%= night.date.strftime('%a') %><br><%= night.date.strftime('%-m/%-d') %></th>
+                            <% end %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <% @open_beds_by_night.each do |_night, open| %>
+                                <% if open.zero? %>
+                                    <td class="bed-full">Full</td>
+                                <% else %>
+                                    <td class="<%= open == 1 ? 'bed-low' : 'bed-open' %>"><%= open %></td>
+                                <% end %>
+                            <% end %>
+                        </tr>
+                    </tbody>
+                </table>
                 <% if @open_bed_spots.zero? && @any_night_open %>
                     <h5>No full-week beds left. Some nights still have room.</h5>
                 <% elsif @open_bed_spots.zero? %>

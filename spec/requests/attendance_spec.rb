@@ -20,8 +20,9 @@ RSpec.describe 'Attendance open bed count', type: :request do
     create(:golfer_night, night: nights[0])
     get '/attendance', params: { trip_id: trip.id }
     expect(response.body).to include('Open Bed Count', '1 of 2 open all week')
-    expect(response.body).to include("#{nights[0].date.strftime('%a %-m/%-d')}: 1")
-    expect(response.body).to include("#{nights[1].date.strftime('%a %-m/%-d')}: 2")
+    expect(response.body).to include("#{nights[0].date.strftime('%a')}<br>#{nights[0].date.strftime('%-m/%-d')}")
+    expect(response.body).to match(/class="bed-low">1</)
+    expect(response.body).to match(/class="bed-open">2</)
   end
 
   it 'headlines the best night when every night has a taker' do
@@ -46,6 +47,7 @@ RSpec.describe 'Attendance open bed count', type: :request do
     create(:golfer_night, night: nights[1])
     get '/attendance', params: { trip_id: trip.id }
     expect(response.body).to include('0 of 1 open all week', 'Every night is full')
+    expect(response.body.scan('class="bed-full">Full<').length).to eq(2)
   end
 
   it 'says when no beds have been entered' do
