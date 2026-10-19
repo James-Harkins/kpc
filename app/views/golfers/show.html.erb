@@ -568,6 +568,23 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             </h4>
           <% end %>
           <hr class="line">
+          <h3>Your Balance</h3>
+          <div class="date-card">
+            <h4>Trip Cost: $<%= number_with_delimiter(@golfer_next_trip.cost) %></h4>
+            <h4>Amount Paid: $<%= number_with_delimiter(net_paid) %></h4>
+            <h4>Outstanding Balance: $<%= number_with_delimiter(@golfer_next_trip.balance) %></h4>
+            <% if @golfer_next_trip.is_paid %>
+              <h5 style="color: green; font-weight: bold;">PAID IN FULL</h5>
+            <% end %>
+          </div>
+          <hr class="line">
+          <h3>Payment Instructions</h3>
+          <div class="date-card">
+            <h4>Pay <%= ENV['TREASURER_NAME'] %></h4>
+            <h5>Venmo: <%= ENV['TREASURER_VENMO'] %></h5>
+            <h5>PayPal: <%= ENV['TREASURER_PAYPAL'] %></h5>
+          </div>
+          <hr class="line">
           <div class="iti-calendar">
             <div class="iti-dates">
               <% trip_nights.each do |night| %>
@@ -610,23 +627,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               </div>
             <% end %>
           <% end %>
-          <hr class="line">
-          <h3>Your Balance</h3>
-          <div class="date-card">
-            <h4>Trip Cost: $<%= number_with_delimiter(@golfer_next_trip.cost) %></h4>
-            <h4>Amount Paid: $<%= number_with_delimiter(net_paid) %></h4>
-            <h4>Outstanding Balance: $<%= number_with_delimiter(@golfer_next_trip.balance) %></h4>
-            <% if @golfer_next_trip.is_paid %>
-              <h5 style="color: green; font-weight: bold;">PAID IN FULL</h5>
-            <% end %>
-          </div>
-          <hr class="line">
-          <h3>Payment Instructions</h3>
-          <div class="date-card">
-            <h4>Pay <%= ENV['TREASURER_NAME'] %></h4>
-            <h5>Venmo: <%= ENV['TREASURER_VENMO'] %></h5>
-            <h5>PayPal: <%= ENV['TREASURER_PAYPAL'] %></h5>
-          </div>
         </div>
       <% else %>
         <div class='next-trip-cost' style="text-align: center;">

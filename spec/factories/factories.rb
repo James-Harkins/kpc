@@ -41,6 +41,11 @@ FactoryBot.define do
     cost { 75 }
   end
 
+  factory :golfer_round do
+    golfer
+    round
+  end
+
   factory :golfer_night do
     golfer
     night
