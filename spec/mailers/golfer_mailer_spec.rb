@@ -135,6 +135,24 @@ RSpec.describe GolferMailer, 'bed alerts', type: :mailer do
       expect(body).to include('3 open')
     end
 
+    it 'reads exactly as written when only some nights have room' do
+      create(:night, trip: trip)
+      3.times { create(:golfer_night, night: night) }
+      expect(mail.text_part.body.encoded).to include(
+        "Hey #{golfer.nickname}. Every bed at KPC #{trip.number} is taken for at least one night, so there's no room for the full week. " \
+        "A few nights still have space (below), and nights marked Full can't be booked. Beds can also open up if someone drops out. " \
+        "If you can only make the open nights, sign up and we'll see you in #{trip.location}!"
+      )
+    end
+
+    it 'reads exactly as written when the house is full' do
+      3.times { create(:golfer_night, night: night) }
+      expect(mail.text_part.body.encoded).to include(
+        "Hey #{golfer.nickname}. Every night at the house is spoken for right now. " \
+        "Beds can still open up if someone drops out, and the committee is tracking demand. Check back soon!"
+      )
+    end
+
     it 'lists open beds by night and the registration link' do
       body = mail.text_part.body.encoded
       expect(body).to include('3 open')
