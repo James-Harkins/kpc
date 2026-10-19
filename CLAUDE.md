@@ -157,7 +157,7 @@ GET/PATCH /golfer_trips/:id   golfer_trips#edit/admin_update (site admin only)
 PUT /update_golfer_payment    golfer_trips#update
 
 GET  /finances                finances#index (admin)
-GET  /attendance              attendance#index (admin)
+GET  /attendance              attendance#index (admin; shows a live Open Bed Count for the current, uncompleted trip)
 GET  /roster                  rosters#index
 GET  /previous_trips          previous_trips#index
 POST /trip_financial_summaries
@@ -170,6 +170,7 @@ GET/POST /bed_alerts/opt_out  bed_alert_opt_outs#show/create (signed token, no l
 GET/POST  /trips/new, /trips
 GET/PATCH /trips/:id/edit, /trips/:id
 PATCH     /trips/:id/complete
+PATCH     /trips/:id/open_registration   # dashboard "Open Trip Registration" button, sets registration_open (no email)
 
 # Course mgmt (site admin)
 /courses (index/new/create/edit/update)

@@ -45,6 +45,13 @@ class TripsController < ApplicationController
     redirect_to "/dashboard"
   end
 
+  def open_registration
+    trip = Trip.find(params[:id])
+    trip.update!(registration_open: true)
+    flash[:notice] = "Registration for KPC #{trip.number} is now open."
+    redirect_to "/dashboard"
+  end
+
   private
 
   def trip_params

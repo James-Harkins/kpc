@@ -222,6 +222,23 @@ body::before {
 <div class="next-trip-cost">
     <h1>Attendance &mdash; KPC <%= @next_trip.number %></h1>
 
+    <% if @show_open_beds %>
+        <div class="date-card">
+            <h3>Open Bed Count</h3>
+            <% if @total_bed_spots.zero? %>
+                <h4>No beds have been entered for this trip yet.</h4>
+            <% else %>
+                <h4><%= @open_bed_spots %> of <%= @total_bed_spots %> open</h4>
+                <h5>
+                    <%= @open_beds_by_night.map { |night, open| "#{night.date.strftime('%a %-m/%-d')}: #{open}" }.join(' &bull; ').html_safe %>
+                </h5>
+                <% if @open_bed_spots.zero? %>
+                    <h5>Every night is full.</h5>
+                <% end %>
+            <% end %>
+        </div>
+    <% end %>
+
     <% adm_nights = @next_trip.nights.order(:date).to_a %>
     <% adm_rounds_by_date = @next_trip.rounds.order(:date).index_by(&:date) %>
     <% adm_golfers = @next_trip.golfers.order(:nickname) %>

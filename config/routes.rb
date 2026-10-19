@@ -51,6 +51,7 @@ Rails.application.routes.draw do
   get   '/trips/:id/edit',     to: 'trips#edit',     as: :edit_trip
   patch '/trips/:id',          to: 'trips#update',   as: :trip
   patch '/trips/:id/complete', to: 'trips#complete', as: :complete_trip
+  patch '/trips/:id/open_registration', to: 'trips#open_registration', as: :open_registration_trip
 
   # Course management (admin)
   get   '/courses',          to: 'courses#index',  as: :courses
