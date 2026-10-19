@@ -50,6 +50,20 @@ class GolferTrip < ApplicationRecord
     deposit_met_by_deadline? ? 1 : 2
   end
 
+  # Night ids this golfer takes a bed spot on: every night when reserved all
+  # week, otherwise only the nights they attend.
+  def occupied_night_ids
+    return trip.nights.pluck(:id) if reserved_all_week?
+    golfer.golfer_nights.joins(:night).where(nights: { trip_id: trip_id }).pluck(:night_id)
+  end
+
+  # Most golfers sharing a bed on any single night.
+  def self.peak_night_load(golfer_trips)
+    load = Hash.new(0)
+    golfer_trips.each { |golfer_trip| golfer_trip.occupied_night_ids.each { |night_id| load[night_id] += 1 } }
+    load.values.max.to_i
+  end
+
   def nights_attending
     golfer.nights.where(trip_id: trip_id).count
   end
@@ -57,8 +71,8 @@ class GolferTrip < ApplicationRecord
   private
 
   def bed_capacity_not_exceeded
-    other_occupants = GolferTrip.where(bed_id: bed_id).where.not(id: id).count
-    errors.add(:bed, "is already at capacity") if other_occupants >= bed.capacity
+    others = GolferTrip.where(bed_id: bed_id).where.not(id: id).to_a
+    errors.add(:bed, "is already at capacity") if GolferTrip.peak_night_load(others + [self]) > bed.capacity
   end
 
   def bed_belongs_to_same_trip

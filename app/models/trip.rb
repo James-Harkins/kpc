@@ -84,10 +84,16 @@ class Trip < ApplicationRecord
     beds.sum(:capacity)
   end
 
+  # A golfer marked reserved_all_week holds their spot every night, attending or
+  # not; everyone else holds one only on the nights they attend.
   def open_bed_spots_by_night
-    total   = total_bed_spots
-    counts  = GolferNight.where(night_id: nights.select(:id)).group(:night_id).count
-    nights.order(:date).map { |night| [night, [total - counts.fetch(night.id, 0), 0].max] }
+    total          = total_bed_spots
+    reserved       = golfer_trips.where(reserved_all_week: true)
+    reserved_count = reserved.count
+    counts = GolferNight.where(night_id: nights.select(:id))
+                        .where.not(golfer_id: reserved.select(:golfer_id))
+                        .group(:night_id).count
+    nights.order(:date).map { |night| [night, [total - reserved_count - counts.fetch(night.id, 0), 0].max] }
   end
 
   # Spots a new golfer could still take on at least one night. 0 means every

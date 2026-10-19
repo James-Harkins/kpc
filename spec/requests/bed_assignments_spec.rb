@@ -23,6 +23,24 @@ RSpec.describe 'BedAssignments', type: :request do
     end
   end
 
+  describe 'reserve all week' do
+    before { log_in_as(create(:golfer, :admin)) }
+
+    it 'saves checked golfers as reserved and clears the rest' do
+      keeps = create(:golfer_trip, trip: trip, reserved_all_week: true)
+      gets  = create(:golfer_trip, trip: trip)
+      patch '/bed_assignments', params: { trip_id: trip.id, reserved_all_week: [gets.id.to_s] }
+      expect(gets.reload.reserved_all_week).to be(true)
+      expect(keeps.reload.reserved_all_week).to be(false)
+    end
+
+    it 'ignores golfer trips from other trips' do
+      other = create(:golfer_trip, trip: create(:trip))
+      patch '/bed_assignments', params: { trip_id: trip.id, reserved_all_week: [other.id.to_s] }
+      expect(other.reload.reserved_all_week).to be(false)
+    end
+  end
+
   describe 'PATCH /bed_assignments' do
     before { log_in_as(create(:golfer, :admin)) }
 

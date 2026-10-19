@@ -24,15 +24,46 @@ RSpec.describe GolferTrip, type: :model do
       expect(duplicate.errors[:golfer_id]).to include('is already signed up for this trip')
     end
 
-    it 'allows two golfers on a capacity-2 bed but rejects a third' do
-      trip = create(:trip)
-      bed = create(:bed, bedroom: create(:bedroom, house: create(:house, trip: trip)), capacity: 2)
-      create(:golfer_trip, trip: trip, bed: bed)
-      create(:golfer_trip, trip: trip, bed: bed)
-      third = build(:golfer_trip, trip: trip, bed: bed)
+    context 'bed capacity is counted per night' do
+      let(:trip) { create(:trip) }
+      let!(:nights) { Array.new(3) { create(:night, trip: trip) } }
+      let(:house) { create(:house, trip: trip) }
 
-      expect(third).not_to be_valid
-      expect(third.errors[:bed]).to include('is already at capacity')
+      def registered(*attended, **attrs)
+        golfer = create(:golfer)
+        attended.each { |night| create(:golfer_night, golfer: golfer, night: night) }
+        build(:golfer_trip, golfer: golfer, trip: trip, **attrs)
+      end
+
+      it 'allows two golfers on a capacity-2 bed but rejects a third' do
+        bed = create(:bed, bedroom: create(:bedroom, house: house), capacity: 2)
+        2.times { registered(*nights, bed: bed).save! }
+        third = registered(*nights, bed: bed)
+
+        expect(third).not_to be_valid
+        expect(third.errors[:bed]).to include('is already at capacity')
+      end
+
+      it 'lets golfers with non-overlapping nights share a capacity-1 bed' do
+        bed = create(:bed, bedroom: create(:bedroom, house: house), capacity: 1)
+        registered(nights[0], nights[1], bed: bed).save!
+
+        expect(registered(nights[2], bed: bed)).to be_valid
+      end
+
+      it 'rejects a capacity-1 bed when nights overlap' do
+        bed = create(:bed, bedroom: create(:bedroom, house: house), capacity: 1)
+        registered(nights[0], nights[1], bed: bed).save!
+
+        expect(registered(nights[1], nights[2], bed: bed)).not_to be_valid
+      end
+
+      it 'holds every night for a golfer reserved all week' do
+        bed = create(:bed, bedroom: create(:bedroom, house: house), capacity: 1)
+        registered(nights[1], nights[2], bed: bed, reserved_all_week: true).save!
+
+        expect(registered(nights[0], bed: bed)).not_to be_valid
+      end
     end
 
     it 'rejects a bed from a different trip' do
@@ -41,6 +72,24 @@ RSpec.describe GolferTrip, type: :model do
 
       expect(golfer_trip).not_to be_valid
       expect(golfer_trip.errors[:bed]).to include('belongs to a different trip')
+    end
+  end
+
+  describe '#occupied_night_ids' do
+    let(:trip) { create(:trip) }
+    let!(:nights) { Array.new(3) { create(:night, trip: trip) } }
+    let(:golfer) { create(:golfer) }
+
+    before { create(:golfer_night, golfer: golfer, night: nights[2]) }
+
+    it 'is the attended nights by default' do
+      golfer_trip = create(:golfer_trip, golfer: golfer, trip: trip)
+      expect(golfer_trip.occupied_night_ids).to eq([nights[2].id])
+    end
+
+    it 'is every night when reserved all week' do
+      golfer_trip = create(:golfer_trip, golfer: golfer, trip: trip, reserved_all_week: true)
+      expect(golfer_trip.occupied_night_ids).to match_array(nights.map(&:id))
     end
   end
 

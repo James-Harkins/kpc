@@ -77,7 +77,8 @@ body::before {
         <span class="tier-1">met by deadline</span>,
         <span class="tier-2">met late</span>,
         <span class="tier-3">not met</span>.
-        A bed stays reserved for its golfer all week &mdash; nights they're away show <em>away</em>, never open.
+        A bed marked <em>reserved all week</em> stays held for its golfer on nights they're away (shown as <em>away &mdash; reserved</em>);
+        otherwise a bed shows <em>open</em> on nights its golfer isn't there.
     </p>
 
     <% if @houses.empty? %>
@@ -111,11 +112,13 @@ body::before {
                                             <td class="cell-open">open</td>
                                         <% elsif @attending.include?([occupant.golfer_id, night.id]) %>
                                             <td class="tier-<%= occupant.bed_priority_tier %>"><%= occupant.golfer.nickname.strip.titleize %></td>
-                                        <% else %>
+                                        <% elsif occupant.reserved_all_week? %>
                                             <td class="cell-away tier-<%= occupant.bed_priority_tier %>">
                                                 <%= occupant.golfer.nickname.strip.titleize %>
-                                                <span class="away-label">away</span>
+                                                <span class="away-label">away &mdash; reserved</span>
                                             </td>
+                                        <% else %>
+                                            <td class="cell-open">open</td>
                                         <% end %>
                                     <% end %>
                                 </tr>

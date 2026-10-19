@@ -67,6 +67,29 @@ RSpec.describe Trip, 'bed availability' do
       expect(trip.open_bed_spots).to eq(1)
     end
 
+    context 'with a golfer reserved all week' do
+      it 'holds the spot on nights they are away' do
+        attend(create(:golfer), nights[1], nights[2]).update!(reserved_all_week: true)
+        expect(trip.open_bed_spots_by_night.map(&:last)).to eq([1, 1, 1])
+      end
+
+      it 'does not double count the nights a reserved golfer attends' do
+        attend(create(:golfer), *nights).update!(reserved_all_week: true)
+        expect(trip.open_bed_spots_by_night.map(&:last)).to eq([1, 1, 1])
+      end
+
+      it 'still opens a spot for a golfer who is not reserved and is away' do
+        attend(create(:golfer), nights[1], nights[2]).update!(reserved_all_week: true)
+        attend(create(:golfer), nights[0])
+        expect(trip.open_bed_spots_by_night.map(&:last)).to eq([0, 1, 1])
+      end
+
+      it 'reaches true zero when reserved golfers fill every spot' do
+        2.times { attend(create(:golfer), nights[2]).update!(reserved_all_week: true) }
+        expect(trip.open_bed_spots).to eq(0)
+      end
+    end
+
     it 'is zero for a trip with no nights' do
       expect(create(:trip).open_bed_spots).to eq(0)
     end

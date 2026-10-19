@@ -24,7 +24,7 @@ class Bed < ApplicationRecord
 
   def capacity_covers_current_occupants
     return if new_record? || capacity.nil?
-    occupant_count = golfer_trips.count
-    errors.add(:capacity, "cannot be less than current occupants (#{occupant_count})") if capacity < occupant_count
+    peak = GolferTrip.peak_night_load(golfer_trips)
+    errors.add(:capacity, "cannot be less than current occupants (#{peak})") if capacity < peak
   end
 end

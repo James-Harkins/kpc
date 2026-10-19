@@ -30,7 +30,8 @@ class BedAssignmentsController < ApplicationController
     else
       begin
         GolferTrip.transaction do
-          trip.golfer_trips.update_all(bed_id: nil)
+          trip.golfer_trips.update_all(bed_id: nil, reserved_all_week: false)
+          trip.golfer_trips.where(id: Array(params[:reserved_all_week])).update_all(reserved_all_week: true)
           submitted.each do |bed_id, golfer_trip_ids|
             golfer_trip_ids.reject(&:blank?).each do |golfer_trip_id|
               trip.golfer_trips.find(golfer_trip_id).update!(bed_id: bed_id)

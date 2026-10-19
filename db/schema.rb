@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_10_19_000002) do
+ActiveRecord::Schema.define(version: 2026_10_19_000003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -90,6 +90,7 @@ ActiveRecord::Schema.define(version: 2026_10_19_000002) do
     t.integer "balance"
     t.bigint "bed_id"
     t.datetime "deposit_policy_acknowledged_at"
+    t.boolean "reserved_all_week", default: false, null: false
     t.index ["bed_id"], name: "index_golfer_trips_on_bed_id"
     t.index ["golfer_id", "trip_id"], name: "index_golfer_trips_on_golfer_id_and_trip_id", unique: true
     t.index ["golfer_id"], name: "index_golfer_trips_on_golfer_id"

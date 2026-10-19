@@ -106,6 +106,7 @@ select {
                 <th>Deposit</th>
                 <th>Registered</th>
                 <th>Current Bed</th>
+                <% if @houses.any? %><th>Reserve All Week</th><% end %>
             </tr>
         </thead>
         <tbody>
@@ -137,16 +138,28 @@ select {
                             &mdash;
                         <% end %>
                     </td>
+                    <% if @houses.any? %>
+                        <td style="text-align: center;">
+                            <input type="checkbox" name="reserved_all_week[]" value="<%= golfer_trip.id %>" form="assignments-form" <%= 'checked' if golfer_trip.reserved_all_week? %>>
+                        </td>
+                    <% end %>
                 </tr>
             <% end %>
         </tbody>
     </table>
+    <% if @houses.any? %>
+        <p style="font-size: 0.85em; color: #555;">
+            Check <strong>Reserve All Week</strong> to hold a golfer's bed every night, even nights they're away
+            (e.g. an admin arriving mid-week). Unchecked golfers only hold their bed on the nights they attend,
+            so someone else can take it the other nights. Save Assignments below to apply.
+        </p>
+    <% end %>
 
     <h2>Assignments</h2>
     <% if @houses.empty? %>
         <p>No houses have been added for this trip yet. A site admin can add one from the Houses page.</p>
     <% else %>
-        <%= form_with url: bed_assignments_path, method: :patch, local: true do %>
+        <%= form_with url: bed_assignments_path, method: :patch, local: true, id: 'assignments-form' do %>
             <input type="hidden" name="trip_id" value="<%= @trip.id %>">
             <% @houses.each do |house| %>
                 <h3><%= house.name %></h3>

@@ -32,13 +32,30 @@ RSpec.describe Bed, type: :model do
     it 'prevents shrinking capacity below the current occupant count' do
       trip = create(:trip)
       bed = create(:bed, bedroom: create(:bedroom, house: create(:house, trip: trip)), capacity: 2)
-      create(:golfer_trip, trip: trip, bed: bed)
-      create(:golfer_trip, trip: trip, bed: bed)
+      night = create(:night, trip: trip)
+      2.times do
+        golfer_trip = create(:golfer_trip, trip: trip, bed: bed)
+        create(:golfer_night, golfer: golfer_trip.golfer, night: night)
+      end
 
       bed.capacity = 1
 
       expect(bed).not_to be_valid
       expect(bed.errors[:capacity].first).to include('current occupants')
+    end
+
+    it 'allows shrinking capacity when the occupants never overlap' do
+      trip = create(:trip)
+      bed = create(:bed, bedroom: create(:bedroom, house: create(:house, trip: trip)), capacity: 2)
+      nights = Array.new(2) { create(:night, trip: trip) }
+      nights.each do |night|
+        golfer_trip = create(:golfer_trip, trip: trip, bed: bed)
+        create(:golfer_night, golfer: golfer_trip.golfer, night: night)
+      end
+
+      bed.capacity = 1
+
+      expect(bed).to be_valid
     end
   end
 end
