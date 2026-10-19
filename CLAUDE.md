@@ -1,10 +1,10 @@
-# CLAUDE.md — Kitchen Pass Classic (KPC)
+# CLAUDE.md - Kitchen Pass Classic (KPC)
 
 ## What This App Is
 
 A golf trip management app for an annual golf outing. Golfers register for trips, select which rounds and nights they're attending, and costs are calculated accordingly. "Kitchen Pass" = permission slip from the family to go.
 
-Admins manage trips, courses, expenses, financials, and bed assignments. There's an end-of-trip tournament (currently the last three rounds) where golfers split into teams and compete in 2v2 (and occasionally 1v1 or 2v1) matchups — the app handles team generation, pairing, score entry, and result tracking. Beds in the rental houses are awarded by payment incentive: golfers who stay the most nights and pay their 50% deposit earliest get the best beds.
+Admins manage trips, courses, expenses, financials, and bed assignments. There's an end-of-trip tournament (currently the last three rounds) where golfers split into teams and compete in 2v2 (and occasionally 1v1 or 2v1) matchups - the app handles team generation, pairing, score entry, and result tracking. Beds in the rental houses are awarded by payment incentive: golfers who stay the most nights and pay their 50% deposit earliest get the best beds.
 
 ---
 
@@ -12,8 +12,8 @@ Admins manage trips, courses, expenses, financials, and bed assignments. There's
 
 - Rails 5.2.8, Ruby 2.7.4
 - PostgreSQL (`kpc_development` / `kpc_test`)
-- Bootstrap 5, jQuery, Turbolinks — no heavy JS framework
-- `bcrypt` / `has_secure_password` — no Devise
+- Bootstrap 5, jQuery, Turbolinks - no heavy JS framework
+- `bcrypt` / `has_secure_password` - no Devise
 - `figaro` for env vars (`config/application.yml`, gitignored)
 - `rack-attack` for rate limiting
 - Action Mailer via Resend (`RESEND_API_KEY`)
@@ -30,7 +30,7 @@ rails console       # bin/rails c
 bundle exec rspec   # run tests
 ```
 
-No asset watcher needed — standard Sprockets pipeline.
+No asset watcher needed - standard Sprockets pipeline.
 
 ---
 
@@ -40,9 +40,9 @@ All set via Figaro in `config/application.yml` (not checked in).
 
 | Variable | Purpose |
 |---|---|
-| `CURRENT_TRIP_NUMBER` | Roman numeral (e.g. `XXV`) — drives `Trip.current` |
+| `CURRENT_TRIP_NUMBER` | Roman numeral (e.g. `XXV`) - drives `Trip.current` |
 | `SITE_ADMIN_EMAIL` | Unlocks site-admin-only actions (create trip, edit courses, broadcast) |
-| `REGISTER_TOKEN` | Required token on the registration form — invite-only signup |
+| `REGISTER_TOKEN` | Required token on the registration form - invite-only signup |
 | `TREASURER_EMAIL` | Used for financial settlement calculations |
 | `TREASURER_NAME` | Displayed in payment instructions |
 | `TREASURER_VENMO` | Displayed in payment instructions |
@@ -55,11 +55,11 @@ All set via Figaro in `config/application.yml` (not checked in).
 
 - Session-based auth via `session[:golfer_id]`
 - `current_user` returns the logged-in `Golfer`
-- Two roles: `default` (0) and `admin` (1) — `enum role: [:default, :admin]`
+- Two roles: `default` (0) and `admin` (1) - `enum role: [:default, :admin]`
 - Three access levels in `ApplicationController`:
-  - `require_login` — any logged-in golfer
-  - `require_admin` — any admin
-  - `require_site_admin` — only the golfer whose email matches `SITE_ADMIN_EMAIL`
+  - `require_login` - any logged-in golfer
+  - `require_admin` - any admin
+  - `require_site_admin` - only the golfer whose email matches `SITE_ADMIN_EMAIL`
 - Registration is invite-only: requires `REGISTER_TOKEN` param to match the env var
 
 ---
@@ -70,7 +70,7 @@ All set via Figaro in `config/application.yml` (not checked in).
 Core user. Has `role` (default/admin), `nickname`, `t_shirt_size`. Auth via `has_secure_password`. Password min 8 chars. Password reset tokens are SHA-256 hashed with 2-hour expiry.
 
 ### `Trip`
-One per year. `number` is a Roman numeral string (e.g. `"XXV"`). `Trip.current` looks up by `CURRENT_TRIP_NUMBER`. Has a `completed` boolean. `start_date` is a datetime. `registration_open` (boolean, default false; site admin ticks it on the trip form — until then only admins can register, so they claim their beds first; the dashboard tells everyone else registration isn't open). Nullable `deposit_due_date` (date) — when set, registration requires acknowledging the non-refundable 50% deposit policy and drives bed-priority tiers. `bed_priority_order` returns golfer_trips sorted for bed assignment (tier, nights desc, deposit_met_at asc, registration asc).
+One per year. `number` is a Roman numeral string (e.g. `"XXV"`). `Trip.current` looks up by `CURRENT_TRIP_NUMBER`. Has a `completed` boolean. `start_date` is a datetime. `registration_open` (boolean, default false; site admin ticks it on the trip form - until then only admins can register, so they claim their beds first; the dashboard tells everyone else registration isn't open). Nullable `deposit_due_date` (date) - when set, registration requires acknowledging the non-refundable 50% deposit policy and drives bed-priority tiers. `bed_priority_order` returns golfer_trips sorted for bed assignment (tier, nights desc, deposit_met_at asc, registration asc).
 
 ### `Round`
 Belongs to a `Trip` and optionally a `Course`. Has `date`, `cost`, `tee_time`, `is_tournament_round`. Tournament rounds are excluded from ranking score calculations.
@@ -81,16 +81,16 @@ Scopes: `Round.tournament` / `Round.non_tournament`
 Belongs to a `Trip`. Represents one night at the house.
 
 ### `GolferTrip`
-Join between `Golfer` and `Trip`. Tracks `cost`, `balance`, `is_paid`, `is_full_trip`. A "full trip" gets the first night comped. Nullable `bed_id` FK holds the golfer's bed assignment (capacity-2 beds are two golfer_trips sharing a bed_id). `reserved_all_week` (boolean; set automatically when an admin registers, editable on `/bed_assignments`) makes the golfer hold their bed spot every night, attending or not — e.g. an admin arriving mid-week. Unreserved golfers hold a spot only on the nights they attend, so bed capacity is enforced **per night** (`GolferTrip.peak_night_load`): non-overlapping golfers can share a capacity-1 bed. Deposit logic is derived live from the payments ledger: `deposit_amount` (50% of cost, ceil), `deposit_met_at` (timestamp of the last upward crossing of the deposit; a later return un-meets it), `deposit_met_by_deadline?`, `bed_priority_tier` (0 = admin, always first; 1 = met by deadline; 2 = met late; 3 = not met). `deposit_policy_acknowledged_at` records acceptance of the non-refundable policy at registration.
+Join between `Golfer` and `Trip`. Tracks `cost`, `balance`, `is_paid`, `is_full_trip`. A "full trip" gets the first night comped. Nullable `bed_id` FK holds the golfer's bed assignment (capacity-2 beds are two golfer_trips sharing a bed_id). `reserved_all_week` (boolean; set automatically when an admin registers, editable on `/bed_assignments`) makes the golfer hold their bed spot every night, attending or not - e.g. an admin arriving mid-week. Unreserved golfers hold a spot only on the nights they attend, so bed capacity is enforced **per night** (`GolferTrip.peak_night_load`): non-overlapping golfers can share a capacity-1 bed. Deposit logic is derived live from the payments ledger: `deposit_amount` (50% of cost, ceil), `deposit_met_at` (timestamp of the last upward crossing of the deposit; a later return un-meets it), `deposit_met_by_deadline?`, `bed_priority_tier` (0 = admin, always first; 1 = met by deadline; 2 = met late; 3 = not met). `deposit_policy_acknowledged_at` records acceptance of the non-refundable policy at registration.
 
 ### `House` / `Bedroom` / `Bed`
-`House` belongs to a `Trip` (`name`, `address`, `url` — rental listing link shown to golfers on the dashboard). Multiple houses per trip (main + overflow). `Bedroom` belongs to a house. `Bed` belongs to a bedroom: `description`, `capacity` (1 or 2), `rank` (1 = best; unique per trip, enforced in the model). Beds `has_many :golfer_trips, dependent: :nullify`. House/bed structure is site-admin; the `/bed_assignments` page (admin) shows the computed priority order and per-bed slot dropdowns — assignment is manual, admins take the best beds at their discretion.
+`House` belongs to a `Trip` (`name`, `address`, `url` - rental listing link shown to golfers on the dashboard). Multiple houses per trip (main + overflow). `Bedroom` belongs to a house. `Bed` belongs to a bedroom: `description`, `capacity` (1 or 2), `rank` (1 = best; unique per trip, enforced in the model). Beds `has_many :golfer_trips, dependent: :nullify`. House/bed structure is site-admin; the `/bed_assignments` page (admin) shows the computed priority order and per-bed slot dropdowns - assignment is manual, admins take the best beds at their discretion.
 
 ### Bed availability (`Trip`) and opt-outs (`BedAlertOptOut`)
-Spots are counted **per night**, not per golfer: `total_bed_spots` is the sum of bed capacities, `open_bed_spots_by_night` subtracts each night's `golfer_nights` (excluding reserved golfers) plus the reserved-all-week count, `open_bed_spots` is the **tightest** night's free count — the beds a full-week guest could take (0 = no full-week bed, even if some nights have room). `open_bed_spots_any_night` is the roomiest night, and `full_night_ids` lists nights with every spot taken. Non-admin signups (`GolferTripsController#create`) are rejected for any full night, including the whole-trip button, and the form disables full nights; admins are exempt and nothing is blocked until beds are entered. A golfer who leaves early and one who arrives later never share a night, so they use one spot — except golfers marked `reserved_all_week`, who hold a spot on every night. `Trip#send_bed_alerts(golfer, had_open_spots)` is called from `GolferTripsController#create`; the golfer blast is rate-limited to once per `BED_ALERT_COOLDOWN` (1 hour, stamped in `trips.last_bed_alert_at`) to stay under Resend's daily send cap, except the hit-zero blast which always sends. `BedAlertOptOut` (golfer + trip, unique) is created from a signed link (`/bed_alerts/opt_out?token=`, GET confirms, POST opts out — no login). Opt-outs are per trip.
+Spots are counted **per night**, not per golfer: `total_bed_spots` is the sum of bed capacities, `open_bed_spots_by_night` subtracts each night's `golfer_nights` (excluding reserved golfers) plus the reserved-all-week count, `open_bed_spots` is the **tightest** night's free count - the beds a full-week guest could take (0 = no full-week bed, even if some nights have room). `open_bed_spots_any_night` is the roomiest night, and `full_night_ids` lists nights with every spot taken. Non-admin signups (`GolferTripsController#create`) are rejected for any full night, including the whole-trip button, and the form disables full nights; admins are exempt and nothing is blocked until beds are entered. A golfer who leaves early and one who arrives later never share a night, so they use one spot - except golfers marked `reserved_all_week`, who hold a spot on every night. `Trip#send_bed_alerts(golfer, had_open_spots)` is called from `GolferTripsController#create`; the golfer blast is rate-limited to once per `BED_ALERT_COOLDOWN` (1 hour, stamped in `trips.last_bed_alert_at`) to stay under Resend's daily send cap, except the hit-zero blast which always sends. `BedAlertOptOut` (golfer + trip, unique) is created from a signed link (`/bed_alerts/opt_out?token=`, GET confirms, POST opts out - no login). Opt-outs are per trip.
 
 ### `GolferRound`
-Join between `Golfer` and `Round`. Has a nullable `score` integer (total strokes — used for tournament ranking).
+Join between `Golfer` and `Round`. Has a nullable `score` integer (total strokes - used for tournament ranking).
 
 ### `GolferNight`
 Join between `Golfer` and `Night`.
@@ -117,7 +117,7 @@ Belongs to `Round`. Stores `matchup_group` and `result` ("A", "B", or "tie"). Un
 ## Facades
 
 ### `GolferTripFacade`
-Located in `app/facades/`. Used in `GolferTripsController#create` to handle golfer registration — creates `GolferNight` and `GolferRound` records based on form params, and determines `is_full_trip`.
+Located in `app/facades/`. Used in `GolferTripsController#create` to handle golfer registration - creates `GolferNight` and `GolferRound` records based on form params, and determines `is_full_trip`.
 
 ---
 
@@ -131,13 +131,13 @@ Located in `app/facades/`. Used in `GolferTripsController#create` to handle golf
 | `password_reset` | Password reset requested |
 | `announcement` | Admin broadcasts to all registered golfers |
 | `trip_reminder_paid` / `trip_reminder_unpaid` | `emails:send_pre_trip_reminder` rake task (daily GitHub Actions cron; sends 1 month before `trip.start_date`) |
-| `balance_final_notice` | Same rake task, 1 week before `trip.start_date` — unpaid balances only |
+| `balance_final_notice` | Same rake task, 1 week before `trip.start_date` - unpaid balances only |
 | `deposit_reminder` | `emails:send_deposit_reminder` rake task (daily GitHub Actions cron; sends 1 week before `deposit_due_date` to golfers who haven't met their 50% deposit) |
-| `deposit_final_call` | Same rake task, on `deposit_due_date` itself — last-day warning that late deposits drop a priority tier |
+| `deposit_final_call` | Same rake task, on `deposit_due_date` itself - last-day warning that late deposits drop a priority tier |
 | `bed_availability` | After each non-admin signup, to every golfer not registered for the trip and not opted out ("X beds left" + open beds by night + per-golfer signed opt-out link; becomes "no full-week beds left" when only some nights have room, and "house is full" at 0) |
 | `bed_capacity_reached` | To all admins when a signup takes the trip from open full-week beds to none (names any nights that still have room) |
 
-**Bulk sends:** anything going to many people goes through `BulkMailJob` (`perform_later('mailer_method', golfer_ids, *args)` — mailer method is a **String**, ActiveJob 5.2 can't serialize Symbols). It sends one message per golfer with a 0.6s gap (Resend rate limit) on the in-process async adapter, so the web request returns immediately. Transactional single-recipient mail stays `deliver_now`; the rake-task reminders run in their own process and keep their own sleeps.
+**Bulk sends:** anything going to many people goes through `BulkMailJob` (`perform_later('mailer_method', golfer_ids, *args)` - mailer method is a **String**, ActiveJob 5.2 can't serialize Symbols). It sends one message per golfer with a 0.6s gap (Resend rate limit) on the in-process async adapter, so the web request returns immediately. Transactional single-recipient mail stays `deliver_now`; the rake-task reminders run in their own process and keep their own sleeps.
 
 ---
 
@@ -203,7 +203,7 @@ PATCH /tournament_matchup_results/:round_id
 1. Admin marks the tournament rounds (currently the last three) as `is_tournament_round: true` on the trip edit page
 2. Admin enters stroke scores for golfers on non-tournament rounds via `/rounds/:id/scores`
 3. Admin visits `/tournament` and clicks "Generate Teams"
-4. Algorithm ranks players by average score (ascending — lower = better), then uses serpentine assignment into groups of 4 to produce balanced teams
+4. Algorithm ranks players by average score (ascending - lower = better), then uses serpentine assignment into groups of 4 to produce balanced teams
 5. Pairings are generated per round (same by default, but each round's assignments are independent records)
 6. Admin can redraw pairings for a single round or override individual player assignments
 7. After each tournament round, admin enters results (Team A wins / Tie / Team B wins) per matchup group
@@ -225,10 +225,10 @@ If a golfer has no scores on the current trip's non-tournament rounds, the algor
 ### How it works
 
 1. Site admin sets `deposit_due_date` on the trip (new/edit form). This activates the whole feature: the registration form requires acknowledging the non-refundable 50% deposit policy (checkbox, JS-gated with inline error, server-enforced, timestamped in `deposit_policy_acknowledged_at`)
-2. Site admin adds houses under `/houses` (often after registration has opened) — bedrooms and beds entered as dynamic rows; each bed gets capacity (1–2) and a trip-unique rank (1 = best)
+2. Site admin adds houses under `/houses` (often after registration has opened) - bedrooms and beds entered as dynamic rows; each bed gets capacity (1–2) and a trip-unique rank (1 = best)
 3. Admins visit `/bed_assignments`: a priority table plus per-bed slot dropdowns
-4. "Autofill by Priority" (client-side JS) fills slots: pass 1 gives one golfer per bed, best bed to highest priority; pass 2 doubles remaining golfers into the lowest-ranked capacity-2 beds. Admin rearranges, then saves — full-replace PATCH in a transaction, rejected whole on duplicate golfers or over-capacity
-5. `/bed_assignments/week` is a read-only grid of the whole stay: one table per bedroom (grouped by house), a row per bed slot, a column per night. Nights the bed's golfer isn't attending show "away — reserved" if they're `reserved_all_week`, otherwise "open". Capacity-2 beds get two rows. Below the bedrooms: golfers with no bed (and the nights they need one) and attending-vs-spots per night. Admin only; golfers never see beds.
+4. "Autofill by Priority" (client-side JS) fills slots: pass 1 gives one golfer per bed, best bed to highest priority; pass 2 doubles remaining golfers into the lowest-ranked capacity-2 beds. Admin rearranges, then saves - full-replace PATCH in a transaction, rejected whole on duplicate golfers or over-capacity
+5. `/bed_assignments/week` is a read-only grid of the whole stay: one table per bedroom (grouped by house), a row per bed slot, a column per night. Nights the bed's golfer isn't attending show "away - reserved" if they're `reserved_all_week`, otherwise "open". Capacity-2 beds get two rows. Below the bedrooms: golfers with no bed (and the nights they need one) and attending-vs-spots per night. Admin only; golfers never see beds.
 6. House names link to their rental listing (`houses.url`) on every golfer's dashboard; bed assignments themselves are admin-only
 
 ### Priority order (`Trip#bed_priority_order`)
@@ -238,11 +238,11 @@ Tiers via `GolferTrip#bed_priority_tier`: **0** admin (always first), **1** depo
 
 ### Deposit derivation (no stored flag)
 
-`deposit_amount` = 50% of cost, ceil. `deposit_met_at` walks the payments ledger in order and returns the **last upward crossing** of the deposit — nil if the current net total is below it. So returns can un-meet a deposit, refund-then-repay yields the later timestamp, and cost edits move the threshold automatically. Cost-0 (admin-registered) golfers are trivially met at registration.
+`deposit_amount` = 50% of cost, ceil. `deposit_met_at` walks the payments ledger in order and returns the **last upward crossing** of the deposit - nil if the current net total is below it. So returns can un-meet a deposit, refund-then-repay yields the later timestamp, and cost edits move the threshold automatically. Cost-0 (admin-registered) golfers are trivially met at registration.
 
 ### Returns warning
 
-On the finances page, a return that would drop a golfer's net paid below their deposit triggers a JS `confirm` (warn, don't block — site admin can proceed).
+On the finances page, a return that would drop a golfer's net paid below their deposit triggers a JS `confirm` (warn, don't block - site admin can proceed).
 
 ---
 
@@ -258,7 +258,7 @@ bundle exec rspec spec/models/tournament_assignment_spec.rb
 
 Uses `shoulda-matchers` for one-liner relationship/validation assertions. Database is cleaned via transactional fixtures (`use_transactional_fixtures = true`). Older tests use direct `Model.create!` calls; new tests should use the FactoryBot factories in `spec/factories/factories.rb` (`FactoryBot::Syntax::Methods` is included in `rails_helper.rb`).
 
-`db/seeds/mad_men_walkthrough.rb` is a second, blank-trip scenario for walking registration end to end (`bin/rails runner db/seeds/mad_men_walkthrough.rb` — wipes the dev DB; needs `CURRENT_TRIP_NUMBER=XXVII` and `SITE_ADMIN_EMAIL=don@sterlingcooper.com`). `spec/requests/walkthrough_spec.rb` runs the same sequence with expected counts.
+`db/seeds/mad_men_walkthrough.rb` is a second, blank-trip scenario for walking registration end to end (`bin/rails runner db/seeds/mad_men_walkthrough.rb` - wipes the dev DB; needs `CURRENT_TRIP_NUMBER=XXVII` and `SITE_ADMIN_EMAIL=don@sterlingcooper.com`). `spec/requests/walkthrough_spec.rb` runs the same sequence with expected counts.
 
 Seeds (`db/seeds.rb`) build a full manual-testing scenario: Sopranos-themed golfers, a current trip (KPC XXVI) with courses/tee times and three tournament rounds, two houses with ranked beds, and backdated payments spreading golfers across all bed-priority tiers. `furio@giunta.it` is seeded unregistered for testing the registration flow. Rerun with `rails db:reset`.
 
@@ -266,10 +266,10 @@ Seeds (`db/seeds.rb`) build a full manual-testing scenario: Sopranos-themed golf
 
 ## Conventions
 
-- No Devise. Auth is custom and intentional — don't add Devise.
+- No Devise. Auth is custom and intentional - don't add Devise.
 - No service objects except `GolferTripFacade` (which predates this convention). Keep logic in models.
 - Controllers are thin. Business logic lives in model class/instance methods.
-- Views use inline `<style>` blocks — no separate CSS files. Background image is `course_1.jpg` via `asset_path`.
+- Views use inline `<style>` blocks - no separate CSS files. Background image is `course_1.jpg` via `asset_path`.
 - `button_to` with `method: :get` is used for navigation buttons throughout the admin UI. This is intentional (existing pattern).
 - All admin actions use `before_action :require_admin`. Site-admin-only actions use `require_site_admin`.
-- `Trip.current` is the single source of truth for the active trip — driven by `CURRENT_TRIP_NUMBER` env var, not a database flag.
+- `Trip.current` is the single source of truth for the active trip - driven by `CURRENT_TRIP_NUMBER` env var, not a database flag.

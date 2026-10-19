@@ -127,7 +127,7 @@ body::before {
                    <%= 'checked' if (@selected_night_ids || []).include?(night.id) %>
                    onchange="updateProjectedCost()">
             <label for="night-<%= night.id %>">
-                <%= night.date.strftime('%A, %B %d, %Y') %> &mdash; $<%= number_with_delimiter(night.cost) %>
+                <%= night.date.strftime('%A, %B %d, %Y') %> - $<%= number_with_delimiter(night.cost) %>
             </label>
         </div>
         <% end %>
@@ -145,9 +145,9 @@ body::before {
                    onchange="updateProjectedCost()">
             <label for="round-<%= round.id %>">
                 <%= round.date.strftime('%A, %B %d, %Y') %>
-                <% if round.tee_time.present? %> &mdash; <%= round.tee_time %><% end %>
+                <% if round.tee_time.present? %> - <%= round.tee_time %><% end %>
                 <% if round.course.present? %> @ <%= round.course.name %><% end %>
-                &mdash; $<%= number_with_delimiter(round.cost) %>
+                - $<%= number_with_delimiter(round.cost) %>
             </label>
         </div>
         <% end %>

@@ -44,7 +44,7 @@ RSpec.describe 'BedAssignments week view', type: :request do
       attend(admin_trip, nights[1], nights[2])
       get '/bed_assignments/week', params: { trip_id: trip.id }
       expect(response.body.scan('Boss').length).to eq(3)
-      expect(response.body.scan('away &mdash; reserved</span>').length).to eq(1)
+      expect(response.body.scan('away (reserved)</span>').length).to eq(1)
       expect(response.body.scan('>open</td>').length).to eq(3)
     end
 
@@ -53,7 +53,7 @@ RSpec.describe 'BedAssignments week view', type: :request do
       attend(admin_trip, nights[1], nights[2])
       get '/bed_assignments/week', params: { trip_id: trip.id }
       expect(response.body.scan('Boss').length).to eq(2)
-      expect(response.body).not_to include('away &mdash; reserved</span>')
+      expect(response.body).not_to include('away (reserved)</span>')
       expect(response.body.scan('>open</td>').length).to eq(4)
     end
 

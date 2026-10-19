@@ -126,7 +126,7 @@
 @night_6_trip_5 = @trip_5.nights.create!(date: Date.parse('2026-10-22'), cost: 120)
 @night_7_trip_5 = @trip_5.nights.create!(date: Date.parse('2026-10-23'), cost: 120)
 
-# Trip 5 courses — one per round day, with tee times.
+# Trip 5 courses - one per round day, with tee times.
 # The last three rounds (Oct 21–23) are tournament rounds.
 @red_wing      = Course.create!(name: 'Red Wing Lake Golf Course',    address: '1144 Prosperity Rd, Virginia Beach, VA 23451')
 @hells_point   = Course.create!(name: "Hell's Point Golf Club",       address: '2700 Atwoodtown Rd, Virginia Beach, VA 23456')
@@ -143,11 +143,11 @@
 @trip_5_course_6 = @trip_5.rounds.create!(date: Date.parse('2026-10-23'), cost: 75, course: @va_beach_natl, tee_time: '8:00 AM', is_tournament_round: true)
 
 # ---------------------------------------------------------------------------
-# Sopranos golfers — 15 trip 5 registrations
+# Sopranos golfers - 15 trip 5 registrations
 #
 # Trip 5 costs (full trip):
 #   7 nights × $120 = $840, 6 rounds = $0+$0+$75+$75+$75+$75 = $300
-#   Gross = $1,140 — first night discount ($120) = $1,020 net
+#   Gross = $1,140 - first night discount ($120) = $1,020 net
 #
 # Night → round mapping (sequential logic):
 #   Stay night Oct N, wake up and play round Oct N+1
@@ -162,7 +162,7 @@
 
 # --- 8 full trips (all 7 nights + all 6 rounds, cost $1,020) ---
 
-# 1. Feech La Manna — full trip, paid in full
+# 1. Feech La Manna - full trip, paid in full
 @feech = Golfer.create!(
   first_name: 'Feech', last_name: 'La Manna', nickname: 'Feech',
   email: 'feech@lamanna.com',
@@ -174,7 +174,7 @@
 [@trip_5_course_1, @trip_5_course_2, @trip_5_course_3, @trip_5_course_4, @trip_5_course_5, @trip_5_course_6].each { |r| @feech.golfer_rounds.create!(round: r) }
 @feech_trip.payments.create!(amount: 1020)
 
-# 2. Christopher Moltisanti — full trip, paid in two installments
+# 2. Christopher Moltisanti - full trip, paid in two installments
 @christopher = Golfer.create!(
   first_name: 'Christopher', last_name: 'Moltisanti', nickname: 'Chrissy',
   email: 'chris@discretewaste.com',
@@ -187,7 +187,7 @@
 @christopher_trip.payments.create!(amount: 500)
 @christopher_trip.payments.create!(amount: 520)
 
-# 3. Eugene Pontecorvo — full trip, partially paid
+# 3. Eugene Pontecorvo - full trip, partially paid
 @eugene = Golfer.create!(
   first_name: 'Eugene', last_name: 'Pontecorvo', nickname: 'Eugene',
   email: 'eugene@pontecorvo.net',
@@ -199,7 +199,7 @@
 [@trip_5_course_1, @trip_5_course_2, @trip_5_course_3, @trip_5_course_4, @trip_5_course_5, @trip_5_course_6].each { |r| @eugene.golfer_rounds.create!(round: r) }
 @eugene_trip.payments.create!(amount: 600)
 
-# 4. Bobby Baccalieri — full trip, paid in three installments
+# 4. Bobby Baccalieri - full trip, paid in three installments
 @bobby = Golfer.create!(
   first_name: 'Bobby', last_name: 'Baccalieri', nickname: 'Bacala',
   email: 'bobby@northjerseymodelrailroad.com',
@@ -213,7 +213,7 @@
 @bobby_trip.payments.create!(amount: 400)
 @bobby_trip.payments.create!(amount: 320)
 
-# 5. Vito Spatafore — full trip, not yet paid
+# 5. Vito Spatafore - full trip, not yet paid
 @vito = Golfer.create!(
   first_name: 'Vito', last_name: 'Spatafore', nickname: 'Vito',
   email: 'vito@spatafore.net',
@@ -224,7 +224,7 @@
 [@night_1_trip_5, @night_2_trip_5, @night_3_trip_5, @night_4_trip_5, @night_5_trip_5, @night_6_trip_5, @night_7_trip_5].each { |n| @vito.golfer_nights.create!(night: n) }
 [@trip_5_course_1, @trip_5_course_2, @trip_5_course_3, @trip_5_course_4, @trip_5_course_5, @trip_5_course_6].each { |r| @vito.golfer_rounds.create!(round: r) }
 
-# 6. Salvatore Bonpensiero — full trip, overpaid then returned
+# 6. Salvatore Bonpensiero - full trip, overpaid then returned
 #    Paid $1,100, return of $80 issued → net paid $1,020, balance $0
 @sal = Golfer.create!(
   first_name: 'Salvatore', last_name: 'Bonpensiero', nickname: 'Big Pussy',
@@ -238,7 +238,7 @@
 @sal_trip.payments.create!(amount: 1100)
 @sal_trip.payments.create!(amount: -80)
 
-# 7. Carlo Gervasi — full trip, paid in full
+# 7. Carlo Gervasi - full trip, paid in full
 @carlo = Golfer.create!(
   first_name: 'Carlo', last_name: 'Gervasi', nickname: 'Carlo',
   email: 'carlo@gervasi.net',
@@ -250,7 +250,7 @@
 [@trip_5_course_1, @trip_5_course_2, @trip_5_course_3, @trip_5_course_4, @trip_5_course_5, @trip_5_course_6].each { |r| @carlo.golfer_rounds.create!(round: r) }
 @carlo_trip.payments.create!(amount: 1020)
 
-# 8. Corrado Soprano — full trip, barely started paying
+# 8. Corrado Soprano - full trip, barely started paying
 @junior = Golfer.create!(
   first_name: 'Corrado', last_name: 'Soprano', nickname: 'Junior',
   email: 'corrado@soprano.com',
@@ -265,7 +265,7 @@
 
 # --- 7 partial trips (all sequential stays) ---
 
-# 9. Ralph Cifaretto — arrives Thu (night 4, Oct 20), departs Sun (after night 7, Oct 23)
+# 9. Ralph Cifaretto - arrives Thu (night 4, Oct 20), departs Sun (after night 7, Oct 23)
 #    Nights 4-7 ($480) + Rounds 4-6 ($225) = $705, paid in full
 @ralph = Golfer.create!(
   first_name: 'Ralph', last_name: 'Cifaretto', nickname: 'Ralphie',
@@ -278,7 +278,7 @@
 [@trip_5_course_4, @trip_5_course_5, @trip_5_course_6].each { |r| @ralph.golfer_rounds.create!(round: r) }
 @ralph_trip.payments.create!(amount: 705)
 
-# 10. Richard Aprile — arrives Sat (night 1, Oct 17), departs Tue (after night 3, Oct 19)
+# 10. Richard Aprile - arrives Sat (night 1, Oct 17), departs Tue (after night 3, Oct 19)
 #     Nights 1-3 ($360) + Rounds 1-2 ($0) = $360, partially paid
 @richie = Golfer.create!(
   first_name: 'Richard', last_name: 'Aprile', nickname: 'Richie',
@@ -291,7 +291,7 @@
 [@trip_5_course_1, @trip_5_course_2].each { |r| @richie.golfer_rounds.create!(round: r) }
 @richie_trip.payments.create!(amount: 200)
 
-# 11. John Sacrimoni — arrives Sun (night 2, Oct 18), departs Fri (after night 6, Oct 22)
+# 11. John Sacrimoni - arrives Sun (night 2, Oct 18), departs Fri (after night 6, Oct 22)
 #     Nights 2-6 ($600) + Rounds 2-5 ($225) = $825, paid in full
 @johnny = Golfer.create!(
   first_name: 'John', last_name: 'Sacrimoni', nickname: 'Johnny Sack',
@@ -304,7 +304,7 @@
 [@trip_5_course_2, @trip_5_course_3, @trip_5_course_4, @trip_5_course_5].each { |r| @johnny.golfer_rounds.create!(round: r) }
 @johnny_trip.payments.create!(amount: 825)
 
-# 12. Phil Leotardo — arrives Mon (night 3, Oct 19), departs Thu (after night 5, Oct 21)
+# 12. Phil Leotardo - arrives Mon (night 3, Oct 19), departs Thu (after night 5, Oct 21)
 #     Nights 3-5 ($360) + Rounds 3-4 ($150) = $510, not paid
 @phil = Golfer.create!(
   first_name: 'Phil', last_name: 'Leotardo', nickname: 'Phil',
@@ -316,7 +316,7 @@
 [@night_3_trip_5, @night_4_trip_5, @night_5_trip_5].each { |n| @phil.golfer_nights.create!(night: n) }
 [@trip_5_course_3, @trip_5_course_4].each { |r| @phil.golfer_rounds.create!(round: r) }
 
-# 13. Herman Rabkin — just the opening weekend (nights 1-2, Oct 17-18), round 1 only
+# 13. Herman Rabkin - just the opening weekend (nights 1-2, Oct 17-18), round 1 only
 #     Nights 1-2 ($240) + Round 1 ($0) = $240, paid in full
 @hesh = Golfer.create!(
   first_name: 'Herman', last_name: 'Rabkin', nickname: 'Hesh',
@@ -329,7 +329,7 @@
 @hesh.golfer_rounds.create!(round: @trip_5_course_1)
 @hesh_trip.payments.create!(amount: 240)
 
-# 14. Arthur Bucco — late arrival, Wed through end (nights 5-7, Oct 21-23), rounds 5-6
+# 14. Arthur Bucco - late arrival, Wed through end (nights 5-7, Oct 21-23), rounds 5-6
 #     Nights 5-7 ($360) + Rounds 5-6 ($150) = $510, partially paid
 @artie = Golfer.create!(
   first_name: 'Arthur', last_name: 'Bucco', nickname: 'Artie',
@@ -342,7 +342,7 @@
 [@trip_5_course_5, @trip_5_course_6].each { |r| @artie.golfer_rounds.create!(round: r) }
 @artie_trip.payments.create!(amount: 300)
 
-# 15. Jimmy Altieri — Sun through Tue (nights 2-4, Oct 18-20), rounds 2-3
+# 15. Jimmy Altieri - Sun through Tue (nights 2-4, Oct 18-20), rounds 2-3
 #     Nights 2-4 ($360) + Rounds 2-3 ($75) = $435, paid in full
 @jimmy = Golfer.create!(
   first_name: 'Jimmy', last_name: 'Altieri', nickname: 'Jimmy',
@@ -356,12 +356,12 @@
 @jimmy_trip.payments.create!(amount: 435)
 
 # ---------------------------------------------------------------------------
-# Tournament scoring — Trip 5 (XXVI)
+# Tournament scoring - Trip 5 (XXVI)
 #
 # Rounds 4 (Oct 21), 5 (Oct 22), and 6 (Oct 23) are tournament rounds.
 # Rounds 1–3 are scoring rounds used to rank players before team generation.
 # (Scores also exist on round 4, but tournament rounds are excluded from
-# ranking — so Ralph, whose only scored round is round 4, falls back to
+# ranking - so Ralph, whose only scored round is round 4, falls back to
 # prior-trip history / no-history handling just like Artie.)
 #
 # Tournament participants (golfers in rounds 5 and/or 6):
@@ -378,7 +378,7 @@ def set_score(golfer, round, score)
   GolferRound.find_by!(golfer: golfer, round: round).update!(score: score)
 end
 
-# Round 1 (Oct 18) — full-trip golfers, Richie, Hesh
+# Round 1 (Oct 18) - full-trip golfers, Richie, Hesh
 set_score(@feech,       @trip_5_course_1, 74)
 set_score(@christopher, @trip_5_course_1, 80)
 set_score(@eugene,      @trip_5_course_1, 84)
@@ -388,7 +388,7 @@ set_score(@sal,         @trip_5_course_1, 96)
 set_score(@carlo,       @trip_5_course_1, 99)
 set_score(@junior,      @trip_5_course_1, 103)
 
-# Round 2 (Oct 19) — full-trip golfers, Richie, Johnny, Jimmy
+# Round 2 (Oct 19) - full-trip golfers, Richie, Johnny, Jimmy
 set_score(@feech,       @trip_5_course_2, 72)
 set_score(@christopher, @trip_5_course_2, 78)
 set_score(@eugene,      @trip_5_course_2, 86)
@@ -399,7 +399,7 @@ set_score(@carlo,       @trip_5_course_2, 101)
 set_score(@junior,      @trip_5_course_2, 105)
 set_score(@johnny,      @trip_5_course_2, 87)
 
-# Round 3 (Oct 20) — full-trip golfers, Phil, Johnny, Jimmy
+# Round 3 (Oct 20) - full-trip golfers, Phil, Johnny, Jimmy
 set_score(@feech,       @trip_5_course_3, 76)
 set_score(@christopher, @trip_5_course_3, 82)
 set_score(@eugene,      @trip_5_course_3, 83)
@@ -410,7 +410,7 @@ set_score(@carlo,       @trip_5_course_3, 100)
 set_score(@junior,      @trip_5_course_3, 102)
 set_score(@johnny,      @trip_5_course_3, 88)
 
-# Round 4 (Oct 21) — full-trip golfers, Ralph, Phil, Johnny
+# Round 4 (Oct 21) - full-trip golfers, Ralph, Phil, Johnny
 set_score(@feech,       @trip_5_course_4, 75)
 set_score(@christopher, @trip_5_course_4, 79)
 set_score(@eugene,      @trip_5_course_4, 85)
@@ -421,7 +421,7 @@ set_score(@carlo,       @trip_5_course_4, 98)
 set_score(@junior,      @trip_5_course_4, 106)
 set_score(@ralph,       @trip_5_course_4, 94)
 
-# Admin registrations for Trip 5 — zero cost (committee members)
+# Admin registrations for Trip 5 - zero cost (committee members)
 # Tony is intentionally left unregistered to test the register flow in dev
 [@silvio, @paulie].each do |admin|
   admin.golfer_trips.create!(trip: @trip_5, is_full_trip: true, cost: 0, balance: 0, is_paid: true)
@@ -432,27 +432,27 @@ set_score(@ralph,       @trip_5_course_4, 94)
 end
 
 # ---------------------------------------------------------------------------
-# Bed assignment feature — Trip 5 (XXVI)
+# Bed assignment feature - Trip 5 (XXVI)
 #
 # Deposit deadline: Jun 15, 2026. Deposit = 50% of golfer_trip cost, derived
 # from the payments ledger. Payments below are backdated to spread golfers
 # across the three priority tiers:
 #
-#   Tier 0 — admins always pick first:
+#   Tier 0 - admins always pick first:
 #     Silvio, Paulie
 #
-#   Tier 1 — deposit met on/before Jun 15:
+#   Tier 1 - deposit met on/before Jun 15:
 #     Feech (Jan 5), Sal (Feb 1, overpay then return that stays above the
 #     deposit), Bobby (crossing at 2nd payment, Feb 5), Christopher (1st
-#     payment $500 is $10 short of the $510 deposit — crossing at 2nd
-#     payment, Feb 10), Carlo (Jun 14), Johnny (Jun 15 — deadline-day
+#     payment $500 is $10 short of the $510 deposit - crossing at 2nd
+#     payment, Feb 10), Carlo (Jun 14), Johnny (Jun 15 - deadline-day
 #     boundary), Ralph (Jan 10), Hesh (Jan 8)
 #
-#   Tier 2 — deposit met after Jun 15:
-#     Eugene (Jun 20), Jimmy (Jun 25), Richie (Jun 28 — $200 of $360 cost
+#   Tier 2 - deposit met after Jun 15:
+#     Eugene (Jun 20), Jimmy (Jun 25), Richie (Jun 28 - $200 of $360 cost
 #     clears the $180 deposit), Artie (Jul 1)
 #
-#   Tier 3 — deposit not met:
+#   Tier 3 - deposit not met:
 #     Vito ($0 paid), Junior ($400 of $510 deposit), Phil ($0 paid)
 #
 # Expected /bed_assignments priority order (tier, nights desc, met_at asc):
@@ -487,7 +487,7 @@ backdate_payments(@jimmy_trip,       Time.utc(2026, 6, 25, 12))
 backdate_payments(@carlo_trip,       Time.utc(2026, 6, 14, 12))
 
 # Backdate admin registrations for deterministic ordering between the two
-# (admins are Tier 0 regardless — they always pick first).
+# (admins are Tier 0 regardless - they always pick first).
 GolferTrip.where(trip: @trip_5, golfer: @silvio).update_all(created_at: Time.utc(2026, 6, 15, 9, 0))
 GolferTrip.where(trip: @trip_5, golfer: @paulie).update_all(created_at: Time.utc(2026, 6, 15, 9, 5))
 
@@ -532,7 +532,7 @@ GolferTrip.where(trip: @trip_5, golfer: @paulie).update_all(created_at: Time.utc
 @living_room.beds.create!(description: 'Air mattress', capacity: 1, rank: 13)
 
 # ---------------------------------------------------------------------------
-# Furio Giunta — default-role golfer with NO trip registration.
+# Furio Giunta - default-role golfer with NO trip registration.
 # Use him to test the registration flow end-to-end (deposit policy box,
 # acknowledgment checkbox, signup email) without creating a golfer first.
 # Login: furio@giunta.it / badabing21

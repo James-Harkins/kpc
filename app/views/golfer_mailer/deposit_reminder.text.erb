@@ -2,7 +2,7 @@ KPC <%= @trip.number %> - Deposit Due <%= @due_date.strftime("%B %-d") %>
 
 Hey <%= @golfer.nickname %>,
 
-Your 50% deposit for KPC <%= @trip.number %> is due by <%= @due_date.strftime("%A, %B %-d") %>. Heads up: the deposit is NON-REFUNDABLE, and this year the best beds go to the guys who stay the most nights and pay their deposit earliest — deposits received after the deadline drop a priority tier.
+Your 50% deposit for KPC <%= @trip.number %> is due by <%= @due_date.strftime("%A, %B %-d") %>. Heads up: the deposit is NON-REFUNDABLE, and this year the best beds go to the guys who stay the most nights and pay their deposit earliest. Deposits received after the deadline drop a priority tier.
 
 DEPOSIT (50% of $<%= number_with_delimiter(@golfer_trip.cost) %>): $<%= number_with_delimiter(@deposit_amount) %>
 PAID SO FAR: $<%= number_with_delimiter(@paid_so_far) %>

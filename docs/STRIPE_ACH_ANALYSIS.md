@@ -2,7 +2,7 @@
 
 **Prepared for:** KPC Committee
 **Date:** February 2026
-**Status:** Research & Planning — No Implementation Commitment
+**Status:** Research & Planning - No Implementation Commitment
 
 ---
 
@@ -14,10 +14,10 @@ Currently, the KPC app requires an admin to manually log in and record each paym
 
 ## What Is Stripe ACH Direct Debit?
 
-ACH (Automated Clearing House) is the US bank-to-bank transfer network — the same network that powers direct deposit paychecks and most bill payments. Stripe offers ACH Direct Debit as a payment method through their developer API, allowing apps to initiate bank transfers and receive automated notifications when those transfers settle.
+ACH (Automated Clearing House) is the US bank-to-bank transfer network - the same network that powers direct deposit paychecks and most bill payments. Stripe offers ACH Direct Debit as a payment method through their developer API, allowing apps to initiate bank transfers and receive automated notifications when those transfers settle.
 
 **Key characteristics:**
-- Golfer pays directly from their US checking account — no credit card required
+- Golfer pays directly from their US checking account - no credit card required
 - No card network involved; fees are significantly lower than card processing
 - Stripe fires a webhook (an automated notification) to the app when a payment settles, triggering automatic recording in the system
 - Settlement takes **3–4 business days** from the time the golfer initiates payment
@@ -31,10 +31,10 @@ Several alternatives were evaluated and ruled out:
 
 | Option | Why Ruled Out |
 |---|---|
-| **Stripe card payments** | ~2.9% + $0.30 per transaction — too expensive |
-| **PayPal Checkout (G&S)** | ~3.49% + $0.49 per transaction — too expensive |
+| **Stripe card payments** | ~2.9% + $0.30 per transaction - too expensive |
+| **PayPal Checkout (G&S)** | ~3.49% + $0.49 per transaction - too expensive |
 | **PayPal F&F polling** | Webhooks don't fire for Friends & Family transfers; automation requires matching payments to golfers via memo text, which is difficult to enforce reliably |
-| **GoCardless** | Cheapest ACH option (~$0.30/transaction) but uses a "pull debit" model that requires golfers to authorize debits from their account — too invasive for a casual group setting |
+| **GoCardless** | Cheapest ACH option (~$0.30/transaction) but uses a "pull debit" model that requires golfers to authorize debits from their account - too invasive for a casual group setting |
 | **Venmo / Zelle / Cash App** | No developer API available for automated payment detection |
 | **Dwolla** | Monthly platform fees make it uneconomical for ~20 annual transactions |
 
@@ -57,7 +57,7 @@ This means any Stripe ACH integration is necessarily a **hybrid model**: automat
 US golfers would see both the existing payment instructions (Venmo, PayPal, check) **and** a new "Pay by Bank Transfer" option via Stripe. They can choose whichever method they prefer. The treasurer still accepts manual payments from US golfers and can record them manually if needed.
 
 **Pros:**
-- Non-disruptive — golfers who prefer their existing methods can keep using them
+- Non-disruptive - golfers who prefer their existing methods can keep using them
 - Treasurer retains full flexibility
 - Lower adoption risk; golfers who are uncomfortable with a new system can opt out
 
@@ -74,7 +74,7 @@ US golfers would **only** see the Stripe bank transfer option on their dashboard
 Canadian golfers would continue to see the existing manual payment instructions unchanged.
 
 **Pros:**
-- Full automation for all US payments — treasurer does not need to track or record US payments at all
+- Full automation for all US payments - treasurer does not need to track or record US payments at all
 - Clean, predictable process for the treasurer going forward
 - Eliminates the mixed-method tracking burden entirely for the US portion
 
@@ -96,7 +96,7 @@ Canadian golfers would continue to see the existing manual payment instructions 
 | $500 | $4.00 |
 | $625 or more | **$5.00 flat cap** |
 
-For a trip collecting ~$10,000 from US golfers across ~15 transactions, total estimated fees would be in the range of **$50–75 per year**. There are no monthly fees, no setup fees, and no API access fees — the treasurer pays only when a payment is collected.
+For a trip collecting ~$10,000 from US golfers across ~15 transactions, total estimated fees would be in the range of **$50–75 per year**. There are no monthly fees, no setup fees, and no API access fees - the treasurer pays only when a payment is collected.
 
 For context, if golfers currently send PayPal Friends & Family payments, those cost $0 in fees. The Stripe ACH fee is the cost of automation. Whether that trade-off is worthwhile is a committee decision.
 
@@ -106,10 +106,10 @@ For context, if golfers currently send PayPal Friends & Family payments, those c
 
 1. Golfer logs into the KPC app and sees their outstanding balance
 2. They click **"Pay by Bank Transfer"**
-3. A Stripe-hosted form appears — they connect their bank account either by logging into their bank (instant, ~1 minute) or by entering routing/account numbers manually
+3. A Stripe-hosted form appears - they connect their bank account either by logging into their bank (instant, ~1 minute) or by entering routing/account numbers manually
 4. They confirm the payment amount (up to their full outstanding balance; partial payments are supported)
 5. They receive a confirmation that the payment has been initiated
-6. **3–4 business days later**, the transfer settles — the app automatically records the payment, decrements their balance, and sends them the existing payment confirmation email
+6. **3–4 business days later**, the transfer settles - the app automatically records the payment, decrements their balance, and sends them the existing payment confirmation email
 7. If their balance reaches zero, they receive the existing "You're all paid up" email automatically
 
 No further action from the golfer or treasurer is required.
@@ -120,7 +120,7 @@ No further action from the golfer or treasurer is required.
 
 ### Setup (One-Time)
 1. Create a free Stripe account at stripe.com
-2. Complete identity verification (name, address, last 4 of SSN, date of birth — standard for any regulated financial platform)
+2. Complete identity verification (name, address, last 4 of SSN, date of birth - standard for any regulated financial platform)
 3. Link a personal checking account for automatic payouts
 4. Share API keys with the developer for app configuration
 
@@ -133,7 +133,7 @@ No further action from the golfer or treasurer is required.
 ### Important: 1099-K Tax Reporting
 Stripe is a regulated financial platform and is required to issue a **1099-K** to any account that receives over **$600/year** in payments (current IRS threshold). Since the treasurer would be collecting several thousand dollars per year through Stripe, they will receive a 1099-K at tax time.
 
-A 1099-K reports gross payment volume — it does not automatically mean tax is owed on that amount (the treasurer is collecting on behalf of the group, not earning income). However, it does create a paper trail that may require a note on a tax return. **The treasurer should be aware of this and comfortable with it before committing to the Stripe approach.**
+A 1099-K reports gross payment volume - it does not automatically mean tax is owed on that amount (the treasurer is collecting on behalf of the group, not earning income). However, it does create a paper trail that may require a note on a tax return. **The treasurer should be aware of this and comfortable with it before committing to the Stripe approach.**
 
 ---
 
@@ -156,7 +156,7 @@ A 1099-K reports gross payment volume — it does not automatically mean tax is 
 - The `GolferTrip` balance tracking
 - All existing email automations (payment received, balance paid)
 - The admin Finances page and manual payment entry forms
-- Canadian golfer experience — entirely unchanged
+- Canadian golfer experience - entirely unchanged
 
 ---
 
@@ -210,7 +210,7 @@ Notes:
 
 Once the committee has filled in the section above, share this document with the developer and say:
 
-> "We've made our decision — please implement the Stripe ACH integration as described in `STRIPE_ACH_ANALYSIS.md`."
+> "We've made our decision - please implement the Stripe ACH integration as described in `STRIPE_ACH_ANALYSIS.md`."
 
 Claude (or any developer) will read this file, explore the existing codebase, and have everything needed to begin. No additional context is required beyond what is already documented here.
 

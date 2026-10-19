@@ -86,7 +86,7 @@ input[type="number"] {
   <h1>Enter Scores</h1>
   <h2>
     <%= @round.date.strftime('%A, %B %-d, %Y') %>
-    <% if @round.course.present? %>&mdash; <%= @round.course.name %><% end %>
+    <% if @round.course.present? %>- <%= @round.course.name %><% end %>
   </h2>
 
   <% flash.each do |name, msg| %>

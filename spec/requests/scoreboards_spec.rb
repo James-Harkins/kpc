@@ -120,7 +120,7 @@ RSpec.describe 'Scoreboards', type: :request do
 
         it 'displays a column header for each non-tournament round' do
           get '/scoreboard'
-          # round1 date: Apr 21; round2 date: Apr 22 — both should appear
+          # round1 date: Apr 21; round2 date: Apr 22 - both should appear
           expect(response.body).to include('Apr')
         end
 
@@ -183,7 +183,7 @@ RSpec.describe 'Scoreboards', type: :request do
 
           it 'shows a dash for the missing score' do
             get '/scoreboard'
-            expect(response.body).to include('—')
+            expect(response.body).to match(/<td>\s*-\s*<\/td>/)
           end
 
           it 'sorts golfer with no scores entered after golfers with scores' do

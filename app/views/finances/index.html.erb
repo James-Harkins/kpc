@@ -636,12 +636,12 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <div class="golfer-card">
               <h5>
                 <%= s[:payer].nickname.titleize %> pays <%= s[:payee].nickname.titleize %>
-                &mdash; <strong>$<%= number_with_delimiter(s[:amount]) %></strong>
+                - <strong>$<%= number_with_delimiter(s[:amount]) %></strong>
               </h5>
             </div>
           <% end %>
         <% else %>
-          <h3 style="color: green; font-weight: bold;">All even &mdash; no settlements needed!</h3>
+          <h3 style="color: green; font-weight: bold;">All even. No settlements needed!</h3>
         <% end %>
       <% else %>
         <h3 style="color: #888; font-style: italic;">No expenses assigned to committee members yet.</h3>
@@ -668,7 +668,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <% golfer_night_ids = golfer.nights.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <% golfer_round_ids = golfer.rounds.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <div class="golfer-card">
-          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> &mdash; $<%= number_with_delimiter(golfer_trip.cost) %></h4>
+          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> - $<%= number_with_delimiter(golfer_trip.cost) %></h4>
           <div class="trip-calendar">
             <div class="cal-dates">
               <% trip_nights.each do |night| %>
@@ -700,7 +700,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
             <h5>Net Paid: $<%= number_with_delimiter(net_paid) %></h5>
             <% if net_paid > golfer_trip.cost %>
-              <h5 class="overpaid-warning">Overpaid by $<%= number_with_delimiter(net_paid - golfer_trip.cost) %> — return needed</h5>
+              <h5 class="overpaid-warning">Overpaid by $<%= number_with_delimiter(net_paid - golfer_trip.cost) %>, return needed</h5>
             <% end %>
             <%= button_to "Edit Trip", edit_golfer_trip_path(golfer_trip), method: :get, class: 'btn btn-outline-primary' %>
             <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
@@ -725,7 +725,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <% golfer_night_ids = golfer.nights.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <% golfer_round_ids = golfer.rounds.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <div class="golfer-card">
-          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> &mdash; $<%= number_with_delimiter(golfer_trip.cost) %></h4>
+          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> - $<%= number_with_delimiter(golfer_trip.cost) %></h4>
           <div class="trip-calendar">
             <div class="cal-dates">
               <% trip_nights.each do |night| %>

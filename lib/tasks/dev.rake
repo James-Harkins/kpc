@@ -5,7 +5,7 @@ namespace :dev do
     non_admin_golfers = Golfer.where(role: :default).order(:nickname).to_a
 
     if non_admin_golfers.empty?
-      puts "No non-admin golfers found — run db:seed first."
+      puts "No non-admin golfers found. Run db:seed first."
       next
     end
 
@@ -35,7 +35,7 @@ namespace :dev do
         t.location   = config[:location]
         t.start_date = Date.parse(config[:start_date]) if config[:start_date]
       end
-      puts "\nKPC #{trip.number} — #{trip.location} (id #{trip.id})"
+      puts "\nKPC #{trip.number} - #{trip.location} (id #{trip.id})"
 
       # -- Seed nights and rounds for XXV (XIII–XVI already have them) -------
       if config[:nights]
@@ -53,16 +53,16 @@ namespace :dev do
       rounds = trip.rounds.order(:date).to_a
 
       if nights.empty?
-        puts "  No nights found — skipping."
+        puts "  No nights found. Skipping."
         next
       end
 
       # -- Five attendance patterns, offset per trip for visual variety -------
-      #   0 — full trip:        all nights, all rounds
-      #   1 — late arrival:     nights 3–end, rounds 3–end
-      #   2 — early departure:  nights 1–4, rounds 1–3
-      #   3 — middle stretch:   nights 2–5, rounds 2–4
-      #   4 — bookends only:    first 2 nights + last 2 nights, first + last 2 rounds
+      #   0 - full trip:        all nights, all rounds
+      #   1 - late arrival:     nights 3–end, rounds 3–end
+      #   2 - early departure:  nights 1–4, rounds 1–3
+      #   3 - middle stretch:   nights 2–5, rounds 2–4
+      #   4 - bookends only:    first 2 nights + last 2 nights, first + last 2 rounds
       patterns = [
         { n: nights,           r: rounds },
         { n: nights[2..],      r: rounds[2..] },
@@ -92,7 +92,7 @@ namespace :dev do
         gt.payments.find_or_create_by!(amount: gt.cost) if gt.payments.none?
 
         total_revenue += gt.cost
-        puts "  #{golfer.nickname.ljust(16)} #{att_nights.length} nights, #{att_rounds.length} rounds — $#{cost}"
+        puts "  #{golfer.nickname.ljust(16)} #{att_nights.length} nights, #{att_rounds.length} rounds - $#{cost}"
       end
 
       # -- TripFinancialSummary ----------------------------------------------

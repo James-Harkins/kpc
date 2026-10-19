@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run — skip date check and log without sending any emails'
+        description: 'Dry run - skip date check and log without sending any emails'
         required: false
         default: 'false'
         type: boolean

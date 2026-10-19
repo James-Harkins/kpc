@@ -93,7 +93,7 @@ tr:nth-child(even) {
       <h1>Scoreboard</h1>
       <p style="text-align:center;">No active trip.</p>
     <% else %>
-      <h1>KPC <%= @trip.number %> &mdash; Scoreboard</h1>
+      <h1>KPC <%= @trip.number %> - Scoreboard</h1>
       <hr>
       <table>
         <thead>
@@ -118,11 +118,11 @@ tr:nth-child(even) {
               <% @rounds.each do |round| %>
                 <td>
                   <% score = @scores.dig(golfer.id, round.id) %>
-                  <%= score.nil? ? '—' : score %>
+                  <%= score.nil? ? '-' : score %>
                 </td>
               <% end %>
               <% golfer_scores = @scores[golfer.id]&.values&.compact || [] %>
-              <td><%= golfer_scores.any? ? golfer_scores.sum : '—' %></td>
+              <td><%= golfer_scores.any? ? golfer_scores.sum : '-' %></td>
               <td><%= golfer_scores.any? ? (golfer_scores.sum.to_f / golfer_scores.size).round(1) : '' %></td>
             </tr>
           <% end %>

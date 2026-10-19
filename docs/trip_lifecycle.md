@@ -12,8 +12,8 @@ End-to-end process for creating, running, and closing out a KPC trip.
 
 Fill in:
 - **Year**, **Number** (Roman numeral, e.g. `XXVI`), **Location**, **Start date**
-- **Nights** — one row per night: date + cost
-- **Rounds** — one row per round: date + cost + tee time + course + tournament round checkbox
+- **Nights** - one row per night: date + cost
+- **Rounds** - one row per round: date + cost + tee time + course + tournament round checkbox
 
 On save, the `Trip`, `Night`, and `Round` records are created. The trip is not yet visible to golfers.
 
@@ -78,7 +78,7 @@ This creates a `TripFinancialSummary` snapshot record for the trip containing:
 - Net deficit (expenses − revenue)
 - Committee count and fair share per admin
 
-The summary is idempotent — clicking again overwrites the existing snapshot with current figures. It can be regenerated if costs or expenses change after the initial save.
+The summary is idempotent - clicking again overwrites the existing snapshot with current figures. It can be regenerated if costs or expenses change after the initial save.
 
 Once created, the summary appears on the Previous Trips page for that trip.
 
@@ -97,7 +97,7 @@ This sets `trip.completed = true`. The trip:
 - No longer appears in the admin "Edit Trip" dropdown
 - Shows full financial summary and attendance grid on the Previous Trips page
 
-The completed flag is permanent — there is no "uncomplete" action in the UI.
+The completed flag is permanent - there is no "uncomplete" action in the UI.
 
 ---
 

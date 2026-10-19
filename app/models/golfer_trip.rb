@@ -15,7 +15,7 @@ class GolferTrip < ApplicationRecord
 
   # Timestamp of the payment whose running total last crossed the 50% deposit,
   # or nil if the current net total no longer meets it (a later return
-  # un-meets the deposit — an early timestamp can't be banked and refunded).
+  # un-meets the deposit; an early timestamp can't be banked and refunded).
   def deposit_met_at
     return created_at if deposit_amount.zero?
     ordered = payments.order(:created_at, :id).to_a

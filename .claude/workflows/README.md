@@ -9,7 +9,7 @@ Specs are written before implementation, so the implementation is complete when 
 node .claude/workflows/feature_build.js "<feature description>"
 ```
 
-Run from the app root. The feature description can be as long as you like — the first three
+Run from the app root. The feature description can be as long as you like - the first three
 words become the slug used for file paths.
 
 **Examples:**
@@ -26,7 +26,7 @@ Everything lands in `tmp/claude_specs/<slug>/`:
 
 | File | Created by | Purpose |
 |---|---|---|
-| `design.md` | Phase 1 | Feature design document — edit this before Phase 2 |
+| `design.md` | Phase 1 | Feature design document - edit this before Phase 2 |
 | `spec_files.json` | Phase 2 | List of spec files written |
 | `tasks.json` | Phase 3 | Implementation task breakdown by wave |
 | `phase3_files.json` | Phase 3 | Manifest of implementation files written |
@@ -35,7 +35,7 @@ Everything lands in `tmp/claude_specs/<slug>/`:
 
 ## Pipeline
 
-### Phase 1 — Analysis & Design
+### Phase 1 - Analysis & Design
 
 A single agent reads the relevant parts of the codebase and writes a structured design
 document to `tmp/claude_specs/<slug>/design.md`.
@@ -54,10 +54,10 @@ the task list before continuing. Phase 2 spec writing is driven entirely by this
 
 ---
 
-### Phase 2 — Spec Writing (Red Phase)
+### Phase 2 - Spec Writing (Red Phase)
 
 A single agent reads the finalized design doc and writes RSpec specs that describe the
-intended behavior. No implementation exists yet — **all specs will be RED** at this stage.
+intended behavior. No implementation exists yet - **all specs will be RED** at this stage.
 That is correct and expected.
 
 Spec files are placed at:
@@ -69,7 +69,7 @@ your intent. These specs are the contract that Phase 3 must satisfy.
 
 ---
 
-### Phase 3 — Implementation (Green Phase)
+### Phase 3 - Implementation (Green Phase)
 
 A planning agent reads the design doc and breaks the task list into three dependency waves,
 written to `tasks.json`:
@@ -101,7 +101,7 @@ Node.js 18+ required (uses ES modules and top-level await).
 ## Notes
 
 - The workflow reads `CLAUDE.md` at the app root and injects it into every agent prompt.
-  Keep `CLAUDE.md` up to date — it is the primary source of app conventions.
+  Keep `CLAUDE.md` up to date - it is the primary source of app conventions.
 - Parallel implementation agents in Phase 3 do not stream output to avoid interleaving.
   Progress is logged per agent when each finishes.
 - The one-fix-attempt limit on failing specs is intentional. If specs are still failing

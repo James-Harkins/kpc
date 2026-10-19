@@ -8,7 +8,7 @@ body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; heig
 <div class="opt-out-card">
   <h2>Stop bed-availability emails?</h2>
   <p>
-    Hey <%= @golfer.nickname %> &mdash; this stops the "beds left" emails for
+    Hey <%= @golfer.nickname %>. This stops the "beds left" emails for
     KPC <%= @trip.number %> only. You'll still hear about future trips.
   </p>
   <%= form_with url: bed_alert_opt_out_path, method: :post, local: true do |form| %>

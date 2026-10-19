@@ -144,7 +144,7 @@ select.result-select {
         <div>
           <label style="font-weight:bold; display:block; margin-bottom:4px;"><%= @team_a_name %> Captain</label>
           <select name="captain_a_id" style="padding:6px; border:1px solid #ccc; border-radius:4px; min-width:160px;">
-            <option value="">— none —</option>
+            <option value="">- none -</option>
             <% @trip_golfers.each do |g| %>
               <option value="<%= g.id %>" <%= 'selected' if @trip.captain_a_id == g.id %>><%= g.nickname.titleize %></option>
             <% end %>
@@ -153,7 +153,7 @@ select.result-select {
         <div>
           <label style="font-weight:bold; display:block; margin-bottom:4px;"><%= @team_b_name %> Captain</label>
           <select name="captain_b_id" style="padding:6px; border:1px solid #ccc; border-radius:4px; min-width:160px;">
-            <option value="">— none —</option>
+            <option value="">- none -</option>
             <% @trip_golfers.each do |g| %>
               <option value="<%= g.id %>" <%= 'selected' if @trip.captain_b_id == g.id %>><%= g.nickname.titleize %></option>
             <% end %>
@@ -185,8 +185,8 @@ select.result-select {
     <% if @team_points %>
       <h2>Team Standings</h2>
       <div class="team-cards">
-        <div class="team-card"><%= @team_a_name %> &mdash; <%= @team_points["A"] %> pts</div>
-        <div class="team-card"><%= @team_b_name %> &mdash; <%= @team_points["B"] %> pts</div>
+        <div class="team-card"><%= @team_a_name %> - <%= @team_points["A"] %> pts</div>
+        <div class="team-card"><%= @team_b_name %> - <%= @team_points["B"] %> pts</div>
       </div>
       <% if @team_points["A"] > @team_points["B"] %>
         <div class="tournament-result"><%= @team_a_name %> wins!</div>
@@ -221,7 +221,7 @@ select.result-select {
                   <small style="color:#2a6496;">(Captain, <%= @team_b_name %>)</small>
                 <% end %>
               </td>
-              <td><%= p[:avg_score] ? "%.1f" % p[:avg_score] : "—" %></td>
+              <td><%= p[:avg_score] ? "%.1f" % p[:avg_score] : "-" %></td>
               <td><%= p[:source] %></td>
             </tr>
           <% end %>
@@ -236,7 +236,7 @@ select.result-select {
         <div class="round-card">
           <h3>
             <%= round.date.strftime('%A, %B %-d') %>
-            <% if round.course.present? %>&mdash; <%= round.course.name %><% end %>
+            <% if round.course.present? %>- <%= round.course.name %><% end %>
           </h3>
 
           <%= form_tag redraw_tournament_path(round_id: round.id), method: :post, style: 'display:inline' do %>
@@ -296,7 +296,7 @@ select.result-select {
                       </td>
                       <td>
                         <select name="results[<%= group_num %>]" class="result-select">
-                          <option value="">—</option>
+                          <option value="">-</option>
                           <option value="A" <%= 'selected' if existing_result&.result == "A" %>><%= @team_a_name %> wins</option>
                           <option value="tie" <%= 'selected' if existing_result&.result == "tie" %>>Tie</option>
                           <option value="B" <%= 'selected' if existing_result&.result == "B" %>><%= @team_b_name %> wins</option>

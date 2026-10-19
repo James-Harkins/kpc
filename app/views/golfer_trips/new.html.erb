@@ -210,9 +210,9 @@ body::before {
         <div class="cost-summary">
             <strong>Your total: $<span id="running-total">0</span></strong>
             <% if current_user.admin? %>
-                <div class="discount-note" style="display: block;">Committee registration &mdash; no cost, and your bed is reserved all week. Check only the nights and rounds you'll actually attend so the headcount is accurate.</div>
+                <div class="discount-note" style="display: block;">Committee registration: no cost, and your bed is reserved all week. Check only the nights and rounds you'll actually attend so the headcount is accurate.</div>
             <% end %>
-            <div class="discount-note" id="discount-note">Full trip discount applied — Saturday night is free!</div>
+            <div class="discount-note" id="discount-note">Full trip discount applied. Saturday night is free!</div>
         </div>
 
         <% @trip.each do |date| %>
@@ -221,15 +221,15 @@ body::before {
                 <div class="checkbox-item">
                     <% night_full = @full_night_ids.include?(date[:night][:id]) %>
                     <%= check_box_tag 'nights[]', date[:night][:id], false, data: { cost: date[:night][:cost] }, onchange: 'updateTotal()', disabled: night_full %>
-                    <span>Night at House &mdash; $<%= date[:night][:cost] %><%= ' — House full' if night_full %></span>
+                    <span>Night at House - $<%= date[:night][:cost] %><%= ' (House full)' if night_full %></span>
                 </div>
                 <% if date[:round].values.any? %>
                     <div class="checkbox-item">
                         <%= check_box_tag 'rounds[]', date[:round][:id], false, data: { cost: date[:round][:cost] }, onchange: 'updateTotal()' %>
                         <% if date[:round][:cost] == 0 %>
-                            <span>Round &mdash; à la carte</span>
+                            <span>Round - à la carte</span>
                         <% else %>
-                            <span>Round &mdash; $<%= date[:round][:cost] %></span>
+                            <span>Round - $<%= date[:round][:cost] %></span>
                         <% end %>
                     </div>
                 <% end %>

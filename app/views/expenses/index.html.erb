@@ -145,14 +145,14 @@ body::before {
             <%= content_tag :div, msg, class: name %>
         </div>
     <% end %>
-    <h1>Expenses — KPC <%= @trip.number %></h1>
+    <h1>Expenses - KPC <%= @trip.number %></h1>
     <h3>Total: $<%= number_with_delimiter(@trip.total_expenses) %></h3>
     <hr class="line">
     <% if @expenses.any? %>
         <% @expenses.each do |expense| %>
             <div class="expense-card">
                 <div class="expense-card-info">
-                    <h4><%= expense.description %> &mdash; $<%= number_with_delimiter(expense.amount) %></h4>
+                    <h4><%= expense.description %> - $<%= number_with_delimiter(expense.amount) %></h4>
                     <h5><%= expense.golfer&.nickname&.titleize %> &middot; <%= expense.date&.strftime('%A, %B %-d, %Y') %></h5>
                 </div>
                 <div class="expense-card-actions">

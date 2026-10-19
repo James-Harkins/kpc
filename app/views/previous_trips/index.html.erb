@@ -246,7 +246,7 @@ body::before {
   <% @trips.each do |trip| %>
     <div class="next-trip-cost">
       <h1>KPC <%= trip.number %></h1>
-      <h3><%= trip.location %> &mdash; <%= trip.year %></h3>
+      <h3><%= trip.location %> - <%= trip.year %></h3>
 
       <% summary = trip.trip_financial_summary %>
       <% if summary %>

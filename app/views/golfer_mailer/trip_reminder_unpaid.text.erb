@@ -15,12 +15,12 @@ YOUR ITINERARY
 <% if @nights.any? %>
 Nights:
 <% @nights.each do |night| %>
-  <%= night.date.strftime("%A, %B %-d") %> — $<%= number_with_delimiter(night.cost) %>
+  <%= night.date.strftime("%A, %B %-d") %> - $<%= number_with_delimiter(night.cost) %>
 <% end %>
 <% end %>
 <% if @rounds.any? %>
 Rounds:
 <% @rounds.each do |round| %>
-  <%= round.date.strftime("%A, %B %-d") %> — <%= round.cost == 0 ? "à la carte" : "$#{number_with_delimiter(round.cost)}" %>
+  <%= round.date.strftime("%A, %B %-d") %> - <%= round.cost == 0 ? "à la carte" : "$#{number_with_delimiter(round.cost)}" %>
 <% end %>
 <% end %>

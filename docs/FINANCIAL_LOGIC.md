@@ -24,7 +24,7 @@ Payments and returns share the same table. A return is a `Payment` record with a
 
 **`balance` must always equal `max(cost - payments.sum(:amount), 0)`**
 
-`payments.sum(:amount)` is the **net paid** — the sum of all payments minus all returns for that golfer trip. Every code path that writes to `balance` recomputes it from this sum rather than from the cached `balance` value, preventing drift.
+`payments.sum(:amount)` is the **net paid** - the sum of all payments minus all returns for that golfer trip. Every code path that writes to `balance` recomputes it from this sum rather than from the cached `balance` value, preventing drift.
 
 `is_paid` is always `balance == 0`. A golfer is marked paid when they owe nothing, which includes the overpayment case (they paid more than cost; balance stays 0).
 
@@ -93,7 +93,7 @@ When a golfer has overpaid (net paid > cost, balance = 0):
 ```
 total_collected_revenue > total_projected_revenue - total_uncollected_revenue
 ```
-The difference is the total amount that has been collected in excess of what was owed — i.e., the sum of all unprocessed overpayments across golfers.
+The difference is the total amount that has been collected in excess of what was owed - i.e., the sum of all unprocessed overpayments across golfers.
 
 ---
 
@@ -103,21 +103,21 @@ The difference is the total amount that has been collected in excess of what was
 
 1. `GolferTripFacade.create_new_golfer_trip` creates `GolferNight` and `GolferRound` join records
 2. `golfer_trip` is saved (cost and balance are still nil at this point)
-3. `cost = golfer.trip_net_total_cost(trip.id)` — computed from the just-created join records
+3. `cost = golfer.trip_net_total_cost(trip.id)` - computed from the just-created join records
 4. `golfer_trip.cost = cost`
-5. `golfer_trip.balance = cost` — no payments yet, so balance = cost - 0 = cost ✓
+5. `golfer_trip.balance = cost` - no payments yet, so balance = cost - 0 = cost ✓
 
 Email: `GolferMailer.trip_signup`
 
 ### 2. Add a Payment (`PaymentsController#create`)
 
 Guards:
-- `amount > 0` — prevents $0 or negative submissions
-- `amount <= golfer_trip.balance` — prevents overpayment via this form
+- `amount > 0` - prevents $0 or negative submissions
+- `amount <= golfer_trip.balance` - prevents overpayment via this form
 
 Steps:
 1. `Payment.create!(amount: amount)`
-2. `total_paid = golfer_trip.payments.sum(:amount)` — recomputed fresh
+2. `total_paid = golfer_trip.payments.sum(:amount)` - recomputed fresh
 3. `golfer_trip.balance = [golfer_trip.cost - total_paid, 0].max`
 4. `golfer_trip.is_paid = golfer_trip.balance == 0`
 5. Save
@@ -129,16 +129,16 @@ Email: `GolferMailer.balance_paid` if now fully paid, else `GolferMailer.payment
 Used when the admin wants to record full payment in one step, regardless of whether partial payments already exist.
 
 Steps:
-1. `total_paid = golfer_trip.payments.sum(:amount)` — net already received
-2. `remaining = [golfer_trip.cost - total_paid, 0].max` — how much is actually left
-3. `Payment.create!(amount: remaining)` — records exactly what was missing
+1. `total_paid = golfer_trip.payments.sum(:amount)` - net already received
+2. `remaining = [golfer_trip.cost - total_paid, 0].max` - how much is actually left
+3. `Payment.create!(amount: remaining)` - records exactly what was missing
 4. `golfer_trip.balance = 0`
 5. `golfer_trip.is_paid = true`
 6. Save
 
 Email: `GolferMailer.balance_paid`
 
-Note: If the golfer already has partial payments, only the remaining amount is recorded as a new payment — it does not re-record the full cost.
+Note: If the golfer already has partial payments, only the remaining amount is recorded as a new payment - it does not re-record the full cost.
 
 ### 4. Admin Edit of Golfer Nights/Rounds (`GolferTripsController#admin_update`)
 
@@ -149,7 +149,7 @@ Steps:
 2. Determine `is_full_trip` (all nights + all rounds selected)
 3. `gross_cost = sum of selected night costs + sum of selected round costs`
 4. `new_cost = gross_cost - first_night_cost` (if full trip, else gross_cost)
-5. `total_paid = payments.sum(:amount)` — recomputed fresh
+5. `total_paid = payments.sum(:amount)` - recomputed fresh
 
 **Overpayment check**: If `new_cost < total_paid` and `confirm_overpayment != '1'`:
 - Re-render the edit form with a warning showing how much was overpaid
@@ -172,14 +172,14 @@ Site admin only.
 Steps:
 1. `amount > 0` guard (the admin enters a positive number; the controller negates it)
 2. `Payment.create!(amount: -amount)`
-3. `total_paid = golfer_trip.payments.sum(:amount)` — now reflects the return
+3. `total_paid = golfer_trip.payments.sum(:amount)` - now reflects the return
 4. `golfer_trip.balance = [golfer_trip.cost - total_paid, 0].max`
 5. `golfer_trip.is_paid = golfer_trip.balance == 0`
 6. Save
 
 Side effects:
 - `total_collected_revenue` decreases by the return amount
-- If the return exceeds what was overpaid (e.g., admin returns too much), `total_paid` drops below `cost`, balance goes positive, and `is_paid` flips to false — the golfer appears in the unpaid list with an outstanding balance
+- If the return exceeds what was overpaid (e.g., admin returns too much), `total_paid` drops below `cost`, balance goes positive, and `is_paid` flips to false - the golfer appears in the unpaid list with an outstanding balance
 
 ---
 
@@ -190,7 +190,7 @@ Side effects:
 2. Payment received:         cost=$500, balance=$0,   net_paid=$500,  is_paid=true
 3. Admin removes a night:    cost=$400, balance=$0,   net_paid=$500,  is_paid=true
    → overpaid by $100, balance clamped to 0
-   → "Overpaid by $100 — return needed" shown on finances page
+   → "Overpaid by $100 - return needed" shown on finances page
 4. Return processed ($100):  cost=$400, balance=$0,   net_paid=$400,  is_paid=true
    → total_collected_revenue decreases by $100
    → books balance correctly
@@ -201,7 +201,7 @@ Side effects:
 ## Finances Page Display (Site Admin)
 
 For every golfer (paid and unpaid):
-- **Net Paid**: `payments.sum(:amount)` — the actual cash in hand for this golfer after any returns
+- **Net Paid**: `payments.sum(:amount)` - the actual cash in hand for this golfer after any returns
 - **Overpaid by $X**: shown in red when `net_paid > cost`; signals a return is needed
 - **Process Return form**: present for all golfers; site admin enters the amount to return
 

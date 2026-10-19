@@ -236,7 +236,7 @@ RSpec.describe TournamentAssignment, type: :model do
     end
 
     it 'swaps both captains when ca=B and cb=A (both in same group)' do
-      # Positions: 0=A, 1=B, 2=B, 3=A — so rank 2 (pos 1) is B, rank 3 (pos 2) is B
+      # Positions: 0=A, 1=B, 2=B, 3=A - so rank 2 (pos 1) is B, rank 3 (pos 2) is B
       # Build a group of 4 where captain_a lands at pos 1 (B) and captain_b at pos 0 (A)
       # ranked = [cb_id, ca_id, 3, 4] → pos 0=A(cb), 1=B(ca), 2=B, 3=A
       ca_id = 101; cb_id = 102
@@ -251,7 +251,7 @@ RSpec.describe TournamentAssignment, type: :model do
     end
 
     it 'moves cb to B when both captains land on A' do
-      # ranked = [ca_id, 103, 104, cb_id] → pos 0=A(ca), 3=A(cb) — both on A
+      # ranked = [ca_id, 103, 104, cb_id] → pos 0=A(ca), 3=A(cb) - both on A
       ca_id = 201; cb_id = 202
       assignments = assignments_for([[ca_id, 203, 204, cb_id]])
       expect(assignments.find { |a| a[:golfer_id] == ca_id }[:team]).to eq("A")
@@ -264,7 +264,7 @@ RSpec.describe TournamentAssignment, type: :model do
     end
 
     it 'moves ca to A when both captains land on B' do
-      # ranked = [103, ca_id, cb_id, 104] → pos 1=B(ca), 2=B(cb) — both on B
+      # ranked = [103, ca_id, cb_id, 104] → pos 1=B(ca), 2=B(cb) - both on B
       ca_id = 301; cb_id = 302
       assignments = assignments_for([[303, ca_id, cb_id, 304]])
       expect(assignments.find { |a| a[:golfer_id] == ca_id }[:team]).to eq("B")
@@ -279,7 +279,7 @@ RSpec.describe TournamentAssignment, type: :model do
     it 'does nothing when ca=A and cb=B (already correct)' do
       # ranked = [ca_id, 403, 404, cb_id] → pos 0=A(ca) ... wait
       # We need ca on A and cb on B in different positions
-      # ranked = [ca_id, cb_id, 403, 404] → pos 0=A(ca), 1=B(cb) — already correct
+      # ranked = [ca_id, cb_id, 403, 404] → pos 0=A(ca), 1=B(cb) - already correct
       ca_id = 401; cb_id = 402
       assignments = assignments_for([[ca_id, cb_id, 403, 404]])
       expect(assignments.find { |a| a[:golfer_id] == ca_id }[:team]).to eq("A")

@@ -522,7 +522,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <% if @next_trip %>
           <div class="button-row">
             <% @next_trip.rounds.non_tournament.order(:date).each do |round| %>
-              <%= button_to "Scores: #{round.date.strftime('%b %-d')}#{round.course ? ' — ' + round.course.name : ''}", edit_round_scores_path(round), method: :get, class: 'btn btn-outline-primary-finances' %>
+              <%= button_to "Scores: #{round.date.strftime('%b %-d')}#{round.course ? ' - ' + round.course.name : ''}", edit_round_scores_path(round), method: :get, class: 'btn btn-outline-primary-finances' %>
             <% end %>
           </div>
         <% end %>
@@ -552,7 +552,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         %>
         <div class='next-trip-cost'>
           <h2>KPC <%= @next_trip.number %></h2>
-          <h3><%= @next_trip.location %> &mdash; <%= @next_trip.year %></h3>
+          <h3><%= @next_trip.location %> - <%= @next_trip.year %></h3>
           <% if @next_trip.houses.any? %>
             <h4>
               <% @next_trip.houses.each_with_index do |house, index| %>
@@ -631,7 +631,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% if @next_trip.registration_open? %>
             <%= button_to "Sign up for KPC #{@next_trip.number}", "/register_trip", method: :get, class: "btn btn-outline-primary" %>
           <% else %>
-            <h3>Registration for KPC <%= @next_trip.number %> isn't open yet &mdash; watch your email.</h3>
+            <h3>Registration for KPC <%= @next_trip.number %> isn't open yet. Watch your email.</h3>
           <% end %>
         </div>
       <% end %>

@@ -1,7 +1,7 @@
 # KPC Payment Automation: Committee Summary
 
 **Date:** February 2026
-**Status:** Under Consideration — No Decision Made Yet
+**Status:** Under Consideration - No Decision Made Yet
 
 ---
 
@@ -9,7 +9,7 @@
 
 Right now, when a golfer pays their trip balance, nothing happens automatically. The treasurer has to manually log into the app and record each payment by hand. This creates delays between when money arrives and when the app reflects it, and it's an ongoing time burden on the treasurer.
 
-This proposal explores **automating payment tracking for US golfers**, so that when a payment clears, the app records it, updates the golfer's balance, and sends a confirmation email — all without the treasurer doing anything.
+This proposal explores **automating payment tracking for US golfers**, so that when a payment clears, the app records it, updates the golfer's balance, and sends a confirmation email - all without the treasurer doing anything.
 
 Canadian golfers would continue paying the same way they do today, with the treasurer manually recording those payments.
 
@@ -21,9 +21,9 @@ US golfers would pay their trip balance via **bank transfer directly through the
 
 1. Golfer logs into the KPC app and sees their balance
 2. They click **"Pay by Bank Transfer"**
-3. A secure Stripe-hosted screen appears — they connect their bank account by logging into their bank (takes about 1 minute) or by entering their routing and account numbers
+3. A secure Stripe-hosted screen appears - they connect their bank account by logging into their bank (takes about 1 minute) or by entering their routing and account numbers
 4. They confirm the amount and submit
-5. **3–4 business days later**, the transfer clears — the app automatically records the payment, updates their balance, and sends them a confirmation email
+5. **3–4 business days later**, the transfer clears - the app automatically records the payment, updates their balance, and sends them a confirmation email
 
 No follow-up is needed from the golfer or the treasurer.
 
@@ -34,7 +34,7 @@ Canadian golfers would see no change whatsoever. They would continue to pay via 
 ## What Would Change for the Treasurer
 
 ### One-Time Setup
-The treasurer would create a free account with **Stripe** (a widely-used payment platform) and complete a standard identity verification (name, address, date of birth, last 4 of SSN — the same information any financial platform requires). They would then link a personal checking account to receive payouts.
+The treasurer would create a free account with **Stripe** (a widely-used payment platform) and complete a standard identity verification (name, address, date of birth, last 4 of SSN - the same information any financial platform requires). They would then link a personal checking account to receive payouts.
 
 ### Ongoing
 - Stripe automatically deposits collected funds into the treasurer's checking account, typically within a week of a golfer initiating payment
@@ -43,7 +43,7 @@ The treasurer would create a free account with **Stripe** (a widely-used payment
 - Canadian golfer payments continue to be recorded manually, exactly as today
 
 ### Important: Tax Reporting
-Stripe is required by the IRS to send a **1099-K tax form** to any account that receives more than $600/year. Since the treasurer would be collecting several thousand dollars annually, they will receive one. A 1099-K reports the gross dollar amount processed — it does not mean the treasurer owes taxes on that money (they are collecting on behalf of the group, not earning income). However, it does create a paper trail that may require a note on a tax return. **The treasurer should be aware of this and comfortable with it before we move forward.**
+Stripe is required by the IRS to send a **1099-K tax form** to any account that receives more than $600/year. Since the treasurer would be collecting several thousand dollars annually, they will receive one. A 1099-K reports the gross dollar amount processed - it does not mean the treasurer owes taxes on that money (they are collecting on behalf of the group, not earning income). However, it does create a paper trail that may require a note on a tax return. **The treasurer should be aware of this and comfortable with it before we move forward.**
 
 ---
 
@@ -58,7 +58,7 @@ The payment processor charges **0.8% per transaction, with a maximum of $5.00**.
 | $500 | $4.00 |
 | $625 or more | $5.00 (cap) |
 
-For a year where we collect roughly $10,000 from US golfers, total estimated fees would be around **$50–75**. There are no monthly fees, no setup fees — we only pay when a payment is collected.
+For a year where we collect roughly $10,000 from US golfers, total estimated fees would be around **$50–75**. There are no monthly fees, no setup fees - we only pay when a payment is collected.
 
 For comparison, PayPal Friends & Family payments currently cost $0 in fees. The Stripe fee is the cost of automation. Whether that trade-off makes sense is a committee decision.
 
@@ -80,9 +80,9 @@ US golfers would see both the existing payment instructions (Venmo, PayPal, chec
 
 US golfers would **only** see the bank transfer option. The Venmo/PayPal/check instructions would no longer appear for US golfers. The treasurer could still manually record any payment for any golfer in edge cases.
 
-**Upside:** Full automation for all US payments — the treasurer does not need to track or record any US payment. Clean, predictable process.
+**Upside:** Full automation for all US payments - the treasurer does not need to track or record any US payment. Clean, predictable process.
 
-**Downside:** US golfers must complete a one-time bank account connection step before paying. Most will find it straightforward, but some — particularly members less familiar with online banking — may find it unfamiliar or uncomfortable.
+**Downside:** US golfers must complete a one-time bank account connection step before paying. Most will find it straightforward, but some - particularly members less familiar with online banking - may find it unfamiliar or uncomfortable.
 
 ---
 
@@ -98,7 +98,7 @@ US golfers would **only** see the bank transfer option. The Venmo/PayPal/check i
 
 ## What the Committee Needs to Decide
 
-1. **Is the treasurer willing to set up a Stripe account and accept 1099-K tax reporting?** If not, we stop here — the current manual process continues with no changes.
+1. **Is the treasurer willing to set up a Stripe account and accept 1099-K tax reporting?** If not, we stop here - the current manual process continues with no changes.
 
 2. **If yes: Option A (bank transfer as an added option) or Option B (bank transfer required for US golfers)?**
 

@@ -2,7 +2,7 @@ KPC <%= @trip.number %> - Deposit Due TODAY
 
 Hey <%= @golfer.nickname %>,
 
-Today is the deadline: your 50% deposit for KPC <%= @trip.number %> is due TODAY, <%= @due_date.strftime("%A, %B %-d") %>. This is the last day to lock in top-tier bed priority — deposits received after today drop a tier, and the best beds go to the guys who paid on time.
+Today is the deadline: your 50% deposit for KPC <%= @trip.number %> is due TODAY, <%= @due_date.strftime("%A, %B %-d") %>. This is the last day to lock in top-tier bed priority. Deposits received after today drop a tier, and the best beds go to the guys who paid on time.
 
 DEPOSIT (50% of $<%= number_with_delimiter(@golfer_trip.cost) %>): $<%= number_with_delimiter(@deposit_amount) %>
 PAID SO FAR: $<%= number_with_delimiter(@paid_so_far) %>

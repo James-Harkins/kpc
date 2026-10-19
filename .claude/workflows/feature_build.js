@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * feature_build.js — KPC Feature Build Workflow (TDD)
+ * feature_build.js - KPC Feature Build Workflow (TDD)
  *
  * Pipeline:
- *   Phase 1 — Analysis:       Reads codebase, writes design.md, pauses for human review
- *   Phase 2 — Specs:          Writes RSpec from design (all RED — no implementation yet),
+ *   Phase 1 - Analysis:       Reads codebase, writes design.md, pauses for human review
+ *   Phase 2 - Specs:          Writes RSpec from design (all RED - no implementation yet),
  *                              pauses for human review
- *   Phase 3 — Implementation: Parallel task waves; runs specs after each wave until green
+ *   Phase 3 - Implementation: Parallel task waves; runs specs after each wave until green
  *
  * Usage:
  *   node .claude/workflows/feature_build.js "<feature description>"
@@ -113,10 +113,10 @@ async function runAgent({ prompt: agentPrompt, label, maxTurns = 40, stream = tr
   return result;
 }
 
-// ─── Phase 1 — Analysis & Design ─────────────────────────────────────────────
+// ─── Phase 1 - Analysis & Design ─────────────────────────────────────────────
 
 async function phase1(featureDescription, slug) {
-  banner("PHASE 1 — Analysis & Design");
+  banner("PHASE 1 - Analysis & Design");
 
   const dir = specsDir(slug);
   fs.mkdirSync(dir, { recursive: true });
@@ -185,14 +185,14 @@ For each view file created or meaningfully changed:
 ## Task List
 One item per file. Tag each with its dependency tier:
 
-  [migration]  — db/migrate files
-  [model]      — app/models files
-  [controller] — app/controllers files
-  [route]      — config/routes.rb edit
-  [view]       — app/views files
+  [migration]  - db/migrate files
+  [model]      - app/models files
+  [controller] - app/controllers files
+  [route]      - config/routes.rb edit
+  [view]       - app/views files
 
 Format each item as:
-  - [ ] [tier] Description — \`path/to/file\`
+  - [ ] [tier] Description - \`path/to/file\`
 
 Ordering rule: all [migration] and [model] items must appear before [controller] and [route] \
 items, which must appear before [view] items.
@@ -221,10 +221,10 @@ Write only the design document. Do not implement anything.`;
   );
 }
 
-// ─── Phase 2 — Spec Writing (TDD: write tests before implementation) ──────────
+// ─── Phase 2 - Spec Writing (TDD: write tests before implementation) ──────────
 
 async function phase2(slug) {
-  banner("PHASE 2 — Spec Writing (Red Phase)");
+  banner("PHASE 2 - Spec Writing (Red Phase)");
 
   const dir = specsDir(slug);
   const designPath = path.join(dir, "design.md");
@@ -255,16 +255,16 @@ ${designDoc}
 
 ---
 
-STEP 1 — Read existing specs for style reference:
+STEP 1 - Read existing specs for style reference:
 Read 2–3 files from spec/models/ (e.g. round_spec.rb, trip_spec.rb, golfer_round_spec.rb) \
 to internalize the exact test style before writing anything.
 
-STEP 2 — Write the spec files:
+STEP 2 - Write the spec files:
 Write RSpec specs for every model and controller described in the design document. \
-Base your specs entirely on the design document — describe the intended behavior, \
+Base your specs entirely on the design document - describe the intended behavior, \
 not any existing code (the feature code does not exist yet).
 
-Conventions (mandatory — match the existing test files exactly):
+Conventions (mandatory - match the existing test files exactly):
   - require 'rails_helper' at the top of every spec file
   - shoulda-matchers for associations and validations:
       it { should belong_to(:trip) }
@@ -275,16 +275,16 @@ Conventions (mandatory — match the existing test files exactly):
 
 Do NOT write spec files for migrations, routes, or views.
 
-STEP 3 — Confirm specs are RED:
+STEP 3 - Confirm specs are RED:
 Run the new spec files:
   bundle exec rspec <spec_file_1> <spec_file_2> ... --format documentation
 
-Most or all examples will fail with "uninitialized constant" or similar — that is correct \
+Most or all examples will fail with "uninitialized constant" or similar - that is correct \
 and expected. The specs are green only after Phase 3 implementation.
 
 Report: list each spec file written and its failure count.
 
-STEP 4 — Write the spec file list:
+STEP 4 - Write the spec file list:
 Write a JSON file to ${specListPath}:
   { "spec_files": ["spec/models/foo_spec.rb", "spec/controllers/bar_spec.rb"] }
 
@@ -301,16 +301,16 @@ Begin now.`;
 
   await pause(
     `PHASE 2 COMPLETE\n` +
-    `\nAll specs are currently RED — no implementation exists yet. That is correct.\n` +
+    `\nAll specs are currently RED - no implementation exists yet. That is correct.\n` +
     `\nReview the spec files and adjust any examples that don't match your intent.\n` +
     `Implementation in Phase 3 is complete when these specs are green.`
   );
 }
 
-// ─── Phase 3 — Implementation (Green Phase) ───────────────────────────────────
+// ─── Phase 3 - Implementation (Green Phase) ───────────────────────────────────
 
 async function phase3(slug) {
-  banner("PHASE 3 — Implementation (Green Phase)");
+  banner("PHASE 3 - Implementation (Green Phase)");
 
   const dir = specsDir(slug);
   const designPath = path.join(dir, "design.md");
@@ -350,9 +350,9 @@ ${designDoc}
 
 Parse the Task List section. Group tasks into three dependency waves:
 
-  Wave 1 "migrations_and_models"   — all [migration] and [model] items (run in parallel)
-  Wave 2 "controllers_and_routes"  — all [controller] and [route] items (run after wave 1)
-  Wave 3 "views"                   — all [view] items (run after wave 2)
+  Wave 1 "migrations_and_models"   - all [migration] and [model] items (run in parallel)
+  Wave 2 "controllers_and_routes"  - all [controller] and [route] items (run after wave 1)
+  Wave 3 "views"                   - all [view] items (run after wave 2)
 
 For each task:
   - "id":      short unique snake_case string
@@ -485,7 +485,7 @@ Rules:
 1. Follow every convention in CLAUDE.md without exception:
    - No Devise
    - Logic in models, thin controllers
-   - Views use inline <style> blocks — no separate CSS files
+   - Views use inline <style> blocks - no separate CSS files
    - Background image: url(<%= asset_path 'course_1.jpg' %>)
    - Navigation buttons: button_to with method: :get
    - Admin actions require before_action :require_admin (or require_site_admin)
@@ -565,7 +565,7 @@ async function main() {
 
   const slug = featureSlug(featureDescription);
 
-  banner("KPC FEATURE BUILD WORKFLOW — TDD");
+  banner("KPC FEATURE BUILD WORKFLOW - TDD");
   log(`Feature : "${featureDescription}"`);
   log(`Slug    : ${slug}`);
   log(`Specs   : tmp/claude_specs/${slug}/`);
@@ -583,10 +583,10 @@ async function main() {
   banner("WORKFLOW COMPLETE");
   log("All phases finished.");
   log(`Artifacts in tmp/claude_specs/${slug}/:`);
-  log("  design.md         — finalized feature design");
-  log("  spec_files.json   — spec files written in Phase 2");
-  log("  tasks.json        — implementation task breakdown");
-  log("  phase3_files.json — implementation files written in Phase 3");
+  log("  design.md         - finalized feature design");
+  log("  spec_files.json   - spec files written in Phase 2");
+  log("  tasks.json        - implementation task breakdown");
+  log("  phase3_files.json - implementation files written in Phase 3");
 }
 
 main();

@@ -94,7 +94,7 @@ select {
            Tier 2 met it late, Tier 3 haven't met it.
            Within a tier: most nights first, then earliest deposit, then earliest registration.</p>
     <% else %>
-        <p>No deposit deadline is set for this trip — admins pick first, and any met deposit counts as Tier 1.</p>
+        <p>No deposit deadline is set for this trip. Admins pick first, and any met deposit counts as Tier 1.</p>
     <% end %>
 
     <table>
@@ -121,21 +121,21 @@ select {
                     <td class="tier-<%= golfer_trip.bed_priority_tier %>">
                         <% case golfer_trip.bed_priority_tier %>
                         <% when 0 %>
-                            Admin &mdash; first pick
+                            Admin: first pick
                         <% when 1 %>
-                            Tier 1 &mdash; met <%= golfer_trip.deposit_met_at.strftime('%-m/%-d') %>
+                            Tier 1: met <%= golfer_trip.deposit_met_at.strftime('%-m/%-d') %>
                         <% when 2 %>
-                            Tier 2 &mdash; met late <%= golfer_trip.deposit_met_at.strftime('%-m/%-d') %>
+                            Tier 2: met late <%= golfer_trip.deposit_met_at.strftime('%-m/%-d') %>
                         <% else %>
-                            Not met &mdash; $<%= golfer_trip.payments.sum(&:amount) %> of $<%= golfer_trip.deposit_amount %> paid
+                            Not met: $<%= golfer_trip.payments.sum(&:amount) %> of $<%= golfer_trip.deposit_amount %> paid
                         <% end %>
                     </td>
                     <td><%= golfer_trip.created_at.strftime('%-m/%-d') %></td>
                     <td>
                         <% if golfer_trip.bed %>
-                            <%= golfer_trip.bed.house.name %> &mdash; <%= golfer_trip.bed.bedroom.name %> (<%= golfer_trip.bed.description %>)
+                            <%= golfer_trip.bed.house.name %> - <%= golfer_trip.bed.bedroom.name %> (<%= golfer_trip.bed.description %>)
                         <% else %>
-                            &mdash;
+-
                         <% end %>
                     </td>
                     <% if @houses.any? %>
@@ -183,7 +183,7 @@ select {
                                     <td>
                                         <% (1..bed.capacity).each do |slot| %>
                                             <select name="beds[<%= bed.id %>][]" data-bed-id="<%= bed.id %>" data-bed-rank="<%= bed.rank %>" data-slot="<%= slot %>">
-                                                <option value="">&mdash; Unassigned &mdash;</option>
+                                                <option value="">- Unassigned -</option>
                                                 <% @priority.each_with_index do |golfer_trip, index| %>
                                                     <option value="<%= golfer_trip.id %>" <%= 'selected' if occupants[slot - 1]&.id == golfer_trip.id %>>
                                                         #<%= index + 1 %> <%= golfer_trip.golfer.nickname.strip.titleize %><%= ' (admin)' if golfer_trip.golfer.admin? %>
@@ -201,7 +201,7 @@ select {
             <button type="button" class="btn-outline-primary-finances" onclick="autofillAssignments()">Autofill by Priority</button>
             <input type="submit" value="Save Assignments" class="btn-outline-primary-finances">
             <p style="font-size: 0.85em; color: #555;">
-                Autofill gives each golfer their own bed &mdash; best bed to highest priority &mdash; then
+                Autofill gives each golfer their own bed (best bed to highest priority), then
                 doubles the remaining golfers into the lowest-ranked shared beds. Nothing is saved
                 until you click Save Assignments, so rearrange freely first.
             </p>
@@ -226,7 +226,7 @@ function autofillAssignments() {
     });
     var bedList = Object.keys(beds).map(function(id) { return beds[id]; });
 
-    // Golfer trip ids in priority order — the dropdown options are already sorted
+    // Golfer trip ids in priority order (the dropdown options are already sorted)
     var golfers = Array.prototype.slice.call(selects[0].options)
         .map(function(option) { return option.value; })
         .filter(function(value) { return value !== ''; });

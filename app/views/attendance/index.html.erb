@@ -220,7 +220,7 @@ body::before {
 </style>
 
 <div class="next-trip-cost">
-    <h1>Attendance &mdash; KPC <%= @next_trip.number %></h1>
+    <h1>Attendance - KPC <%= @next_trip.number %></h1>
 
     <% if @show_open_beds %>
         <div class="date-card">
@@ -233,7 +233,7 @@ body::before {
                     <%= @open_beds_by_night.map { |night, open| "#{night.date.strftime('%a %-m/%-d')}: #{open}" }.join(' &bull; ').html_safe %>
                 </h5>
                 <% if @open_bed_spots.zero? && @any_night_open %>
-                    <h5>No full-week beds left &mdash; some nights still have room.</h5>
+                    <h5>No full-week beds left. Some nights still have room.</h5>
                 <% elsif @open_bed_spots.zero? %>
                     <h5>Every night is full.</h5>
                 <% end %>

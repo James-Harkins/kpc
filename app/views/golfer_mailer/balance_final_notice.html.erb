@@ -13,7 +13,7 @@
             <td style="background-color:#8b1a1a; padding:36px 40px; text-align:center;">
               <div style="font-size:42px; line-height:1; margin-bottom:12px;">⛳</div>
               <h1 style="color:#ffffff; margin:0 0 8px; font-size:26px; font-weight:bold; letter-spacing:1px;">
-                One Week Out &mdash; Balance Due
+                One Week Out: Balance Due
               </h1>
               <p style="color:#e8b4b4; margin:0; font-size:15px;">
                 KPC <%= @trip.number %> &bull; <%= @trip.location %> &bull; <%= @trip.year %>
@@ -27,7 +27,7 @@
 
               <p style="color:#333333; font-size:16px; margin:0 0 28px; line-height:1.5;">
                 Hey <strong><%= @golfer.nickname %></strong>, KPC <%= @trip.number %> tees off in
-                <strong>one week</strong> &mdash; <%= @trip.start_date.strftime("%A, %B %-d") %> &mdash;
+                <strong>one week</strong> (<%= @trip.start_date.strftime("%A, %B %-d") %>)
                 and you still have a balance due. Please settle up before we hit the road.
               </p>
 

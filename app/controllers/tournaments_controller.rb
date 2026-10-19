@@ -86,7 +86,7 @@ class TournamentsController < ApplicationController
     if prev
       prev_scores = GolferRound.where(golfer_id: golfer_id, round_id: prev.rounds.pluck(:id))
                                .where.not(score: nil)
-      return "#{prev.year} trip — fallback" if prev_scores.any?
+      return "#{prev.year} trip - fallback" if prev_scores.any?
     end
 
     "no history"

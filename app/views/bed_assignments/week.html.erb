@@ -77,7 +77,7 @@ body::before {
         <span class="tier-1">met by deadline</span>,
         <span class="tier-2">met late</span>,
         <span class="tier-3">not met</span>.
-        A bed marked <em>reserved all week</em> stays held for its golfer on nights they're away (shown as <em>away &mdash; reserved</em>);
+        A bed marked <em>reserved all week</em> stays held for its golfer on nights they're away (shown as <em>away (reserved)</em>);
         otherwise a bed shows <em>open</em> on nights its golfer isn't there.
     </p>
 
@@ -103,7 +103,7 @@ body::before {
                                 <tr>
                                     <td class="bed-col">
                                         <strong>#<%= bed.rank %></strong> <%= bed.description %>
-                                        <% if bed.capacity > 1 %><small>(sleeps <%= bed.capacity %> &mdash; slot <%= index + 1 %>)</small><% end %>
+                                        <% if bed.capacity > 1 %><small>(sleeps <%= bed.capacity %>, slot <%= index + 1 %>)</small><% end %>
                                     </td>
                                     <% @nights.each do |night| %>
                                         <% occupant = slot_nights[night.id] %>
@@ -114,7 +114,7 @@ body::before {
                                         <% else %>
                                             <td class="cell-away tier-<%= occupant.bed_priority_tier %>">
                                                 <%= occupant.golfer.nickname.strip.titleize %>
-                                                <span class="away-label">away &mdash; reserved</span>
+                                                <span class="away-label">away (reserved)</span>
                                             </td>
                                         <% end %>
                                     <% end %>
@@ -147,7 +147,7 @@ body::before {
                             <% if @attending.include?([golfer_trip.golfer_id, night.id]) %>
                                 <td class="cell-unassigned">needs bed</td>
                             <% else %>
-                                <td class="cell-open">&mdash;</td>
+                                <td class="cell-open">-</td>
                             <% end %>
                         <% end %>
                     </tr>
