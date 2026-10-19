@@ -113,30 +113,20 @@ class Trip < ApplicationRecord
     open_bed_spots_by_night.select { |_night, open| open.zero? }.map { |night, _open| night.id }
   end
 
-  # Golfers who haven't registered for this trip and haven't opted out of
-  # bed-availability emails.
+  # Non-admin golfers who haven't registered for this trip and haven't opted out
+  # of bed-availability emails.
   def bed_alert_recipients
-    Golfer.where.not(id: golfer_trips.select(:golfer_id))
+    Golfer.where.not(role: :admin)
+          .where.not(id: golfer_trips.select(:golfer_id))
           .where.not(id: bed_alert_opt_outs.select(:golfer_id))
   end
 
-  BED_ALERT_COOLDOWN = 1.hour
-
-  # Called after a signup. Emails the unregistered, non-opted-out golfers the
-  # new bed count at most once per BED_ALERT_COOLDOWN (keeps us under Resend's
-  # daily send cap; the next blast carries the latest count). Skipped for admin
-  # signups, which are bookkeeping. When a signup takes the trip from open beds
-  # to none, the admins are emailed and the golfer blast ignores the cooldown.
-  def send_bed_alerts(signed_up_golfer, had_open_spots)
+  # Called after a signup. When it takes the trip from open full-week beds to
+  # none, the admins are emailed. (Golfers get the weekly emails:send_bed_availability.)
+  def send_bed_alerts(had_open_spots)
     return if total_bed_spots.zero?
 
-    reached_zero = had_open_spots && open_bed_spots.zero?
-    BulkMailJob.perform_later('bed_capacity_reached', Golfer.admin.ids, self) if reached_zero
-    return if signed_up_golfer.admin?
-
-    if claim_bed_alert_slot(force: reached_zero)
-      BulkMailJob.perform_later('bed_availability', bed_alert_recipients.ids, self)
-    end
+    BulkMailJob.perform_later('bed_capacity_reached', Golfer.admin.ids, self) if had_open_spots && open_bed_spots.zero?
   end
 
   # Distinct golfers registered for this trip, committee included (unlike man nights).
@@ -254,15 +244,6 @@ class Trip < ApplicationRecord
   end
 
   private
-
-  # Atomically stamps last_bed_alert_at; true only for the caller that won the slot.
-  def claim_bed_alert_slot(force: false)
-    scope = Trip.where(id: id)
-    unless force
-      scope = scope.where('last_bed_alert_at IS NULL OR last_bed_alert_at <= ?', BED_ALERT_COOLDOWN.ago)
-    end
-    scope.update_all(last_bed_alert_at: Time.current) == 1
-  end
 
   def captains_must_be_different
     return unless captain_a_id.present? && captain_b_id.present?

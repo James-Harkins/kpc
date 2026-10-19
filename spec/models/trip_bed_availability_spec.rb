@@ -123,6 +123,11 @@ RSpec.describe Trip, 'bed availability' do
       expect(trip.bed_alert_recipients).to contain_exactly(waiting)
     end
 
+    it 'excludes admins' do
+      create(:golfer, :admin)
+      expect(trip.bed_alert_recipients.where(role: :admin)).to be_empty
+    end
+
     it 'only honors opt-outs for this trip' do
       golfer = create(:golfer)
       create(:bed_alert_opt_out, golfer: golfer, trip: create(:trip))
@@ -141,68 +146,32 @@ RSpec.describe Trip, 'bed availability' do
       end
 
       it 'sends nothing' do
-        expect { trip.send_bed_alerts(signer, true) }.not_to have_enqueued_job(BulkMailJob)
+        expect { trip.send_bed_alerts(true) }.not_to have_enqueued_job(BulkMailJob)
       end
     end
 
     context 'with beds' do
       before { create(:bed, bedroom: room, capacity: 1) }
 
-      it 'emails the unregistered golfers the bed count' do
-        expect { trip.send_bed_alerts(signer, true) }
-          .to have_enqueued_job(BulkMailJob)
-          .with('bed_availability', a_collection_including(waiting.id, admin.id), trip)
-      end
-
-      it 'does not email golfers for an admin signup' do
-        expect { trip.send_bed_alerts(admin, true) }.not_to have_enqueued_job(BulkMailJob)
+      it 'never emails golfers about beds' do
+        expect { trip.send_bed_alerts(true) }
+          .not_to have_enqueued_job(BulkMailJob).with('bed_availability', anything, trip)
       end
 
       it 'alerts the admins once when a signup takes the trip to zero' do
         attend(signer, *nights)
-        expect { trip.send_bed_alerts(signer, true) }
+        expect { trip.send_bed_alerts(true) }
           .to have_enqueued_job(BulkMailJob).with('bed_capacity_reached', [admin.id], trip)
-          .and have_enqueued_job(BulkMailJob).with('bed_availability', anything, trip)
       end
 
       it 'does not re-alert the admins when the trip was already at zero' do
         attend(signer, *nights)
-        expect { trip.send_bed_alerts(signer, false) }
+        expect { trip.send_bed_alerts(false) }
           .not_to have_enqueued_job(BulkMailJob).with('bed_capacity_reached', anything, trip)
       end
 
-      it 'still alerts the admins when an admin signup takes the trip to zero' do
-        attend(admin, *nights)
-        expect { trip.send_bed_alerts(admin, true) }
-          .to have_enqueued_job(BulkMailJob).with('bed_capacity_reached', [admin.id], trip)
-      end
-
-      it 'sends at most one golfer blast per cooldown' do
-        trip.send_bed_alerts(signer, true)
-        expect { trip.send_bed_alerts(create(:golfer), true) }.not_to have_enqueued_job(BulkMailJob)
-      end
-
-      it 'sends again once the cooldown has passed' do
-        trip.send_bed_alerts(signer, true)
-        trip.update_column(:last_bed_alert_at, (Trip::BED_ALERT_COOLDOWN + 1.minute).ago)
-        expect { trip.send_bed_alerts(create(:golfer), true) }
-          .to have_enqueued_job(BulkMailJob).with('bed_availability', anything, trip)
-      end
-
-      it 'ignores the cooldown when a signup takes the trip to zero' do
-        trip.send_bed_alerts(signer, true)
-        attend(signer, *nights)
-        expect { trip.send_bed_alerts(signer, true) }
-          .to have_enqueued_job(BulkMailJob).with('bed_availability', anything, trip)
-      end
-
-      it 'does not start the cooldown for an admin signup' do
-        trip.send_bed_alerts(admin, true)
-        expect(trip.reload.last_bed_alert_at).to be_nil
-      end
-
       it 'does not alert the admins while beds remain' do
-        expect { trip.send_bed_alerts(signer, true) }
+        expect { trip.send_bed_alerts(true) }
           .not_to have_enqueued_job(BulkMailJob).with('bed_capacity_reached', anything, trip)
       end
     end

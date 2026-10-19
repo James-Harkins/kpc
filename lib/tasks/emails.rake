@@ -101,4 +101,29 @@ namespace :emails do
 
     puts "#{"[DRY RUN] " if dry_run}Done! #{dry_run ? "Would have sent" : "Sent"} #{label}s to #{sent} golfers."
   end
+
+  desc "Send the weekly bed-availability email to unregistered, non-admin golfers who haven't opted out"
+  task send_bed_availability: :environment do
+    dry_run = ENV["DRY_RUN"] == "true"
+    trip    = Trip.current
+
+    abort "No current trip found. Set CURRENT_TRIP_NUMBER env var." if trip.nil?
+
+    if trip.completed? || !trip.registration_open? || trip.total_bed_spots.zero? || trip.open_bed_spots_any_night.zero?
+      puts "KPC #{trip.number} is completed, closed to registration, has no beds entered, or is full. No emails sent."
+      exit
+    end
+
+    puts "#{"[DRY RUN] " if dry_run}Sending bed availability for KPC #{trip.number}..."
+
+    sent = 0
+    trip.bed_alert_recipients.each do |golfer|
+      GolferMailer.bed_availability(golfer, trip).deliver_now unless dry_run
+      puts "  #{"[DRY RUN] Would send" if dry_run}#{"Sent" unless dry_run} to #{golfer.nickname}"
+      sent += 1
+      sleep(0.6) unless dry_run
+    end
+
+    puts "#{"[DRY RUN] " if dry_run}Done! #{dry_run ? "Would have sent" : "Sent"} bed availability to #{sent} golfers."
+  end
 end

@@ -29,22 +29,22 @@ RSpec.describe 'Previous trips', type: :request do
       get '/previous_trips'
       expect(old_trip.unique_attendance).to eq(2)
       expect(new_trip.unique_attendance).to eq(3)
-      expect(response.body.scan('Attendance (unique golfers, committee included)').length).to eq(2)
-      expect(response.body).to match(/Attendance \(unique golfers, committee included\)<\/td>\s*<td>3<\/td>/)
-      expect(response.body).to match(/Attendance \(unique golfers, committee included\)<\/td>\s*<td>2<\/td>/)
+      expect(response.body.scan('Attendance:').length).to eq(2)
+      expect(response.body).to match(/Attendance: <strong>3<\/strong>/)
+      expect(response.body).to match(/Attendance: <strong>2<\/strong>/)
     end
 
     it 'shows the all-time unique count once per golfer at the top' do
       get '/previous_trips'
       expect(Trip.unique_attendance_across([old_trip, new_trip])).to eq(3)   # not 5
-      expect(response.body).to include('3 different golfers across 2 trips')
-      expect(response.body.index('3 different golfers')).to be < response.body.index('KPC XXVI')
+      expect(response.body).to match(/Unique Attendance Across 2 Trips<\/td>\s*<td>3<\/td>/)
+      expect(response.body.index('Unique Attendance Across')).to be < response.body.index('KPC XXVI')
     end
 
     it 'shows a headcount even when a trip has no financial summary' do
       get '/previous_trips'
       expect(response.body).to include('No financial summary recorded.')
-      expect(response.body).to match(/Attendance \(unique golfers, committee included\)<\/td>\s*<td>3<\/td>/)
+      expect(response.body).to match(/Attendance: <strong>3<\/strong>/)
     end
   end
 

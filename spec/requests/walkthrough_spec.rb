@@ -34,16 +34,12 @@ RSpec.describe 'Registration walkthrough', type: :request do
   end
 
   def recipients_without(new_golfer)
-    Golfer.where.not(id: registered.select(:id)).where.not(id: @trip.bed_alert_opt_outs.select(:golfer_id)).where.not(id: new_golfer.id)
+    @trip.bed_alert_recipients.where.not(id: new_golfer.id)
   end
 
-  # Everyone unregistered and not opted out, minus the golfer whose signup triggers the blast.
-  def blast_without(new_golfer)
-    have_enqueued_job(BulkMailJob).with('bed_availability', a_collection_containing_exactly(*recipients_without(new_golfer).ids), @trip)
-  end
-
-  def rearm
-    @trip.update_column(:last_bed_alert_at, nil)
+  # Signups no longer email golfers; the weekly rake task does.
+  def no_blast
+    have_enqueued_job(BulkMailJob).with('bed_availability', anything, @trip)
   end
 
   def bed_in(room_name, description = nil)
@@ -93,7 +89,7 @@ RSpec.describe 'Registration walkthrough', type: :request do
     expect(response.body).to include('21 of 25 open all week')
 
     # --- 1. Pete (full trip): first blast, to all 24 other golfers
-    expect { register(@g[:pete], full: true) }.to blast_without(@g[:pete])
+    expect { register(@g[:pete], full: true) }.not_to no_blast
     expect(open_counts).to eq([20] * 7)
     expect(@g[:pete].golfer_trips.first.reserved_all_week).to be(false)
 
@@ -106,8 +102,7 @@ RSpec.describe 'Registration walkthrough', type: :request do
     expect(open_counts).to eq([19] * 7)
 
     # --- re-arm. 3. Harry arrives one night late (Sun-Fri): email goes out BEFORE Don flags him, so Saturday still shows 19
-    rearm
-    expect { register(@g[:harry], nights: [1, 2, 3, 4, 5, 6]) }.to blast_without(@g[:harry])
+    expect { register(@g[:harry], nights: [1, 2, 3, 4, 5, 6]) }.not_to no_blast
     expect(open_counts).to eq([19, 18, 18, 18, 18, 18, 18])
     expect(recipients_without(@g[:harry]).count).to eq(21)
     harry_trip = @g[:harry].golfer_trips.first
@@ -138,8 +133,7 @@ RSpec.describe 'Registration walkthrough', type: :request do
     expect(response.body).to include('16 of 25 open all week')
 
     # --- re-arm, 8. Freddy (full): email "15 Beds Left" to 16
-    rearm
-    expect { register(@g[:freddy], full: true) }.to blast_without(@g[:freddy])
+    expect { register(@g[:freddy], full: true) }.not_to no_blast
     expect(open_counts).to eq([15] * 7)
     expect(recipients_without(@g[:freddy]).count).to eq(16)
 
@@ -149,8 +143,7 @@ RSpec.describe 'Registration walkthrough', type: :request do
     expect(registered.count).to eq(4 + 8 + 9)
 
     # --- re-arm, 10. Kurt Sat-Tue: "5 Beds Left" to the 6 still unregistered and not opted out
-    rearm
-    expect { register(@g[:kurt], nights: [0, 1, 2, 3]) }.to blast_without(@g[:kurt])
+    expect { register(@g[:kurt], nights: [0, 1, 2, 3]) }.not_to no_blast
     expect(open_counts).to eq([5, 5, 5, 5, 6, 6, 6])
     expect(recipients_without(@g[:kurt]).map(&:first_name)).to match_array(%w[Bobby Lou Joey Ed Smitty Gene])
 
@@ -159,8 +152,7 @@ RSpec.describe 'Registration walkthrough', type: :request do
     expect(open_counts).to eq([5, 5, 5, 5, 6, 5, 5])
 
     # --- re-arm, 12. Ed (full): "4 Beds Left" to 4, Wednesday shows 5 open
-    rearm
-    expect { register(@g[:ed], full: true) }.to blast_without(@g[:ed])
+    expect { register(@g[:ed], full: true) }.not_to no_blast
     expect(open_counts).to eq([4, 4, 4, 4, 5, 4, 4])
     expect(recipients_without(@g[:ed]).map(&:first_name)).to match_array(%w[Bobby Lou Smitty Gene])
 
@@ -170,17 +162,15 @@ RSpec.describe 'Registration walkthrough', type: :request do
     expect(open_counts).to eq([2, 2, 2, 2, 3, 2, 2])
 
     # --- re-arm, 15. Gene (full): "1 Bed Left" to Bobby and Lou, Wednesday shows 2 open
-    rearm
-    expect { register(@g[:gene], full: true) }.to blast_without(@g[:gene])
+    expect { register(@g[:gene], full: true) }.not_to no_blast
     expect(open_counts).to eq([1, 1, 1, 1, 2, 1, 1])
     mail = GolferMailer.bed_availability(@g[:bobby], @trip)
     expect(mail.subject).to eq('KPC XXVII - 1 Bed Left')
     expect(mail.text_part.body.encoded).to include('Wednesday, April 28: 2 open')
 
-    # --- 16. Lou (full): full-week zero. Admin alert AND a forced blast despite the cooldown
+    # --- 16. Lou (full): full-week zero. Admin alert, no golfer blast
     expect { register(@g[:lou], full: true) }
       .to have_enqueued_job(BulkMailJob).with('bed_capacity_reached', a_collection_containing_exactly(@don.id, @roger.id, @burt.id, @lane.id), @trip)
-      .and blast_without(@g[:lou])
     expect(open_counts).to eq([0, 0, 0, 0, 1, 0, 0])
     expect(@trip.open_bed_spots).to eq(0)
     expect(recipients_without(@g[:lou]).map(&:first_name)).to eq(['Bobby'])
@@ -202,11 +192,10 @@ RSpec.describe 'Registration walkthrough', type: :request do
       .not_to change(GolferTrip, :count)
     expect { post '/register_trip', params: { deposit_policy_acknowledged: '1' } }.not_to change(GolferTrip, :count)
     expect(flash[:error]).to include('Pick at least one night or round')
-    rearm
     ActiveJob::Base.queue_adapter.enqueued_jobs.clear
     register(@g[:bobby], nights: [4])
     expect(open_counts).to eq([0] * 7)
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.map { |job| job[:args].first }).to eq(['bed_availability'])   # job queued, but nobody is left to receive it
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.map { |job| job[:args].first }).to eq([])
     expect(recipients_without(@g[:bobby]).count).to eq(0)
     expect(GolferMailer.bed_availability(@g[:lou], @trip).subject).to eq('KPC XXVII - The House Is Full')
     expect(registered.count).to eq(4 + 25)   # 29 registered for 25 slots, because the stays above share spots

@@ -18,9 +18,9 @@ RSpec.describe 'Bed alerts on signup', type: :request do
     log_in_as(signer)
   end
 
-  it 'emails unregistered golfers after a signup' do
+  it 'does not email unregistered golfers after a signup' do
     expect { post '/register_trip', params: { full_trip: '1' } }
-      .to have_enqueued_job(BulkMailJob).with('bed_availability', a_collection_including(waiting.id), trip)
+      .not_to have_enqueued_job(BulkMailJob).with('bed_availability', anything, trip)
   end
 
   it 'alerts the admins when the signup fills the last open spot' do
@@ -32,11 +32,5 @@ RSpec.describe 'Bed alerts on signup', type: :request do
   it 'does not alert the admins when spots remain' do
     expect { post '/register_trip', params: { full_trip: '1' } }
       .not_to have_enqueued_job(BulkMailJob).with('bed_capacity_reached', anything, trip)
-  end
-
-  it 'does not email golfers who already opted out' do
-    create(:bed_alert_opt_out, golfer: waiting, trip: trip)
-    expect { post '/register_trip', params: { full_trip: '1' } }
-      .to have_enqueued_job(BulkMailJob).with('bed_availability', [admin.id], trip)
   end
 end
