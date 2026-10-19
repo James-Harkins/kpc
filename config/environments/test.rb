@@ -36,6 +36,8 @@ Rails.application.configure do
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
   # ActionMailer::Base.deliveries array.
+  # Keep specs (and Rack::Attack's cache clear) out of tmp/cache, which the dev server shares
+  config.cache_store = :memory_store
   config.action_mailer.delivery_method = :test
   config.active_job.queue_adapter = :test
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
