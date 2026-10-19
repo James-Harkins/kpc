@@ -68,18 +68,20 @@ RSpec.describe 'Registration walkthrough', type: :request do
     get '/register_trip'
     expect(response).to redirect_to('/dashboard')
 
-    # --- admins register first: $0, bed reserved all week, only the nights they pick, no emails
+    # --- admins register first: $0, bed reserved all week. Roger, Burt and Lane attend all week; Don Mon-Fri.
     expect do
       register(@don,   nights: [2, 3, 4, 5, 6])
-      register(@roger, nights: [0, 1, 2, 3])
-      register(@burt,  nights: [1, 2, 3, 4, 5])
-      register(@lane,  nights: [0, 1, 2, 3, 4, 5, 6])
+      register(@roger, full: true)
+      register(@burt,  full: true)
+      register(@lane,  full: true)
     end.not_to have_enqueued_job(BulkMailJob).with('bed_availability', anything, @trip)
     admin_trips = GolferTrip.where(golfer: [@don, @roger, @burt, @lane])
     expect(admin_trips.pluck(:cost, :balance, :reserved_all_week).uniq).to eq([[0, 0, true]])
     expect(@don.golfer_nights.count).to eq(5)
-    expect(@roger.golfer_trips.first.is_full_trip).to be_falsey
-    expect(open_counts).to eq([9] * 7)
+    expect(@don.golfer_trips.first.is_full_trip).to be_falsey
+    expect([@roger, @burt, @lane].map { |a| a.golfer_trips.first.is_full_trip }).to eq([true, true, true])
+    expect(GolferNight.where(night: @nights).group(:night_id).count.values_at(*@nights.map(&:id))).to eq([3, 3, 4, 4, 4, 4, 4])
+    expect(open_counts).to eq([9] * 7)   # all four hold a spot every night, Don's two away nights included
     log_in_as(@don)
     get "/attendance", params: { trip_id: @trip.id }
     expect(response.body).to include('9 of 13 open all week')
