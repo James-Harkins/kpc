@@ -4,7 +4,7 @@
 #
 
 app = 'kpc'
-primary_region = 'ewr'
+primary_region = 'iad'
 console_command = '/rails/bin/rails console'
 
 [build]
@@ -21,7 +21,7 @@ console_command = '/rails/bin/rails console'
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
 
