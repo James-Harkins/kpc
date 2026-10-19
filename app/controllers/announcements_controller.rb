@@ -10,26 +10,13 @@ class AnnouncementsController < ApplicationController
     body    = params[:body]
 
     if params[:trip_id] == "all"
-      Golfer.all.each do |golfer|
-        GolferMailer.announcement(golfer, subject, body, nil).deliver_now
-        sleep(0.6)
-      end
-      flash[:notice] = "Email sent to all golfers!"
+      BulkMailJob.perform_later('announcement', Golfer.ids, subject, body, nil)
+      flash[:notice] = "Email is being sent to all golfers!"
     else
       trip = Trip.find(params[:trip_id])
-
-      trip.golfers.each do |golfer|
-        GolferMailer.announcement(golfer, subject, body, trip).deliver_now
-        sleep(0.6)
-      end
-
-      admin_ids_on_trip = trip.golfers.where(role: :admin).pluck(:id)
-      Golfer.where(role: :admin).where.not(id: admin_ids_on_trip).each do |admin|
-        GolferMailer.announcement(admin, subject, body, trip).deliver_now
-        sleep(0.6)
-      end
-
-      flash[:notice] = "Email sent to all golfers on KPC #{trip.number}!"
+      recipient_ids = (trip.golfers.ids + Golfer.admin.ids).uniq
+      BulkMailJob.perform_later('announcement', recipient_ids, subject, body, trip)
+      flash[:notice] = "Email is being sent to all golfers on KPC #{trip.number}!"
     end
 
     redirect_to "/dashboard"

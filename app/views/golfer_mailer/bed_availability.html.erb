@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; padding:0; background-color:#f0f0f0; font-family:'Trebuchet MS', Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0f0f0; padding:30px 0;">
+    <tr>
+      <td align="center">
+
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#1a4d2e; padding:36px 40px; text-align:center;">
+              <div style="font-size:42px; line-height:1; margin-bottom:12px;">🛏️</div>
+              <h1 style="color:#ffffff; margin:0 0 8px; font-size:26px; font-weight:bold; letter-spacing:1px;">
+                <% if @open_spots.zero? %>
+                  The House Is Full
+                <% else %>
+                  <%= @open_spots %> <%= 'Bed'.pluralize(@open_spots) %> Left
+                <% end %>
+              </h1>
+              <p style="color:#a8d5b5; margin:0; font-size:15px;">
+                KPC <%= @trip.number %> &bull; <%= @trip.location %> &bull; <%= @trip.year %>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px 40px;">
+
+              <p style="color:#333333; font-size:16px; margin:0 0 28px; line-height:1.5;">
+                <% if @open_spots.zero? %>
+                  Hey <strong><%= @golfer.nickname %></strong>, every night at the house is spoken for right now. Beds can still open up if someone drops out, and the committee is tracking demand. If you still want in, sign up now so we know.
+                <% else %>
+                  Hey <strong><%= @golfer.nickname %></strong>, there <%= @open_spots == 1 ? 'is' : 'are' %> still <strong><%= @open_spots %> <%= 'bed'.pluralize(@open_spots) %></strong> open for KPC <%= @trip.number %> &mdash; and they're going fast. The best beds go to the guys who stay the most nights and put their non-refundable 50% deposit down earliest<% if @trip.deposit_due_date %> (deposit due <strong><%= @trip.deposit_due_date.strftime("%B %-d") %></strong>)<% end %>. Sign up and pay your deposit before they're gone.
+                <% end %>
+              </p>
+
+              <!-- Open spots by night -->
+              <h3 style="color:#1a4d2e; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 8px; padding-bottom:6px; border-bottom:2px solid #1a4d2e;">
+                Open Beds by Night
+              </h3>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                <% @open_by_night.each_with_index do |(night, open), i| %>
+                  <tr style="<%= 'background-color:#f5faf7;' if i.odd? %>">
+                    <td style="padding:9px 12px; font-size:14px; color:#333333; border-bottom:1px solid #e8e8e8;">
+                      <%= night.date.strftime("%A, %B %-d") %>
+                    </td>
+                    <td style="padding:9px 12px; font-size:14px; color:<%= open.zero? ? '#999999' : '#1a4d2e' %>; font-weight:bold; text-align:right; border-bottom:1px solid #e8e8e8;">
+                      <%= open.zero? ? 'Full' : "#{open} open" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </table>
+
+              <!-- CTA -->
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 8px;">
+                <tr>
+                  <td style="background-color:#1a4d2e; border-radius:6px;">
+                    <a href="<%= @register_url %>" style="display:inline-block; padding:14px 32px; color:#ffffff; font-size:16px; font-weight:bold; text-decoration:none;">
+                      Sign up for KPC <%= @trip.number %>
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f5faf7; padding:20px 40px; text-align:center; border-top:1px solid #ddeee4;">
+              <p style="color:#aaaaaa; font-size:12px; margin:0 0 8px;">
+                Kitchen Pass Classic &bull; See you on the course 🏌️
+              </p>
+              <p style="color:#aaaaaa; font-size:12px; margin:0;">
+                Can't make it this year? <a href="<%= @opt_out_url %>" style="color:#aaaaaa;">Stop these emails</a>.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

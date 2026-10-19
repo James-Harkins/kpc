@@ -6,6 +6,7 @@ class Golfer < ApplicationRecord
   has_many :golfer_rounds, dependent: :destroy
   has_many :rounds, through: :golfer_rounds
   has_many :tournament_assignments, dependent: :destroy
+  has_many :bed_alert_opt_outs, dependent: :destroy
 
   validates_presence_of :first_name
   validates_presence_of :last_name

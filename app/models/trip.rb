@@ -10,6 +10,7 @@ class Trip < ApplicationRecord
   has_many :houses, dependent: :destroy
   has_many :bedrooms, through: :houses
   has_many :beds, through: :bedrooms
+  has_many :bed_alert_opt_outs, dependent: :destroy
 
   belongs_to :captain_a, class_name: 'Golfer', optional: true, foreign_key: 'captain_a_id'
   belongs_to :captain_b, class_name: 'Golfer', optional: true, foreign_key: 'captain_b_id'
@@ -73,6 +74,51 @@ class Trip < ApplicationRecord
        -golfer_trip.nights_attending,
        golfer_trip.deposit_met_at || golfer_trip.created_at,
        golfer_trip.created_at]
+    end
+  end
+
+  # Bed spots are counted per night, not per golfer: a golfer who leaves early
+  # and one who arrives later never share a night, so together they use a
+  # single spot. Total spots = sum of bed capacities across the trip's houses.
+  def total_bed_spots
+    beds.sum(:capacity)
+  end
+
+  def open_bed_spots_by_night
+    total   = total_bed_spots
+    counts  = GolferNight.where(night_id: nights.select(:id)).group(:night_id).count
+    nights.order(:date).map { |night| [night, [total - counts.fetch(night.id, 0), 0].max] }
+  end
+
+  # Spots a new golfer could still take on at least one night. 0 means every
+  # night is full ("true zero").
+  def open_bed_spots
+    open_bed_spots_by_night.map(&:last).max || 0
+  end
+
+  # Golfers who haven't registered for this trip and haven't opted out of
+  # bed-availability emails.
+  def bed_alert_recipients
+    Golfer.where.not(id: golfer_trips.select(:golfer_id))
+          .where.not(id: bed_alert_opt_outs.select(:golfer_id))
+  end
+
+  BED_ALERT_COOLDOWN = 1.hour
+
+  # Called after a signup. Emails the unregistered, non-opted-out golfers the
+  # new bed count at most once per BED_ALERT_COOLDOWN (keeps us under Resend's
+  # daily send cap; the next blast carries the latest count). Skipped for admin
+  # signups, which are bookkeeping. When a signup takes the trip from open beds
+  # to none, the admins are emailed and the golfer blast ignores the cooldown.
+  def send_bed_alerts(signed_up_golfer, had_open_spots)
+    return if total_bed_spots.zero?
+
+    reached_zero = had_open_spots && open_bed_spots.zero?
+    BulkMailJob.perform_later('bed_capacity_reached', Golfer.admin.ids, self) if reached_zero
+    return if signed_up_golfer.admin?
+
+    if claim_bed_alert_slot(force: reached_zero)
+      BulkMailJob.perform_later('bed_availability', bed_alert_recipients.ids, self)
     end
   end
 
@@ -173,6 +219,15 @@ class Trip < ApplicationRecord
   end
 
   private
+
+  # Atomically stamps last_bed_alert_at; true only for the caller that won the slot.
+  def claim_bed_alert_slot(force: false)
+    scope = Trip.where(id: id)
+    unless force
+      scope = scope.where('last_bed_alert_at IS NULL OR last_bed_alert_at <= ?', BED_ALERT_COOLDOWN.ago)
+    end
+    scope.update_all(last_bed_alert_at: Time.current) == 1
+  end
 
   def captains_must_be_different
     return unless captain_a_id.present? && captain_b_id.present?

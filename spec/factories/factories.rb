@@ -67,4 +67,9 @@ FactoryBot.define do
     capacity { 1 }
     sequence(:rank) { |n| n }
   end
+
+  factory :bed_alert_opt_out do
+    golfer
+    trip
+  end
 end

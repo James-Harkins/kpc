@@ -1,0 +1,12 @@
+<% if @open_spots.zero? %>KPC <%= @trip.number %> - The House Is Full<% else %>KPC <%= @trip.number %> - <%= @open_spots %> <%= 'Bed'.pluralize(@open_spots) %> Left<% end %>
+
+Hey <%= @golfer.nickname %>,
+
+<% if @open_spots.zero? %>Every night at the house is spoken for right now. Beds can still open up if someone drops out, and the committee is tracking demand. If you still want in, sign up now so we know.<% else %>There <%= @open_spots == 1 ? 'is' : 'are' %> still <%= @open_spots %> <%= 'bed'.pluralize(@open_spots) %> open for KPC <%= @trip.number %> -- and they're going fast. The best beds go to the guys who stay the most nights and put their non-refundable 50% deposit down earliest<% if @trip.deposit_due_date %> (deposit due <%= @trip.deposit_due_date.strftime("%B %-d") %>)<% end %>. Sign up and pay your deposit before they're gone.<% end %>
+
+OPEN BEDS BY NIGHT
+<% @open_by_night.each do |night, open| %>  <%= night.date.strftime("%A, %B %-d") %>: <%= open.zero? ? 'Full' : "#{open} open" %>
+<% end %>
+Sign up: <%= @register_url %>
+
+Can't make it this year? Stop these emails: <%= @opt_out_url %>

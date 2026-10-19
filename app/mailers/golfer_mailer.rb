@@ -92,4 +92,28 @@ class GolferMailer < ApplicationMailer
     @rounds      = golfer.rounds.where(trip_id: @trip.id).order(:date)
     mail(to: golfer.email, subject: "KPC #{@trip.number} - One Month Out (Balance Due)")
   end
+
+  def bed_availability(golfer, trip)
+    @golfer        = golfer
+    @trip          = trip
+    @open_spots    = trip.open_bed_spots
+    @open_by_night = trip.open_bed_spots_by_night
+    @register_url  = register_trip_url
+    @opt_out_url   = bed_alert_opt_out_url(token: BedAlertOptOut.token_for(golfer, trip))
+    subject = if @open_spots.zero?
+      "KPC #{trip.number} - The House Is Full"
+    else
+      "KPC #{trip.number} - #{@open_spots} #{'Bed'.pluralize(@open_spots)} Left"
+    end
+    mail(to: golfer.email, subject: subject)
+  end
+
+  def bed_capacity_reached(admin, trip)
+    @admin            = admin
+    @trip             = trip
+    @registered_count = trip.golfer_trips.count
+    @recipient_count  = trip.bed_alert_recipients.count
+    @bed_assignments_url = bed_assignments_url(trip_id: trip.id)
+    mail(to: admin.email, subject: "KPC #{trip.number} - Bed Capacity Hit 0")
+  end
 end

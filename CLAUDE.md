@@ -86,6 +86,9 @@ Join between `Golfer` and `Trip`. Tracks `cost`, `balance`, `is_paid`, `is_full_
 ### `House` / `Bedroom` / `Bed`
 `House` belongs to a `Trip` (`name`, `address`, `url` — rental listing link shown to golfers on the dashboard). Multiple houses per trip (main + overflow). `Bedroom` belongs to a house. `Bed` belongs to a bedroom: `description`, `capacity` (1 or 2), `rank` (1 = best; unique per trip, enforced in the model). Beds `has_many :golfer_trips, dependent: :nullify`. House/bed structure is site-admin; the `/bed_assignments` page (admin) shows the computed priority order and per-bed slot dropdowns — assignment is manual, admins take the best beds at their discretion.
 
+### Bed availability (`Trip`) and opt-outs (`BedAlertOptOut`)
+Spots are counted **per night**, not per golfer: `total_bed_spots` is the sum of bed capacities, `open_bed_spots_by_night` subtracts each night's `golfer_nights`, and `open_bed_spots` is the best night's free count (0 = true zero, every night full). A golfer who leaves early and one who arrives later never share a night, so they use one spot. `Trip#send_bed_alerts(golfer, had_open_spots)` is called from `GolferTripsController#create`; the golfer blast is rate-limited to once per `BED_ALERT_COOLDOWN` (1 hour, stamped in `trips.last_bed_alert_at`) to stay under Resend's daily send cap, except the hit-zero blast which always sends. `BedAlertOptOut` (golfer + trip, unique) is created from a signed link (`/bed_alerts/opt_out?token=`, GET confirms, POST opts out — no login). Opt-outs are per trip.
+
 ### `GolferRound`
 Join between `Golfer` and `Round`. Has a nullable `score` integer (total strokes — used for tournament ranking).
 
@@ -131,6 +134,10 @@ Located in `app/facades/`. Used in `GolferTripsController#create` to handle golf
 | `balance_final_notice` | Same rake task, 1 week before `trip.start_date` — unpaid balances only |
 | `deposit_reminder` | `emails:send_deposit_reminder` rake task (daily GitHub Actions cron; sends 1 week before `deposit_due_date` to golfers who haven't met their 50% deposit) |
 | `deposit_final_call` | Same rake task, on `deposit_due_date` itself — last-day warning that late deposits drop a priority tier |
+| `bed_availability` | After each non-admin signup, to every golfer not registered for the trip and not opted out ("X beds left" + open beds by night + per-golfer signed opt-out link; becomes "house is full" at 0) |
+| `bed_capacity_reached` | To all admins when a signup takes the trip from open beds to true zero |
+
+**Bulk sends:** anything going to many people goes through `BulkMailJob` (`perform_later('mailer_method', golfer_ids, *args)` — mailer method is a **String**, ActiveJob 5.2 can't serialize Symbols). It sends one message per golfer with a 0.6s gap (Resend rate limit) on the in-process async adapter, so the web request returns immediately. Transactional single-recipient mail stays `deliver_now`; the rake-task reminders run in their own process and keep their own sleeps.
 
 ---
 
@@ -157,6 +164,7 @@ POST /trip_financial_summaries
 
 GET/POST /announcements/new   announcements (site admin)
 GET/PATCH /password_resets
+GET/POST /bed_alerts/opt_out  bed_alert_opt_outs#show/create (signed token, no login)
 
 # Trip mgmt (site admin)
 GET/POST  /trips/new, /trips

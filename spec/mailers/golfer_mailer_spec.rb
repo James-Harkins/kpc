@@ -93,3 +93,69 @@ RSpec.describe GolferMailer, type: :mailer do
     end
   end
 end
+
+RSpec.describe GolferMailer, 'bed alerts', type: :mailer do
+  let(:trip) { create(:trip, deposit_due_date: Date.new(2027, 1, 1)) }
+  let(:golfer) { create(:golfer) }
+  let(:night)  { create(:night, trip: trip) }
+
+  before do
+    room = create(:bedroom, house: create(:house, trip: trip))
+    create(:bed, bedroom: room, capacity: 2)
+    create(:bed, bedroom: room, capacity: 1)
+    night
+  end
+
+  describe '#bed_availability' do
+    let(:mail) { GolferMailer.bed_availability(golfer, trip) }
+
+    it 'sends to the golfer with the bed count in the subject' do
+      expect(mail.to).to eq([golfer.email])
+      expect(mail.subject).to eq("KPC #{trip.number} - 3 Beds Left")
+    end
+
+    it 'uses the singular for one bed' do
+      2.times { create(:golfer_night, night: night) }
+      expect(mail.subject).to eq("KPC #{trip.number} - 1 Bed Left")
+    end
+
+    it 'says the house is full at zero' do
+      3.times { create(:golfer_night, night: night) }
+      expect(mail.subject).to eq("KPC #{trip.number} - The House Is Full")
+      expect(mail.text_part.body.encoded).to include('Every night at the house is spoken for')
+    end
+
+    it 'lists open beds by night and the registration link' do
+      body = mail.text_part.body.encoded
+      expect(body).to include('3 open')
+      expect(body).to include('/register_trip')
+    end
+
+    it 'mentions the deposit deadline when one is set' do
+      expect(mail.text_part.body.encoded).to include('deposit due January 1')
+    end
+
+    it 'includes a signed opt-out link for this golfer and trip' do
+      token = BedAlertOptOut.token_for(golfer, trip)
+      expect(mail.html_part.body.decoded).to include(CGI.escape(token))
+      expect(mail.text_part.body.encoded).to include('/bed_alerts/opt_out?token=')
+    end
+  end
+
+  describe '#bed_capacity_reached' do
+    let(:admin) { create(:golfer, :admin) }
+    let(:mail)  { GolferMailer.bed_capacity_reached(admin, trip) }
+
+    it 'sends to the admin' do
+      expect(mail.to).to eq([admin.email])
+      expect(mail.subject).to eq("KPC #{trip.number} - Bed Capacity Hit 0")
+    end
+
+    it 'reports registered and still-unregistered counts and links to bed assignments' do
+      create(:golfer_trip, trip: trip)
+      body = mail.text_part.body.encoded
+      expect(body).to include('1 golfers registered')
+      expect(body).to include("/bed_assignments?trip_id=#{trip.id}")
+    end
+  end
+end
