@@ -14,6 +14,9 @@ WORKDIR /rails
 RUN gem update --system 3.4.22 --no-document && \
     gem install -N bundler
 
+# bullseye is EOL: its security packages moved from security.debian.org to the archive
+RUN sed -i 's|http://security.debian.org|http://archive.debian.org|g' /etc/apt/sources.list
+
 # Install base packages needed to install nodejs
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libjemalloc2 postgresql-client && \
