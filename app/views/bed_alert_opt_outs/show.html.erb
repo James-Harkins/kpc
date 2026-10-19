@@ -1,0 +1,18 @@
+<style>
+body { display: flex; min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; }
+body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: url(<%= asset_path 'course_4.jpg' %>) center/cover no-repeat; z-index: -1; }
+.opt-out-card { margin: 30px; padding: 50px; max-width: 520px; text-align: center; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; color: black; background-color: white; opacity: 0.9; border-radius: 25px; }
+.opt-out-card button { margin: 1rem 0; background-color: #fff; padding: 20px; cursor: pointer; border-radius: 10px; }
+</style>
+
+<div class="opt-out-card">
+  <h2>Stop bed-availability emails?</h2>
+  <p>
+    Hey <%= @golfer.nickname %> &mdash; this stops the "beds left" emails for
+    KPC <%= @trip.number %> only. You'll still hear about future trips.
+  </p>
+  <%= form_with url: bed_alert_opt_out_path, method: :post, local: true do |form| %>
+    <%= hidden_field_tag :token, params[:token] %>
+    <%= form.submit "Yes, stop the emails" %>
+  <% end %>
+</div>

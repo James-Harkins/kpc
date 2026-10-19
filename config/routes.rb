@@ -79,6 +79,10 @@ Rails.application.routes.draw do
   get   '/bed_assignments', to: 'bed_assignments#index', as: :bed_assignments
   patch '/bed_assignments', to: 'bed_assignments#update'
 
+  # Bed-availability email opt-out (signed link, no login)
+  get  '/bed_alerts/opt_out', to: 'bed_alert_opt_outs#show',   as: :bed_alert_opt_out
+  post '/bed_alerts/opt_out', to: 'bed_alert_opt_outs#create'
+
   # Golfer trip admin editing
   get   '/golfer_trips/:id/edit', to: 'golfer_trips#edit',         as: :edit_golfer_trip
   patch '/golfer_trips/:id',      to: 'golfer_trips#admin_update', as: :golfer_trip

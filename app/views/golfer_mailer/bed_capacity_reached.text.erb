@@ -1,0 +1,9 @@
+KPC <%= @trip.number %> - Bed Capacity Hit 0
+
+Hey <%= @admin.nickname %>,
+
+The house just filled up: every night is at capacity with <%= @registered_count %> golfers registered.
+
+<%= @recipient_count %> <%= 'golfer'.pluralize(@recipient_count) %> haven't registered yet and will keep getting the "house is full" email, so sign-ups may continue. If they do, it's time to decide whether to book a second house. Beds also reopen if someone drops out or cuts their trip short.
+
+View bed assignments: <%= @bed_assignments_url %>

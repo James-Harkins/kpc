@@ -1,0 +1,13 @@
+<style>
+body { display: flex; min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; }
+body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: url(<%= asset_path 'course_4.jpg' %>) center/cover no-repeat; z-index: -1; }
+.opt-out-card { margin: 30px; padding: 50px; max-width: 520px; text-align: center; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; color: black; background-color: white; opacity: 0.9; border-radius: 25px; }
+</style>
+
+<div class="opt-out-card">
+  <h2>You're off the list</h2>
+  <p>
+    No more bed-availability emails for KPC <%= @trip.number %>. If your plans
+    change, you can still sign up any time while the trip is open.
+  </p>
+</div>

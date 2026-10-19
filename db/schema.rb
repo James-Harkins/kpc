@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_07_06_000006) do
+ActiveRecord::Schema.define(version: 2026_10_19_000002) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "bed_alert_opt_outs", force: :cascade do |t|
+    t.bigint "golfer_id", null: false
+    t.bigint "trip_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["golfer_id", "trip_id"], name: "index_bed_alert_opt_outs_on_golfer_id_and_trip_id", unique: true
+    t.index ["golfer_id"], name: "index_bed_alert_opt_outs_on_golfer_id"
+    t.index ["trip_id"], name: "index_bed_alert_opt_outs_on_trip_id"
+  end
 
   create_table "bedrooms", force: :cascade do |t|
     t.bigint "house_id", null: false
@@ -191,10 +201,13 @@ ActiveRecord::Schema.define(version: 2026_07_06_000006) do
     t.bigint "captain_a_id"
     t.bigint "captain_b_id"
     t.date "deposit_due_date"
+    t.datetime "last_bed_alert_at"
     t.index ["captain_a_id"], name: "index_trips_on_captain_a_id"
     t.index ["captain_b_id"], name: "index_trips_on_captain_b_id"
   end
 
+  add_foreign_key "bed_alert_opt_outs", "golfers"
+  add_foreign_key "bed_alert_opt_outs", "trips"
   add_foreign_key "bedrooms", "houses"
   add_foreign_key "beds", "bedrooms"
   add_foreign_key "expenses", "golfers"

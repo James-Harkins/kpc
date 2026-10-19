@@ -27,6 +27,7 @@ class GolferTripsController < ApplicationController
       flash[:error] = "You must acknowledge the non-refundable deposit policy."
       redirect_to "/register_trip" and return
     end
+    had_open_spots = trip.open_bed_spots > 0
     golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
 
     if golfer_trip.save
@@ -41,6 +42,7 @@ class GolferTripsController < ApplicationController
       end
       golfer_trip.save
       GolferMailer.trip_signup(golfer, golfer_trip).deliver_now unless golfer.admin?
+      trip.send_bed_alerts(golfer, had_open_spots)
       redirect_to "/dashboard"
     else
       flash[:error] = golfer.errors.full_messages.to_sentence + "."
