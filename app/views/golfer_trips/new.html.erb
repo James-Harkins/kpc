@@ -205,6 +205,9 @@ body::before {
         <%= hidden_field_tag 'deposit_policy_acknowledged', '0', id: nil %>
         <div class="cost-summary">
             <strong>Your total: $<span id="running-total">0</span></strong>
+            <% if current_user.admin? %>
+                <div class="discount-note" style="display: block;">Committee registration &mdash; no cost, and your bed is reserved all week. Check only the nights and rounds you'll actually attend so the headcount is accurate.</div>
+            <% end %>
             <div class="discount-note" id="discount-note">Full trip discount applied — Saturday night is free!</div>
         </div>
 
@@ -233,6 +236,7 @@ body::before {
 </div>
 
 <script>
+var isAdmin = <%= current_user.admin? %>;
 var firstNightCost = <%= @next_trip.nights.order(:date).first&.cost || 0 %>;
 var totalNights = document.querySelectorAll('input[name="nights[]"]').length;
 var totalRounds = document.querySelectorAll('input[name="rounds[]"]').length;
@@ -247,9 +251,10 @@ function updateTotal() {
 
     var isFullTrip = (nightsChecked.length === totalNights && roundsChecked.length === totalRounds);
     if (isFullTrip) total -= firstNightCost;
+    if (isAdmin) total = 0;
 
     document.getElementById('running-total').textContent = total;
-    document.getElementById('discount-note').style.display = isFullTrip ? 'block' : 'none';
+    document.getElementById('discount-note').style.display = (isFullTrip && !isAdmin) ? 'block' : 'none';
 }
 
 function updateDepositAck() {
