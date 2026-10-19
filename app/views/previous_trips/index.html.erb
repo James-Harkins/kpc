@@ -92,6 +92,13 @@ body::before {
     padding-top: 4px;
 }
 
+.all-time-attendance { text-align: center; }
+.all-time-attendance h3 { margin: 0 0 4px; }
+.all-time-attendance p { margin: 0; color: #555; }
+
+.expenses-heading { margin: 24px 0 0; }
+.expenses-list .expense-meta { display: block; font-size: 13px; color: #666; }
+
 .no-summary {
     color: #888;
     font-style: italic;
@@ -243,6 +250,10 @@ body::before {
 </style>
 
 <% if @trips.any? %>
+  <div class="next-trip-cost all-time-attendance">
+    <h3><%= number_with_delimiter(@all_time_attendance) %> different <%= 'golfer'.pluralize(@all_time_attendance) %> across <%= @trips.size %> <%= 'trip'.pluralize(@trips.size) %></h3>
+    <p>Unique attendance, committee included.</p>
+  </div>
   <% @trips.each do |trip| %>
     <div class="next-trip-cost">
       <h1>KPC <%= trip.number %></h1>
@@ -265,6 +276,10 @@ body::before {
               <td>Total Deficit</td>
               <td>$<%= number_with_delimiter(summary.total_deficit) %></td>
             </tr>
+            <tr>
+              <td>Attendance (unique golfers, committee included)</td>
+              <td><%= trip.unique_attendance %></td>
+            </tr>
             <tr class="summary-section-header">
               <td colspan="2">Committee</td>
             </tr>
@@ -280,6 +295,38 @@ body::before {
         </table>
       <% else %>
         <p class="no-summary">No financial summary recorded.</p>
+        <table class="finances-summary">
+          <tbody>
+            <tr>
+              <td>Attendance (unique golfers, committee included)</td>
+              <td><%= trip.unique_attendance %></td>
+            </tr>
+          </tbody>
+        </table>
+      <% end %>
+
+      <% expenses = trip.expenses_by_amount.to_a %>
+      <h3 class="expenses-heading">Expenses</h3>
+      <% if expenses.any? %>
+        <table class="finances-summary expenses-list">
+          <tbody>
+            <% expenses.each do |expense| %>
+              <tr>
+                <td>
+                  <%= expense.description %>
+                  <span class="expense-meta"><%= expense.date&.strftime('%b %-d, %Y') %><%= " - paid by #{expense.golfer.nickname.strip.titleize}" if expense.golfer %></span>
+                </td>
+                <td>$<%= number_with_delimiter(expense.amount) %></td>
+              </tr>
+            <% end %>
+            <tr class="balance-row">
+              <td>Listed expenses total</td>
+              <td>$<%= number_with_delimiter(expenses.sum(&:amount)) %></td>
+            </tr>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="no-summary">No expenses recorded.</p>
       <% end %>
 
       <hr class="line">

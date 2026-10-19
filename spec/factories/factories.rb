@@ -41,6 +41,13 @@ FactoryBot.define do
     cost { 75 }
   end
 
+  factory :expense do
+    trip
+    golfer
+    description { 'Supplies' }
+    amount { 100 }
+  end
+
   factory :golfer_round do
     golfer
     round

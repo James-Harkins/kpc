@@ -326,3 +326,54 @@ RSpec.describe Trip, type: :model do
     end
   end
 end
+
+RSpec.describe Trip, 'previous trip helpers' do
+  let(:trip) { create(:trip) }
+  let(:admin) { create(:golfer, :admin) }
+  let(:regular) { create(:golfer) }
+
+  describe '#unique_attendance' do
+    it 'counts registered golfers once each, admins included' do
+      create(:golfer_trip, golfer: admin, trip: trip)
+      create(:golfer_trip, golfer: regular, trip: trip)
+      expect(trip.unique_attendance).to eq(2)
+    end
+
+    it 'is zero for a trip nobody registered for' do
+      expect(trip.unique_attendance).to eq(0)
+    end
+
+    it 'ignores golfers registered for other trips' do
+      create(:golfer_trip, golfer: regular, trip: create(:trip))
+      expect(trip.unique_attendance).to eq(0)
+    end
+  end
+
+  describe '.unique_attendance_across' do
+    it 'counts a golfer who went to several trips once' do
+      other = create(:trip)
+      [trip, other].each { |t| create(:golfer_trip, golfer: regular, trip: t) }
+      create(:golfer_trip, golfer: admin, trip: other)
+      expect(Trip.unique_attendance_across([trip, other])).to eq(2)
+    end
+
+    it 'is zero for no trips' do
+      expect(Trip.unique_attendance_across([])).to eq(0)
+    end
+  end
+
+  describe '#expenses_by_amount' do
+    it 'orders largest first, then newest date for ties' do
+      small  = create(:expense, trip: trip, amount: 50,  date: Date.new(2026, 1, 1))
+      big    = create(:expense, trip: trip, amount: 900, date: Date.new(2026, 1, 1))
+      tie_old = create(:expense, trip: trip, amount: 200, date: Date.new(2026, 1, 1))
+      tie_new = create(:expense, trip: trip, amount: 200, date: Date.new(2026, 2, 1))
+      expect(trip.expenses_by_amount.to_a).to eq([big, tie_new, tie_old, small])
+    end
+
+    it 'only includes this trip' do
+      create(:expense, trip: create(:trip), amount: 999)
+      expect(trip.expenses_by_amount).to be_empty
+    end
+  end
+end

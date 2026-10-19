@@ -139,6 +139,21 @@ class Trip < ApplicationRecord
     end
   end
 
+  # Distinct golfers registered for this trip, committee included (unlike man nights).
+  def unique_attendance
+    golfer_trips.distinct.count(:golfer_id)
+  end
+
+  # Distinct golfers across all of the given trips; a golfer who went to several counts once.
+  def self.unique_attendance_across(trips)
+    GolferTrip.where(trip_id: trips.map(&:id)).distinct.count(:golfer_id)
+  end
+
+  # Largest expense first; ties broken by newest date.
+  def expenses_by_amount
+    expenses.includes(:golfer).order(amount: :desc, date: :desc, id: :asc)
+  end
+
   def paid_golfer_trips
     golfer_trips.where(is_paid: true)
   end

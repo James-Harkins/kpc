@@ -5,5 +5,6 @@ class PreviousTripsController < ApplicationController
     @trips = Trip.where(completed: true)
                  .order(number: :desc)
                  .includes(:trip_financial_summary, :nights, :rounds)
+    @all_time_attendance = Trip.unique_attendance_across(@trips)
   end
 end
