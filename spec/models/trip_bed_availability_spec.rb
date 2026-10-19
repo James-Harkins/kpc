@@ -46,13 +46,28 @@ RSpec.describe Trip, 'bed availability' do
       expect(trip.open_bed_spots_by_night.map(&:last)).to eq([0, 0, 0])
     end
 
-    it 'only reaches true zero when every night is full' do
+    it 'has no full-week bed once any night is full, but still has room on other nights' do
       attend(create(:golfer), *nights)
       attend(create(:golfer), nights[0], nights[1])
-      expect(trip.open_bed_spots).to eq(1)
+      expect(trip.open_bed_spots).to eq(0)
+      expect(trip.open_bed_spots_any_night).to eq(1)
+      expect(trip.full_night_ids).to match_array([nights[0].id, nights[1].id])
 
       attend(create(:golfer), nights[2])
+      expect(trip.open_bed_spots_any_night).to eq(0)
+      expect(trip.full_night_ids).to match_array(nights.map(&:id))
+    end
+
+    it 'does not report a middle-of-the-week gap as an open bed' do
+      attend(create(:golfer), nights[0], nights[2])
+      attend(create(:golfer), *nights)
+      expect(trip.open_bed_spots_by_night.map(&:last)).to eq([0, 1, 0])
       expect(trip.open_bed_spots).to eq(0)
+    end
+
+    it 'reports every spot as full-week open on an empty trip' do
+      expect(trip.open_bed_spots).to eq(2)
+      expect(trip.full_night_ids).to eq([])
     end
 
     it 'never goes below zero when overbooked' do
@@ -64,6 +79,9 @@ RSpec.describe Trip, 'bed availability' do
       2.times { attend(create(:golfer), *nights) }
       expect(trip.open_bed_spots).to eq(0)
       GolferNight.where(night: nights[1]).first.destroy
+      expect(trip.open_bed_spots_any_night).to eq(1)
+      expect(trip.open_bed_spots).to eq(0)
+      GolferNight.where(golfer_id: GolferTrip.first.golfer_id).destroy_all
       expect(trip.open_bed_spots).to eq(1)
     end
 
@@ -118,6 +136,10 @@ RSpec.describe Trip, 'bed availability' do
     let!(:admin) { create(:golfer, :admin) }
 
     context 'with no beds entered' do
+      it 'blocks no nights' do
+        expect(trip.full_night_ids).to eq([])
+      end
+
       it 'sends nothing' do
         expect { trip.send_bed_alerts(signer, true) }.not_to have_enqueued_job(BulkMailJob)
       end

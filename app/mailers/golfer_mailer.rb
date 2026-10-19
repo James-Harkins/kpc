@@ -97,13 +97,16 @@ class GolferMailer < ApplicationMailer
     @golfer        = golfer
     @trip          = trip
     @open_spots    = trip.open_bed_spots
+    @any_open      = trip.open_bed_spots_any_night > 0
     @open_by_night = trip.open_bed_spots_by_night
     @register_url  = register_trip_url
     @opt_out_url   = bed_alert_opt_out_url(token: BedAlertOptOut.token_for(golfer, trip))
-    subject = if @open_spots.zero?
-      "KPC #{trip.number} - The House Is Full"
-    else
+    subject = if @open_spots > 0
       "KPC #{trip.number} - #{@open_spots} #{'Bed'.pluralize(@open_spots)} Left"
+    elsif @any_open
+      "KPC #{trip.number} - No Full-Week Beds Left"
+    else
+      "KPC #{trip.number} - The House Is Full"
     end
     mail(to: golfer.email, subject: subject)
   end
@@ -113,7 +116,9 @@ class GolferMailer < ApplicationMailer
     @trip             = trip
     @registered_count = trip.golfer_trips.count
     @recipient_count  = trip.bed_alert_recipients.count
+    @open_by_night    = trip.open_bed_spots_by_night
+    @any_open         = trip.open_bed_spots_any_night > 0
     @bed_assignments_url = bed_assignments_url(trip_id: trip.id)
-    mail(to: admin.email, subject: "KPC #{trip.number} - Bed Capacity Hit 0")
+    mail(to: admin.email, subject: "KPC #{trip.number} - No Full-Week Beds Left")
   end
 end

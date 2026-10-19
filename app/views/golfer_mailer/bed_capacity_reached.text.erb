@@ -1,9 +1,9 @@
-KPC <%= @trip.number %> - Bed Capacity Hit 0
+KPC <%= @trip.number %> - No Full-Week Beds Left
 
 Hey <%= @admin.nickname %>,
 
-The house just filled up: every night is at capacity with <%= @registered_count %> golfers registered.
+<% if @any_open %>No bed is open for the full week anymore (<%= @registered_count %> golfers registered), but some nights still have room: <%= @open_by_night.select { |_n, o| o > 0 }.map { |n, o| "#{n.date.strftime('%a %-m/%-d')} (#{o})" }.join(', ') %>.<% else %>The house just filled up: every night is at capacity with <%= @registered_count %> golfers registered.<% end %>
 
-<%= @recipient_count %> <%= 'golfer'.pluralize(@recipient_count) %> haven't registered yet and will keep getting the "house is full" email, so sign-ups may continue. If they do, it's time to decide whether to book a second house. Beds also reopen if someone drops out or cuts their trip short.
+<%= @recipient_count %> <%= 'golfer'.pluralize(@recipient_count) %> haven't registered yet and will keep getting the "house is full" email, so sign-ups may continue. Registration is blocked on full nights, so anyone who wants a full week now needs a second house -- time to decide whether to book one. Beds also reopen if someone drops out or cuts their trip short.
 
 View bed assignments: <%= @bed_assignments_url %>

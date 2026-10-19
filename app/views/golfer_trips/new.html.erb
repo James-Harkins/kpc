@@ -196,7 +196,11 @@ body::before {
     <% end %>
 
     <div class="enchilada-section">
-        <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id, deposit_policy_acknowledged: '0'}, class: 'btn-outline-primary' %>
+        <% if @full_night_ids.any? %>
+            <p><strong>The house is full on some nights, so the full trip can't be booked.</strong> Pick the nights below that still have room.</p>
+        <% else %>
+            <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id, deposit_policy_acknowledged: '0'}, class: 'btn-outline-primary' %>
+        <% end %>
     </div>
 
     <hr class="line">
@@ -215,8 +219,9 @@ body::before {
             <div class="date-card">
                 <h3><%= date[:date] %></h3>
                 <div class="checkbox-item">
-                    <%= check_box_tag 'nights[]', date[:night][:id], false, data: { cost: date[:night][:cost] }, onchange: 'updateTotal()' %>
-                    <span>Night at House &mdash; $<%= date[:night][:cost] %></span>
+                    <% night_full = @full_night_ids.include?(date[:night][:id]) %>
+                    <%= check_box_tag 'nights[]', date[:night][:id], false, data: { cost: date[:night][:cost] }, onchange: 'updateTotal()', disabled: night_full %>
+                    <span>Night at House &mdash; $<%= date[:night][:cost] %><%= ' — House full' if night_full %></span>
                 </div>
                 <% if date[:round].values.any? %>
                     <div class="checkbox-item">

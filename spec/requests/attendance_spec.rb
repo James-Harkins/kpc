@@ -19,7 +19,7 @@ RSpec.describe 'Attendance open bed count', type: :request do
     create(:bed, bedroom: room, capacity: 2)
     create(:golfer_night, night: nights[0])
     get '/attendance', params: { trip_id: trip.id }
-    expect(response.body).to include('Open Bed Count', '2 of 2 open')
+    expect(response.body).to include('Open Bed Count', '1 of 2 open all week')
     expect(response.body).to include("#{nights[0].date.strftime('%a %-m/%-d')}: 1")
     expect(response.body).to include("#{nights[1].date.strftime('%a %-m/%-d')}: 2")
   end
@@ -29,7 +29,15 @@ RSpec.describe 'Attendance open bed count', type: :request do
     golfer = create(:golfer)
     nights.each { |night| create(:golfer_night, golfer: golfer, night: night) }
     get '/attendance', params: { trip_id: trip.id }
-    expect(response.body).to include('1 of 2 open')
+    expect(response.body).to include('1 of 2 open all week')
+  end
+
+  it 'flags nights that still have room once the full week is gone' do
+    create(:bed, bedroom: room, capacity: 1)
+    create(:golfer_night, night: nights[0])
+    get '/attendance', params: { trip_id: trip.id }
+    expect(response.body).to include('0 of 1 open all week', 'No full-week beds left')
+    expect(response.body).not_to include('Every night is full')
   end
 
   it 'says so when the house is full' do
@@ -37,7 +45,7 @@ RSpec.describe 'Attendance open bed count', type: :request do
     create(:golfer_night, night: nights[0])
     create(:golfer_night, night: nights[1])
     get '/attendance', params: { trip_id: trip.id }
-    expect(response.body).to include('0 of 1 open', 'Every night is full')
+    expect(response.body).to include('0 of 1 open all week', 'Every night is full')
   end
 
   it 'says when no beds have been entered' do

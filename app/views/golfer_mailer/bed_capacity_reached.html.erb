@@ -13,7 +13,7 @@
             <td style="background-color:#1a4d2e; padding:36px 40px; text-align:center;">
               <div style="font-size:42px; line-height:1; margin-bottom:12px;">🛏️</div>
               <h1 style="color:#ffffff; margin:0 0 8px; font-size:26px; font-weight:bold; letter-spacing:1px;">
-                Bed Capacity Hit 0
+                No Full-Week Beds Left
               </h1>
               <p style="color:#a8d5b5; margin:0; font-size:15px;">
                 KPC <%= @trip.number %> &bull; <%= @trip.location %> &bull; <%= @trip.year %>
@@ -26,10 +26,15 @@
             <td style="padding:32px 40px;">
 
               <p style="color:#333333; font-size:16px; margin:0 0 20px; line-height:1.5;">
-                Hey <strong><%= @admin.nickname %></strong>, the house just filled up: <strong>every night is at capacity</strong> with <%= @registered_count %> golfers registered.
+                Hey <strong><%= @admin.nickname %></strong>,
+                <% if @any_open %>
+                  <strong>no bed is open for the full week anymore</strong> (<%= @registered_count %> golfers registered), but some nights still have room: <%= @open_by_night.select { |_n, o| o > 0 }.map { |n, o| "#{n.date.strftime('%a %-m/%-d')} (#{o})" }.join(', ') %>.
+                <% else %>
+                  the house just filled up: <strong>every night is at capacity</strong> with <%= @registered_count %> golfers registered.
+                <% end %>
               </p>
               <p style="color:#333333; font-size:16px; margin:0 0 28px; line-height:1.5;">
-                <%= @recipient_count %> <%= 'golfer'.pluralize(@recipient_count) %> haven't registered yet and will keep getting the "house is full" email, so sign-ups may continue. If they do, it's time to decide whether to book a second house. Beds also reopen if someone drops out or cuts their trip short.
+                <%= @recipient_count %> <%= 'golfer'.pluralize(@recipient_count) %> haven't registered yet and will keep getting the "house is full" email, so sign-ups may continue. Registration is blocked on full nights, so anyone who wants a full week now needs a second house — time to decide whether to book one. Beds also reopen if someone drops out or cuts their trip short.
               </p>
 
               <!-- CTA -->

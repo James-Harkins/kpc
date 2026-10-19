@@ -125,6 +125,16 @@ RSpec.describe GolferMailer, 'bed alerts', type: :mailer do
       expect(mail.text_part.body.encoded).to include('Every night at the house is spoken for')
     end
 
+    it 'says there is no full-week bed when only some nights have room' do
+      create(:night, trip: trip)
+      3.times { create(:golfer_night, night: night) }
+      body = mail.text_part.body.encoded
+      expect(mail.subject).to eq("KPC #{trip.number} - No Full-Week Beds Left")
+      expect(body).to include("no room for the full week")
+      expect(body).to include('Full')
+      expect(body).to include('3 open')
+    end
+
     it 'lists open beds by night and the registration link' do
       body = mail.text_part.body.encoded
       expect(body).to include('3 open')
@@ -148,7 +158,13 @@ RSpec.describe GolferMailer, 'bed alerts', type: :mailer do
 
     it 'sends to the admin' do
       expect(mail.to).to eq([admin.email])
-      expect(mail.subject).to eq("KPC #{trip.number} - Bed Capacity Hit 0")
+      expect(mail.subject).to eq("KPC #{trip.number} - No Full-Week Beds Left")
+    end
+
+    it 'names the nights that still have room when only the full week is gone' do
+      create(:night, trip: trip)
+      3.times { create(:golfer_night, night: night) }
+      expect(mail.text_part.body.encoded).to include('no bed is open for the full week'.capitalize)
     end
 
     it 'reports registered and still-unregistered counts and links to bed assignments' do

@@ -96,10 +96,21 @@ class Trip < ApplicationRecord
     nights.order(:date).map { |night| [night, [total - reserved_count - counts.fetch(night.id, 0), 0].max] }
   end
 
-  # Spots a new golfer could still take on at least one night. 0 means every
-  # night is full ("true zero").
+  # Beds a full-week guest could still take: the tightest night decides. 0 means
+  # no bed is open for the whole trip, even if some nights have room.
   def open_bed_spots
+    open_bed_spots_by_night.map(&:last).min || 0
+  end
+
+  # Most spots open on any single night, for "some nights still have room".
+  def open_bed_spots_any_night
     open_bed_spots_by_night.map(&:last).max || 0
+  end
+
+  # Nights with every spot taken. Empty until beds have been entered.
+  def full_night_ids
+    return [] if total_bed_spots.zero?
+    open_bed_spots_by_night.select { |_night, open| open.zero? }.map { |night, _open| night.id }
   end
 
   # Golfers who haven't registered for this trip and haven't opted out of

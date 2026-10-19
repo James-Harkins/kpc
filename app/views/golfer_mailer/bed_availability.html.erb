@@ -13,10 +13,12 @@
             <td style="background-color:#1a4d2e; padding:36px 40px; text-align:center;">
               <div style="font-size:42px; line-height:1; margin-bottom:12px;">🛏️</div>
               <h1 style="color:#ffffff; margin:0 0 8px; font-size:26px; font-weight:bold; letter-spacing:1px;">
-                <% if @open_spots.zero? %>
-                  The House Is Full
-                <% else %>
+                <% if @open_spots > 0 %>
                   <%= @open_spots %> <%= 'Bed'.pluralize(@open_spots) %> Left
+                <% elsif @any_open %>
+                  No Full-Week Beds Left
+                <% else %>
+                  The House Is Full
                 <% end %>
               </h1>
               <p style="color:#a8d5b5; margin:0; font-size:15px;">
@@ -30,10 +32,12 @@
             <td style="padding:32px 40px;">
 
               <p style="color:#333333; font-size:16px; margin:0 0 28px; line-height:1.5;">
-                <% if @open_spots.zero? %>
-                  Hey <strong><%= @golfer.nickname %></strong>, every night at the house is spoken for right now. Beds can still open up if someone drops out, and the committee is tracking demand. If you still want in, sign up now so we know.
+                <% if @open_spots > 0 %>
+                  Hey <strong><%= @golfer.nickname %></strong>, there <%= @open_spots == 1 ? 'is' : 'are' %> still <strong><%= @open_spots %> <%= 'bed'.pluralize(@open_spots) %></strong> open for the full week at KPC <%= @trip.number %> &mdash; and they're going fast. The best beds go to the guys who stay the most nights and put their non-refundable 50% deposit down earliest<% if @trip.deposit_due_date %> (deposit due <strong><%= @trip.deposit_due_date.strftime("%B %-d") %></strong>)<% end %>. Sign up and pay your deposit before they're gone.
+                <% elsif @any_open %>
+                  Hey <strong><%= @golfer.nickname %></strong>, every bed at KPC <%= @trip.number %> is taken for at least one night, so there's no room for the full week. A few nights still have space (below) &mdash; if you can only make those, sign up. Nights marked Full can't be booked. Beds can also open up if someone drops out.
                 <% else %>
-                  Hey <strong><%= @golfer.nickname %></strong>, there <%= @open_spots == 1 ? 'is' : 'are' %> still <strong><%= @open_spots %> <%= 'bed'.pluralize(@open_spots) %></strong> open for KPC <%= @trip.number %> &mdash; and they're going fast. The best beds go to the guys who stay the most nights and put their non-refundable 50% deposit down earliest<% if @trip.deposit_due_date %> (deposit due <strong><%= @trip.deposit_due_date.strftime("%B %-d") %></strong>)<% end %>. Sign up and pay your deposit before they're gone.
+                  Hey <strong><%= @golfer.nickname %></strong>, every night at the house is spoken for right now. Beds can still open up if someone drops out, and the committee is tracking demand. Check back soon.
                 <% end %>
               </p>
 

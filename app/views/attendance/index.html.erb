@@ -228,11 +228,13 @@ body::before {
             <% if @total_bed_spots.zero? %>
                 <h4>No beds have been entered for this trip yet.</h4>
             <% else %>
-                <h4><%= @open_bed_spots %> of <%= @total_bed_spots %> open</h4>
+                <h4><%= @open_bed_spots %> of <%= @total_bed_spots %> open all week</h4>
                 <h5>
                     <%= @open_beds_by_night.map { |night, open| "#{night.date.strftime('%a %-m/%-d')}: #{open}" }.join(' &bull; ').html_safe %>
                 </h5>
-                <% if @open_bed_spots.zero? %>
+                <% if @open_bed_spots.zero? && @any_night_open %>
+                    <h5>No full-week beds left &mdash; some nights still have room.</h5>
+                <% elsif @open_bed_spots.zero? %>
                     <h5>Every night is full.</h5>
                 <% end %>
             <% end %>

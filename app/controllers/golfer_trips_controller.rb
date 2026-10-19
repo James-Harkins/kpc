@@ -17,6 +17,7 @@ class GolferTripsController < ApplicationController
       redirect_to "/dashboard"
     else
       @trip = @next_trip.sort_by_calendar
+      @full_night_ids = current_user.admin? ? [] : @next_trip.full_night_ids
     end
   end
 
@@ -33,6 +34,13 @@ class GolferTripsController < ApplicationController
     if trip.deposit_due_date.present? && !golfer.admin? && params[:deposit_policy_acknowledged] != "1"
       flash[:error] = "You must acknowledge the non-refundable deposit policy."
       redirect_to "/register_trip" and return
+    end
+    unless golfer.admin?
+      full_nights = trip.nights.where(id: trip.full_night_ids & requested_night_ids(trip)).order(:date)
+      if full_nights.any?
+        flash[:error] = "The house is already full on #{full_nights.map { |n| n.date.strftime('%a %-m/%-d') }.to_sentence}. Uncheck #{full_nights.one? ? 'that night' : 'those nights'} to sign up, or contact the committee."
+        redirect_to "/register_trip" and return
+      end
     end
     had_open_spots = trip.open_bed_spots > 0
     golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
@@ -155,5 +163,12 @@ class GolferTripsController < ApplicationController
     @golfer_trip.save!
 
     redirect_to "/finances?trip_id=#{@trip.id}"
+  end
+
+  private
+
+  def requested_night_ids(trip)
+    return trip.nights.pluck(:id) if params[:full_trip]
+    Array(params[:nights]).map(&:to_i)
   end
 end
