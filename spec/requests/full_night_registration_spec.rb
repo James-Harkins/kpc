@@ -94,3 +94,26 @@ RSpec.describe 'Registration with nothing selected', type: :request do
     expect { post '/register_trip', params: { nights: [night.id.to_s] } }.to change(GolferTrip, :count).by(1)
   end
 end
+
+RSpec.describe 'Registration form guards', type: :request do
+  let(:trip) { create(:trip) }
+  let!(:night) { create(:night, trip: trip) }
+  let(:golfer) { create(:golfer) }
+
+  before do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with('CURRENT_TRIP_NUMBER').and_return(trip.number)
+    post '/login', params: { email: golfer.email, password: 'test1234' }
+    get '/register_trip'
+  end
+
+  it 'has an inline message for submitting with nothing ticked' do
+    expect(response.body).to include('id="selection-error"', 'Pick at least one night or round to sign up.')
+  end
+
+  it 're-syncs the deposit box into the hidden field when the form is submitted' do
+    submit_handler = response.body[/addEventListener\('submit'.*?\n    \}\);/m]
+    expect(submit_handler).to match(/updateDepositAck\(\);/)
+    expect(submit_handler.index('updateDepositAck();')).to be < submit_handler.index('ackBox.checked')
+  end
+end

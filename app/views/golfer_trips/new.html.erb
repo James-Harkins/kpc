@@ -242,6 +242,9 @@ body::before {
             </div>
         <% end %>
 
+        <div id="selection-error" class="house-full" style="display: none; margin-bottom: 8px;">
+            Pick at least one night or round to sign up.
+        </div>
         <%= form.submit "Sign me up, motherfucker!", class: 'btn-outline-primary' %>
     <% end %>
 </div>
@@ -264,6 +267,9 @@ function updateTotal() {
     if (isFullTrip) total -= firstNightCost;
     if (isAdmin) total = 0;
 
+    var selectionError = document.getElementById('selection-error');
+    if (selectionError && (nightsChecked.length > 0 || roundsChecked.length > 0)) selectionError.style.display = 'none';
+
     document.getElementById('running-total').textContent = total;
     document.getElementById('discount-note').style.display = (isFullTrip && !isAdmin) ? 'block' : 'none';
 }
@@ -282,12 +288,25 @@ function updateDepositAck() {
 
 document.querySelectorAll('.trip-register-container form').forEach(function(form) {
     form.addEventListener('submit', function(event) {
+        // Keep the hidden field in step with the box at the moment of submit, even if the browser restored its state
+        updateDepositAck();
+
         var ackBox = document.getElementById('deposit-ack');
         if (ackBox && !ackBox.checked) {
             event.preventDefault();
             var error = document.getElementById('deposit-ack-error');
             error.style.display = 'block';
             error.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // The pick-your-nights form (not the whole-trip button) needs at least one night or round ticked
+        var picksNights = form.querySelector('input[name="nights[]"], input[name="rounds[]"]');
+        if (picksNights && !form.querySelector('input[name="nights[]"]:checked, input[name="rounds[]"]:checked')) {
+            event.preventDefault();
+            var selectionError = document.getElementById('selection-error');
+            selectionError.style.display = 'block';
+            selectionError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
 });
