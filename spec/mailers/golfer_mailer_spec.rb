@@ -141,6 +141,19 @@ RSpec.describe GolferMailer, 'bed alerts', type: :mailer do
       expect(body).to include('/register_trip')
     end
 
+    it 'reads exactly as written when full-week beds are open' do
+      expect(mail.text_part.body.encoded).to include(
+        "Hey #{golfer.nickname}. There are still 3 beds open for the full week at KPC #{trip.number} and they're going fast. " \
+        "The best beds go to the guys who stay the most nights and put their non-refundable 50% deposit down earliest " \
+        "(deposit due January 1). Sign up and pay your deposit before they're gone! See you in #{trip.location}!"
+      )
+    end
+
+    it 'uses the singular for one bed in the body' do
+      2.times { create(:golfer_night, night: night) }
+      expect(mail.text_part.body.encoded).to include('There is still 1 bed open for the full week')
+    end
+
     it 'mentions the deposit deadline when one is set' do
       expect(mail.text_part.body.encoded).to include('deposit due January 1')
     end
