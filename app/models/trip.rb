@@ -169,10 +169,13 @@ class Trip < ApplicationRecord
     total_projected_revenue - total_expenses
   end
 
+  # Committee members don't count: only regular golfers' nights, less the comped
+  # first night on their full-trip registrations.
   def total_man_nights
-    man_nights = 0
-    nights.each {|night| man_nights += night.golfer_nights.length}
-    man_nights - number_of_full_trips
+    regular = { golfers: { role: Golfer.roles[:default] } }
+    regular_nights = GolferNight.joins(:golfer).where(night_id: nights.select(:id)).where(regular).count
+    regular_full_trips = golfer_trips.joins(:golfer).where(is_full_trip: true).where(regular).count
+    regular_nights - regular_full_trips
   end
 
   def number_of_full_trips

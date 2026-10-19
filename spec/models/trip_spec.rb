@@ -223,8 +223,20 @@ RSpec.describe Trip, type: :model do
     end
 
     describe '#total_man_nights' do
-      it 'returns sum of golfer_nights minus number of full trips' do
-        # 2 golfer_nights for @golfer - 1 full trip (@admin2_trip) = 1
+      it "counts only regular golfers' nights, ignoring admins and their full trips" do
+        # @golfer (regular) has 2 golfer_nights; @admin2_trip is a full trip but belongs to an admin
+        expect(@trip.total_man_nights).to eq(2)
+      end
+
+      it "ignores an admin's golfer_nights" do
+        @admin1.golfer_nights.create!(night: @night1)
+        @admin1.golfer_nights.create!(night: @night2)
+        expect(@trip.total_man_nights).to eq(2)
+      end
+
+      it 'still subtracts the comped first night for a regular golfer on a full trip' do
+        @trip.golfer_trips.find_by(golfer: @golfer)&.update!(is_full_trip: true) ||
+          @trip.golfer_trips.create!(golfer: @golfer, cost: 0, balance: 0, is_full_trip: true)
         expect(@trip.total_man_nights).to eq(1)
       end
     end
