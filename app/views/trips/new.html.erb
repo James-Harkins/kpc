@@ -90,6 +90,7 @@ input[type="text"], input[type="number"], input[type="date"], select {
                 <th>Location</th>
                 <th>Start Date</th>
                 <th>Deposit Due Date</th>
+                <th>Registration Open</th>
             </tr>
             <tr>
                 <td><%= form.text_field :year %></td>
@@ -97,6 +98,7 @@ input[type="text"], input[type="number"], input[type="date"], select {
                 <td><%= form.text_field :location %></td>
                 <td><%= form.text_field :start_date, placeholder: 'YYYY-MM-DD' %></td>
                 <td><%= form.text_field :deposit_due_date, placeholder: 'YYYY-MM-DD' %></td>
+                <td><%= form.check_box :registration_open %></td>
             </tr>
         </table>
 

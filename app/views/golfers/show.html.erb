@@ -625,7 +625,11 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         </div>
       <% else %>
         <div class='next-trip-cost' style="text-align: center;">
-          <%= button_to "Sign up for KPC #{@next_trip.number}", "/register_trip", method: :get, class: "btn btn-outline-primary" %>
+          <% if @next_trip.registration_open? %>
+            <%= button_to "Sign up for KPC #{@next_trip.number}", "/register_trip", method: :get, class: "btn btn-outline-primary" %>
+          <% else %>
+            <h3>Registration for KPC <%= @next_trip.number %> isn't open yet &mdash; watch your email.</h3>
+          <% end %>
         </div>
       <% end %>
       <% end %>

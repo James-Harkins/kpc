@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_10_19_000003) do
+ActiveRecord::Schema.define(version: 2026_10_19_000005) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -203,6 +203,7 @@ ActiveRecord::Schema.define(version: 2026_10_19_000003) do
     t.bigint "captain_b_id"
     t.date "deposit_due_date"
     t.datetime "last_bed_alert_at"
+    t.boolean "registration_open", default: false, null: false
     t.index ["captain_a_id"], name: "index_trips_on_captain_a_id"
     t.index ["captain_b_id"], name: "index_trips_on_captain_b_id"
   end

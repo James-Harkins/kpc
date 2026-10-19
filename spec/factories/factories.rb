@@ -18,6 +18,11 @@ FactoryBot.define do
     sequence(:number) { |n| "TEST#{n}" }
     location { "Dewey Beach" }
     start_date { Date.new(2026, 9, 16) }
+    registration_open { true }
+
+    trait :registration_closed do
+      registration_open { false }
+    end
 
     trait :with_deposit_deadline do
       deposit_due_date { Date.new(2026, 6, 1) }

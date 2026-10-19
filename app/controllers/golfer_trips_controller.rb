@@ -9,7 +9,10 @@ class GolferTripsController < ApplicationController
       flash[:login] = "No trip is currently open for registration."
       redirect_to '/dashboard' and return
     end
-    if current_user.is_registered_for_next_trip(@next_trip)
+    if !@next_trip.registration_open? && !current_user.admin?
+      flash[:login] = "Registration for KPC #{@next_trip.number} isn't open yet."
+      redirect_to "/dashboard"
+    elsif current_user.is_registered_for_next_trip(@next_trip)
       flash[:login] = "You're already signed up."
       redirect_to "/dashboard"
     else
@@ -21,6 +24,10 @@ class GolferTripsController < ApplicationController
     golfer = current_user
     trip = Trip.current
     if trip.nil?
+      redirect_to '/dashboard' and return
+    end
+    if !trip.registration_open? && !golfer.admin?
+      flash[:login] = "Registration for KPC #{trip.number} isn't open yet."
       redirect_to '/dashboard' and return
     end
     if trip.deposit_due_date.present? && !golfer.admin? && params[:deposit_policy_acknowledged] != "1"
@@ -35,6 +42,7 @@ class GolferTripsController < ApplicationController
         golfer_trip.cost    = 0
         golfer_trip.balance = 0
         golfer_trip.is_paid = true
+        golfer_trip.reserved_all_week = true
       else
         golfer_trip.cost    = golfer.trip_net_total_cost(trip.id)
         golfer_trip.balance = golfer_trip.cost

@@ -117,7 +117,7 @@
 @silvio_trip_2_golfer_round_2 = @silvio.golfer_rounds.create!(round: @trip_3_course_6)
 @silvio_trip_2_night_3 = @silvio.golfer_nights.create!(night: @night_7_trip_3)
 
-@trip_5 = Trip.create!(year: 2026, number: 'XXVI', location: 'VA Beach', start_date: Date.parse('2026-10-17'))
+@trip_5 = Trip.create!(year: 2026, number: 'XXVI', location: 'VA Beach', start_date: Date.parse('2026-10-17'), registration_open: true)
 @night_1_trip_5 = @trip_5.nights.create!(date: Date.parse('2026-10-17'), cost: 120)
 @night_2_trip_5 = @trip_5.nights.create!(date: Date.parse('2026-10-18'), cost: 120)
 @night_3_trip_5 = @trip_5.nights.create!(date: Date.parse('2026-10-19'), cost: 120)
@@ -544,3 +544,6 @@ GolferTrip.where(trip: @trip_5, golfer: @paulie).update_all(created_at: Time.utc
   password: 'badabing21', password_confirmation: 'badabing21',
   t_shirt_size: :l
 )
+
+# Admins hold their beds all week
+GolferTrip.joins(:golfer).where(trip: @trip_5, golfers: { role: Golfer.roles[:admin] }).update_all(reserved_all_week: true)
