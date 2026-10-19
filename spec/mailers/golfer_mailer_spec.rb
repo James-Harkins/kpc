@@ -73,7 +73,7 @@ RSpec.describe GolferMailer, type: :mailer do
 
     it 'includes the remaining deposit amount and the tier warning' do
       expect(mail.text_part.body.encoded).to include('150')
-      expect(mail.text_part.body.encoded).to include('drop a tier')
+      expect(mail.text_part.body.encoded).to include('best beds go to the guys who paid on time')
     end
   end
 
