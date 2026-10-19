@@ -35,6 +35,10 @@ class GolferTripsController < ApplicationController
       flash[:error] = "You must acknowledge the non-refundable deposit policy."
       redirect_to "/register_trip" and return
     end
+    if !params[:full_trip] && requested_night_ids(trip).empty? && Array(params[:rounds]).empty?
+      flash[:error] = "Pick at least one night or round to sign up."
+      redirect_to "/register_trip" and return
+    end
     unless golfer.admin?
       full_nights = trip.nights.where(id: trip.full_night_ids & requested_night_ids(trip)).order(:date)
       if full_nights.any?

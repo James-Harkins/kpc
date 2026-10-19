@@ -35,6 +35,12 @@ FactoryBot.define do
     cost { 65 }
   end
 
+  factory :round do
+    trip
+    sequence(:date) { |n| Date.new(2026, 9, 16) + n.days }
+    cost { 75 }
+  end
+
   factory :golfer_night do
     golfer
     night

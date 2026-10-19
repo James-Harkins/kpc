@@ -94,3 +94,23 @@ RSpec.describe GolferTripFacade do
     end
   end
 end
+
+RSpec.describe GolferTripFacade, 'with nothing ticked in one section' do
+  let(:trip) { create(:trip) }
+  let!(:night) { create(:night, trip: trip) }
+  let!(:round) { create(:round, trip: trip) }
+  let(:golfer) { create(:golfer) }
+
+  it 'registers nights only when no rounds param is sent' do
+    golfer_trip = described_class.create_new_golfer_trip(golfer, trip, ActionController::Parameters.new(nights: [night.id.to_s]))
+    expect(golfer.golfer_nights.count).to eq(1)
+    expect(golfer.golfer_rounds.count).to eq(0)
+    expect(golfer_trip.is_full_trip).to be_falsey
+  end
+
+  it 'registers rounds only when no nights param is sent' do
+    described_class.create_new_golfer_trip(golfer, trip, ActionController::Parameters.new(rounds: [round.id.to_s]))
+    expect(golfer.golfer_nights.count).to eq(0)
+    expect(golfer.golfer_rounds.count).to eq(1)
+  end
+end

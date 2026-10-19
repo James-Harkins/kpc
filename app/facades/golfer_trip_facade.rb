@@ -8,9 +8,9 @@ class GolferTripFacade
     else
       valid_night_ids = trip.nights.pluck(:id).map(&:to_s)
       valid_round_ids = trip.rounds.pluck(:id).map(&:to_s)
-      params[:nights].select { |n| valid_night_ids.include?(n.to_s) }
+      Array(params[:nights]).select { |n| valid_night_ids.include?(n.to_s) }
                      .each   { |n| golfer.golfer_nights.find_or_create_by!(night_id: n) }
-      params[:rounds].select { |r| valid_round_ids.include?(r.to_s) }
+      Array(params[:rounds]).select { |r| valid_round_ids.include?(r.to_s) }
                      .each   { |r| golfer.golfer_rounds.find_or_create_by!(round_id: r) }
     end
     
@@ -23,7 +23,7 @@ class GolferTripFacade
 
   def self.is_full_trip(params, trip)
     params[:full_trip] || 
-    ((params[:nights].length == trip.nights.length) &&
-    (params[:rounds].length == trip.rounds.length))
+    ((Array(params[:nights]).length == trip.nights.length) &&
+    (Array(params[:rounds]).length == trip.rounds.length))
   end
 end

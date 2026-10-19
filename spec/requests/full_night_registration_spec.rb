@@ -64,3 +64,26 @@ RSpec.describe 'Registration on full nights', type: :request do
     expect { post '/register_trip', params: { full_trip: '1' } }.to change(GolferTrip, :count).by(1)
   end
 end
+
+RSpec.describe 'Registration with nothing selected', type: :request do
+  let(:trip) { create(:trip) }
+  let!(:night) { create(:night, trip: trip) }
+  let(:golfer) { create(:golfer) }
+
+  before do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with('CURRENT_TRIP_NUMBER').and_return(trip.number)
+    post '/login', params: { email: golfer.email, password: 'test1234' }
+  end
+
+  it 'asks the golfer to pick something instead of erroring' do
+    expect { post '/register_trip' }.not_to change(GolferTrip, :count)
+    expect(response).to redirect_to('/register_trip')
+    follow_redirect!
+    expect(response.body).to include('Pick at least one night or round')
+  end
+
+  it 'lets a golfer register for nights with no rounds ticked' do
+    expect { post '/register_trip', params: { nights: [night.id.to_s] } }.to change(GolferTrip, :count).by(1)
+  end
+end

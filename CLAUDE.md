@@ -258,6 +258,8 @@ bundle exec rspec spec/models/tournament_assignment_spec.rb
 
 Uses `shoulda-matchers` for one-liner relationship/validation assertions. Database is cleaned via transactional fixtures (`use_transactional_fixtures = true`). Older tests use direct `Model.create!` calls; new tests should use the FactoryBot factories in `spec/factories/factories.rb` (`FactoryBot::Syntax::Methods` is included in `rails_helper.rb`).
 
+`db/seeds/mad_men_walkthrough.rb` is a second, blank-trip scenario for walking registration end to end (`bin/rails runner db/seeds/mad_men_walkthrough.rb` — wipes the dev DB; needs `CURRENT_TRIP_NUMBER=XXVII` and `SITE_ADMIN_EMAIL=don@sterlingcooper.com`). `spec/requests/walkthrough_spec.rb` runs the same sequence with expected counts.
+
 Seeds (`db/seeds.rb`) build a full manual-testing scenario: Sopranos-themed golfers, a current trip (KPC XXVI) with courses/tee times and three tournament rounds, two houses with ranked beds, and backdated payments spreading golfers across all bed-priority tiers. `furio@giunta.it` is seeded unregistered for testing the registration flow. Rerun with `rails db:reset`.
 
 ---
