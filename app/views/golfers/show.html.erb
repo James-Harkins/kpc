@@ -493,6 +493,11 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               <%= button_to "Register for KPC #{@next_trip.number}", "/register_trip", method: :get, class: 'btn btn-outline-primary-finances' %>
             <% end %>
           </div>
+          <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] && !@next_trip.registration_open? %>
+            <div class="button-row">
+              <%= button_to "Open Trip Registration", open_registration_trip_path(@next_trip), method: :patch, class: 'btn btn-outline-primary-finances', data: { confirm: "Open KPC #{@next_trip.number} registration to all golfers? No email is sent." } %>
+            </div>
+          <% end %>
         </div>
       <% end %>
       <div class="next-trip-cost">
@@ -504,9 +509,6 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <%= button_to "Broadcast", "/announcements/new", method: :get, class: 'btn btn-outline-primary-finances' %>
             <%= button_to "Courses", courses_path, method: :get, class: 'btn btn-outline-primary-finances' %>
             <%= button_to "Create Trip", new_trip_path, method: :get, class: 'btn btn-outline-primary-finances' %>
-            <% if @next_trip && !@next_trip.completed? && !@next_trip.registration_open? %>
-              <%= button_to "Open Trip Registration", open_registration_trip_path(@next_trip), method: :patch, class: 'btn btn-outline-primary-finances', data: { confirm: "Open KPC #{@next_trip.number} registration to all golfers? No email is sent." } %>
-            <% end %>
             <%= button_to "Create Golfer", admin_new_golfer_path, method: :get, class: 'btn btn-outline-primary-finances' %>
             <% if @next_trip %>
               <%= button_to "Houses", houses_path, method: :get, class: 'btn btn-outline-primary-finances', params: { trip_id: @next_trip.id } %>

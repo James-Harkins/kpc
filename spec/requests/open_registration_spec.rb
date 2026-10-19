@@ -44,6 +44,17 @@ RSpec.describe 'Open trip registration', type: :request do
       expect(response.body).to include('Open Trip Registration')
     end
 
+    it 'sits in the top trip card on its own row, under Attendance, Edit Trip and Finances' do
+      log_in_as(site_admin)
+      get '/dashboard'
+      body = response.body
+      button = body.index('Open Trip Registration')
+      expect(body.index('Attendance')).to be < body.index('Finances')
+      expect(body.index('Finances')).to be < button
+      expect(button).to be < body.index('Create Trip')
+      expect(body[0...button]).to match(/Finances.*<\/div>\s*<div class="button-row">\s*<form/m)
+    end
+
     it 'goes away once registration is open' do
       trip.update!(registration_open: true)
       log_in_as(site_admin)
