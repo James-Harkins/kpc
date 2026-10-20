@@ -9,7 +9,7 @@ Full-stack Ruby on Rails 5.2.8 web application for managing an annual group golf
 ### For Golfers
 - **Registration & Authentication** - Account creation with invite token, secure login/logout, and password reset via tokenized email link
 - **Trip Registration** - Select individual nights and golf rounds, or register for the full trip (which applies a first-night discount)
-- **Deposit Policy Acknowledgment** - When a trip has a deposit deadline, registration requires acknowledging the non-refundable 50% deposit policy (timestamped, enforced server-side with inline error feedback)
+- **Deposit Policy Acknowledgment** - When a trip has a deposit deadline, registration requires acknowledging the 50% deposit policy (timestamped, enforced server-side with inline error feedback)
 - **Personal Dashboard** - View trip itinerary, cost breakdown, payment history, outstanding balance, and links to the trip's rental house listings
 - **Profile Management** - Update name, email, password, and t-shirt size
 
@@ -34,7 +34,7 @@ The best beds go to the golfers who stay the most nights and pay their 50% depos
 - **Deposit Tracking** - A trip-level deposit deadline plus a derived per-golfer deposit status: the deposit (50% of cost) counts as met at the timestamp of the payment that crossed the threshold, computed live from the payments ledger so cost edits and returns can never leave a stale flag
 - **Priority Board** - Admins see every registrant ranked into tiers: admins first (tier 0), then deposit met by the deadline (tier 1), met late (tier 2), not met (tier 3); within a tier, most nights first, then earliest deposit, then earliest registration
 - **Bed Assignment** - A one-click **Autofill by Priority** fills the board (best bed to highest priority, one golfer per bed, then remaining golfers double into the lowest-ranked shared beds); admins rearrange via per-slot dropdowns before saving. Saves are transactional and all-or-nothing - duplicate or over-capacity submissions are rejected whole
-- **Non-Refundable Deposit Support** - Returns that would dip below a golfer's 50% deposit trigger a confirmation warning (warn, don't block); the registration acknowledgment is stored with a timestamp
+- **Deposit Support** - Returns that would dip below a golfer's 50% deposit trigger a confirmation warning (warn, don't block); the registration acknowledgment is stored with a timestamp
 - **Deposit Reminder Emails** - One week before the deadline, golfers who haven't met their deposit get an email with their remaining deposit math, payment instructions, and the bed-priority incentive
 
 ### Tournament

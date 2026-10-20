@@ -781,7 +781,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
     function checkDepositDip(form, refundableExcess) {
         var amount = parseInt(form.querySelector('input[name="amount"]').value, 10) || 0;
         if (amount > refundableExcess) {
-            return confirm('This return dips into the non-refundable 50% deposit ($' +
+            return confirm('This return dips into the 50% deposit ($' +
                            (amount - refundableExcess) + ' below the deposit floor). Continue?');
         }
         return true;

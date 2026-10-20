@@ -52,8 +52,7 @@ RSpec.describe GolferMailer, type: :mailer do
       expect(mail.body.encoded).to include('150')
     end
 
-    it 'mentions the non-refundable policy and bed incentive' do
-      expect(mail.text_part.body.encoded).to include('NON-REFUNDABLE')
+    it 'mentions the bed incentive' do
       expect(mail.text_part.body.encoded).to include('best beds')
     end
   end
@@ -162,7 +161,7 @@ RSpec.describe GolferMailer, 'bed alerts', type: :mailer do
     it 'reads exactly as written when full-week beds are open' do
       expect(mail.text_part.body.encoded).to include(
         "Hey #{golfer.nickname}. There are still 3 beds open for the full week at KPC #{trip.number} and they're going fast. " \
-        "The best beds go to the guys who stay the most nights and put their non-refundable 50% deposit down earliest " \
+        "The best beds go to the guys who stay the most nights and put their 50% deposit down earliest " \
         "(deposit due January 1). Sign up and pay your deposit before they're gone! See you in #{trip.location}!"
       )
     end

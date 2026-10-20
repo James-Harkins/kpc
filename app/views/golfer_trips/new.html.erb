@@ -185,15 +185,15 @@ body::before {
     <% deposit_policy_required = @next_trip.deposit_due_date.present? && !current_user.admin? %>
     <% if deposit_policy_required %>
         <div class="info-box" id="deposit-policy-box">
-            <strong>Deposit policy:</strong><br> Your 50% deposit is <u>non-refundable</u> and due by
+            <strong>Deposit policy:</strong><br> Your 50% deposit is due by
             <strong><%= @next_trip.deposit_due_date.strftime('%B %-d, %Y') %></strong>.
             The best beds go to the guys who stay the most nights and pay their deposit earliest.
             <div class="checkbox-item">
                 <input type="checkbox" id="deposit-ack" onchange="updateDepositAck()">
-                <span>I understand and accept the non-refundable deposit policy.</span>
+                <span>I understand and accept the deposit policy.</span>
             </div>
             <div id="deposit-ack-error" style="display: none; color: rgb(222, 74, 72); font-weight: bold; margin-top: 8px;">
-                You must check the box to acknowledge the non-refundable deposit policy before signing up.
+                You must check the box to acknowledge the deposit policy before signing up.
             </div>
         </div>
     <% end %>

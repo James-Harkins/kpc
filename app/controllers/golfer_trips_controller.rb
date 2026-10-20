@@ -32,7 +32,7 @@ class GolferTripsController < ApplicationController
       redirect_to '/dashboard' and return
     end
     if trip.deposit_due_date.present? && !golfer.admin? && params[:deposit_policy_acknowledged] != "1"
-      flash[:error] = "You must acknowledge the non-refundable deposit policy."
+      flash[:error] = "You must acknowledge the deposit policy."
       redirect_to "/register_trip" and return
     end
     if !params[:full_trip] && requested_night_ids(trip).empty? && Array(params[:rounds]).empty?

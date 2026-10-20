@@ -109,8 +109,8 @@ namespace :emails do
 
     abort "No current trip found. Set CURRENT_TRIP_NUMBER env var." if trip.nil?
 
-    if trip.completed? || !trip.registration_open? || trip.total_bed_spots.zero? || trip.open_bed_spots_any_night.zero?
-      puts "KPC #{trip.number} is completed, closed to registration, has no beds entered, or is full. No emails sent."
+    if trip.completed? || (trip.start_date.present? && trip.start_date <= Time.current) || !trip.registration_open? || trip.total_bed_spots.zero? || trip.open_bed_spots_any_night.zero?
+      puts "KPC #{trip.number} is completed, already started, closed to registration, has no beds entered, or is full. No emails sent."
       exit
     end
 
