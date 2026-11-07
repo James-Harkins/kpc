@@ -76,6 +76,11 @@ RSpec.describe 'Deleting a reservation', type: :request do
       get '/finances', params: { trip_id: trip.id }
       expect(response.body).to include('Delete Reservation')
 
+      paid = create(:golfer_trip, trip: trip, is_paid: true, balance: 0)
+      get '/finances', params: { trip_id: trip.id }
+      expect(response.body.scan('Delete Reservation').length).to eq(2)
+      expect(response.body).to include(%(action="/golfer_trips/#{paid.id}"))
+
       log_in_as(create(:golfer, :admin))
       get '/finances', params: { trip_id: trip.id }
       expect(response.body).not_to include('Delete Reservation')

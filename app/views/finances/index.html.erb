@@ -382,6 +382,67 @@ body::before {
   line-height: 1.4;
 }
 
+.golfer-card .card-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  margin-top: 8px;
+}
+
+.golfer-card .card-summary h5 {
+  margin: 0;
+}
+
+.golfer-card .card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.golfer-card .card-actions form {
+  margin: 0;
+}
+
+.golfer-card .card-actions .btn,
+.golfer-card .card-actions button {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 16px;
+  opacity: 1;
+}
+
+.golfer-card .money-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.golfer-card .money-form label {
+  margin: 0;
+  font-size: 16px;
+}
+
+.golfer-card .money-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.golfer-card .money-row input {
+  width: 110px;
+  padding: 6px 8px;
+}
+
+.golfer-card .action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .overpaid-warning {
   color: red;
   font-weight: bold;
@@ -698,19 +759,27 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <h5>Rounds: <span style="font-weight:normal"><%= golfer.trip_round_calendar(@next_trip.id).join(', ') %></span></h5>
           <% end %>
           <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
-            <h5>Net Paid: $<%= number_with_delimiter(net_paid) %></h5>
-            <% if net_paid > golfer_trip.cost %>
-              <h5 class="overpaid-warning">Overpaid by $<%= number_with_delimiter(net_paid - golfer_trip.cost) %>, return needed</h5>
-            <% end %>
-            <%= button_to "Edit Trip", edit_golfer_trip_path(golfer_trip), method: :get, class: 'btn btn-outline-primary' %>
-            <%= button_to "Delete Reservation", golfer_trip_path(golfer_trip), method: :delete, class: 'btn btn-outline-danger',
-                  form: { onsubmit: "return confirm('Delete #{j golfer.nickname.titleize.strip}\\'s entire reservation (nights, rounds and trip)? This cannot be undone.');" } %>
-            <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
-            <%= form_with url: "/returns", method: :post, local: true, html: return_form_options do |form| %>
-              <h5><%= form.label :amount, 'Process Return' %></h5>
-              <%= form.number_field :amount %>
-              <%= form.button "Return", name: :golfer_trip_id, value: golfer_trip.id, class: 'btn-outline-danger' %>
-            <% end %>
+            <div class="card-summary">
+              <h5>Net Paid: $<%= number_with_delimiter(net_paid) %></h5>
+              <% if net_paid > golfer_trip.cost %>
+                <h5 class="overpaid-warning">Overpaid by $<%= number_with_delimiter(net_paid - golfer_trip.cost) %>, return needed</h5>
+              <% end %>
+            </div>
+            <div class="card-actions">
+              <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
+              <%= form_with url: "/returns", method: :post, local: true, html: return_form_options.merge(class: 'money-form') do |form| %>
+                <%= form.label :amount, 'Process Return' %>
+                <div class="money-row">
+                  <%= form.number_field :amount %>
+                  <%= form.button "Return", name: :golfer_trip_id, value: golfer_trip.id, class: 'btn-outline-danger' %>
+                </div>
+              <% end %>
+              <div class="action-buttons">
+                <%= button_to "Edit Trip", edit_golfer_trip_path(golfer_trip), method: :get, class: 'btn btn-outline-primary' %>
+                <%= button_to "Delete Reservation", golfer_trip_path(golfer_trip), method: :delete, class: 'btn btn-outline-danger',
+                      form: { onsubmit: "return confirm('Delete #{j golfer.nickname.titleize.strip}\\'s entire reservation (nights, rounds and trip)? This cannot be undone.');" } %>
+              </div>
+            </div>
           <% end %>
         </div>
     <% end %>
@@ -756,27 +825,37 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <h5>Nights: <span style="font-weight:normal"><%= golfer.trip_night_calendar(@next_trip.id).join(', ') %></span></h5>
             <h5>Rounds: <span style="font-weight:normal"><%= golfer.trip_round_calendar(@next_trip.id).join(', ') %></span></h5>
           <% end %>
-          <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
-            <h5>Net Paid: $<%= number_with_delimiter(net_paid) %></h5>
-          <% end %>
-          <h5>Outstanding Balance: $<%= number_with_delimiter(golfer_trip.balance) %></h5>
-          <%= button_to "Mark as Paid", "/update_golfer_payment", method: :put, class: 'btn btn-outline-primary', params: { golfer_trip_id: golfer_trip.id, paid: true } %>
-          <%= form_with url: "/payments", method: :post, local: true do |form| %>
-            <h5><%= form.label :amount, 'Add a Payment' %></h5>
-            <%= form.number_field :amount %>
-            <%= form.button "Add Payment", name: :golfer_trip_id, value: golfer_trip.id %>
-          <% end %>
-          <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
-            <%= button_to "Edit Trip", edit_golfer_trip_path(golfer_trip), method: :get, class: 'btn btn-outline-primary' %>
-            <%= button_to "Delete Reservation", golfer_trip_path(golfer_trip), method: :delete, class: 'btn btn-outline-danger',
-                  form: { onsubmit: "return confirm('Delete #{j golfer.nickname.titleize.strip}\\'s entire reservation (nights, rounds and trip)? This cannot be undone.');" } %>
-            <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
-            <%= form_with url: "/returns", method: :post, local: true, html: return_form_options do |form| %>
-              <h5><%= form.label :amount, 'Process Return' %></h5>
-              <%= form.number_field :amount %>
-              <%= form.button "Return", name: :golfer_trip_id, value: golfer_trip.id, class: 'btn-outline-danger' %>
+          <div class="card-summary">
+            <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
+              <h5>Net Paid: $<%= number_with_delimiter(net_paid) %></h5>
             <% end %>
-          <% end %>
+            <h5>Outstanding Balance: $<%= number_with_delimiter(golfer_trip.balance) %></h5>
+          </div>
+          <div class="card-actions">
+            <%= form_with url: "/payments", method: :post, local: true, html: { class: 'money-form' } do |form| %>
+              <%= form.label :amount, 'Add a Payment' %>
+              <div class="money-row">
+                <%= form.number_field :amount %>
+                <%= form.button "Add Payment", name: :golfer_trip_id, value: golfer_trip.id %>
+              </div>
+            <% end %>
+            <%= button_to "Mark as Paid", "/update_golfer_payment", method: :put, class: 'btn btn-outline-primary', params: { golfer_trip_id: golfer_trip.id, paid: true } %>
+            <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
+              <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
+              <%= form_with url: "/returns", method: :post, local: true, html: return_form_options.merge(class: 'money-form') do |form| %>
+                <%= form.label :amount, 'Process Return' %>
+                <div class="money-row">
+                  <%= form.number_field :amount %>
+                  <%= form.button "Return", name: :golfer_trip_id, value: golfer_trip.id, class: 'btn-outline-danger' %>
+                </div>
+              <% end %>
+              <div class="action-buttons">
+                <%= button_to "Edit Trip", edit_golfer_trip_path(golfer_trip), method: :get, class: 'btn btn-outline-primary' %>
+                <%= button_to "Delete Reservation", golfer_trip_path(golfer_trip), method: :delete, class: 'btn btn-outline-danger',
+                      form: { onsubmit: "return confirm('Delete #{j golfer.nickname.titleize.strip}\\'s entire reservation (nights, rounds and trip)? This cannot be undone.');" } %>
+              </div>
+            <% end %>
+          </div>
         </div>
     <% end %>
     <hr class="line">
