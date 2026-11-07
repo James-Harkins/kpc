@@ -88,6 +88,7 @@ Rails.application.routes.draw do
   # Golfer trip admin editing
   get   '/golfer_trips/:id/edit', to: 'golfer_trips#edit',         as: :edit_golfer_trip
   patch '/golfer_trips/:id',      to: 'golfer_trips#admin_update', as: :golfer_trip
+  delete '/golfer_trips/:id',     to: 'golfer_trips#destroy'
 
   # Tournament
   get   '/tournament',          to: 'tournaments#index',       as: :tournament

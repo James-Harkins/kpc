@@ -1,7 +1,7 @@
 class GolferTripsController < ApplicationController
   before_action :require_login, only: [:new, :create]
   before_action :require_admin,  only: [:update]
-  before_action :require_site_admin, only: [:edit, :admin_update]
+  before_action :require_site_admin, only: [:edit, :admin_update, :destroy]
 
   def new
     @next_trip = Trip.current
@@ -167,6 +167,27 @@ class GolferTripsController < ApplicationController
     @golfer_trip.save!
 
     redirect_to "/finances?trip_id=#{@trip.id}"
+  end
+
+  def destroy
+    golfer_trip = GolferTrip.find(params[:id])
+    trip = golfer_trip.trip
+    golfer = golfer_trip.golfer
+
+    if trip.completed?
+      flash[:error] = "KPC #{trip.number} is completed; its reservations can't be deleted."
+    elsif golfer_trip.payments.sum(:amount) > 0
+      flash[:error] = "#{golfer.nickname.titleize.strip} has payments on file. Process a return first, then delete the reservation."
+    else
+      GolferTrip.transaction do
+        GolferNight.where(golfer_id: golfer.id, night_id: trip.nights.select(:id)).destroy_all
+        GolferRound.where(golfer_id: golfer.id, round_id: trip.rounds.select(:id)).destroy_all
+        golfer_trip.destroy!
+      end
+      flash[:notice] = "Deleted #{golfer.nickname.titleize.strip}'s reservation for KPC #{trip.number}."
+    end
+
+    redirect_to "/finances?trip_id=#{trip.id}"
   end
 
   private
