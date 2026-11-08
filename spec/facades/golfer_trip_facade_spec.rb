@@ -53,7 +53,7 @@ RSpec.describe GolferTripFacade do
         expect(golfer.rounds.where(trip_id: trip.id).count).to eq(2)
       end
 
-      it 'does not set is_full_trip when nights/rounds counts do not match trip totals' do
+      it 'does not set is_full_trip when a night is missing' do
         golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
         expect(golfer_trip.is_full_trip).to be_nil
       end
@@ -64,7 +64,7 @@ RSpec.describe GolferTripFacade do
         { nights: [night1.id.to_s, night2.id.to_s], rounds: [round1.id.to_s, round2.id.to_s] }
       end
 
-      it 'sets is_full_trip to true when counts match trip totals' do
+      it 'sets is_full_trip to true when every night is selected' do
         golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
         expect(golfer_trip.is_full_trip).to eq(true)
       end
@@ -83,12 +83,22 @@ RSpec.describe GolferTripFacade do
       expect(GolferTripFacade.is_full_trip(params, trip)).to eq(true)
     end
 
-    it 'returns true when nights and rounds counts match trip totals' do
+    it 'returns true when every night is selected' do
       params = { nights: [night1.id, night2.id], rounds: [round1.id, round2.id] }
       expect(GolferTripFacade.is_full_trip(params, trip)).to eq(true)
     end
 
-    it 'returns false when neither condition is met' do
+    it 'returns true when every night is selected but only some rounds' do
+      params = { nights: [night1.id, night2.id], rounds: [round2.id] }
+      expect(GolferTripFacade.is_full_trip(params, trip)).to eq(true)
+    end
+
+    it 'returns false when a night is missing, even with every round' do
+      params = { nights: [night1.id], rounds: [round1.id, round2.id] }
+      expect(GolferTripFacade.is_full_trip(params, trip)).to be_falsey
+    end
+
+    it 'returns false when some nights and some rounds are selected' do
       params = { nights: [night1.id], rounds: [round1.id] }
       expect(GolferTripFacade.is_full_trip(params, trip)).to be_falsey
     end
@@ -105,7 +115,7 @@ RSpec.describe GolferTripFacade, 'with nothing ticked in one section' do
     golfer_trip = described_class.create_new_golfer_trip(golfer, trip, ActionController::Parameters.new(nights: [night.id.to_s]))
     expect(golfer.golfer_nights.count).to eq(1)
     expect(golfer.golfer_rounds.count).to eq(0)
-    expect(golfer_trip.is_full_trip).to be_falsey
+    expect(golfer_trip.is_full_trip).to be(true)   # the trip's only night is ticked
   end
 
   it 'registers rounds only when no nights param is sent' do

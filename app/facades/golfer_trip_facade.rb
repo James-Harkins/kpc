@@ -22,8 +22,8 @@ class GolferTripFacade
   end
 
   def self.is_full_trip(params, trip)
-    params[:full_trip] || 
-    ((Array(params[:nights]).length == trip.nights.length) &&
-    (Array(params[:rounds]).length == trip.rounds.length))
+    params[:full_trip] ||
+    (trip.nights.any? &&
+     (trip.nights.pluck(:id).map(&:to_s) - Array(params[:nights]).map(&:to_s)).empty?)
   end
 end

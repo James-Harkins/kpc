@@ -253,7 +253,6 @@ body::before {
 var isAdmin = <%= current_user.admin? %>;
 var firstNightCost = <%= @next_trip.nights.order(:date).first&.cost || 0 %>;
 var totalNights = <%= @next_trip.nights.count %>;   // every night on the trip, including ones with no checkbox because the house is full
-var totalRounds = document.querySelectorAll('input[name="rounds[]"]').length;
 
 function updateTotal() {
     var nightsChecked = document.querySelectorAll('input[name="nights[]"]:checked');
@@ -263,7 +262,7 @@ function updateTotal() {
     nightsChecked.forEach(function(cb) { total += parseInt(cb.dataset.cost) || 0; });
     roundsChecked.forEach(function(cb) { total += parseInt(cb.dataset.cost) || 0; });
 
-    var isFullTrip = (nightsChecked.length === totalNights && roundsChecked.length === totalRounds);
+    var isFullTrip = (nightsChecked.length === totalNights);
     if (isFullTrip) total -= firstNightCost;
     if (isAdmin) total = 0;
 

@@ -270,7 +270,7 @@ A golfer's cost is computed from the nights and rounds they selected:
 
 - **Gross cost** = sum of selected night costs + sum of selected round costs
 - **Full trip discount** - if the golfer attends every night and every round, the first night is free
-- `is_full_trip` is detected automatically during registration by comparing selected counts against total trip counts, or via an explicit "whole enchilada" registration option
+- `is_full_trip` (first night comped) is set automatically whenever every night of the trip is selected, whatever the rounds, or via the "whole enchilada" registration option
 
 ### Deposit Tracking & Bed Priority
 

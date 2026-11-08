@@ -114,8 +114,7 @@ class GolferTripsController < ApplicationController
     rounds_cost = Round.where(id: submitted_round_ids).sum(:cost)
     gross_cost = nights_cost + rounds_cost
 
-    is_full_trip = (submitted_night_ids.sort == valid_night_ids.sort &&
-                    submitted_round_ids.sort == valid_round_ids.sort)
+    is_full_trip = submitted_night_ids.sort == valid_night_ids.sort
 
     first_night_cost = is_full_trip ? (@trip.nights.order(:date).first&.cost || 0) : 0
     new_cost = gross_cost - first_night_cost
