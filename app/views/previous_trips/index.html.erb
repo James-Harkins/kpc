@@ -259,11 +259,11 @@ body::before {
         <% if @average_revenue %>
           <tr>
             <td>Average Revenue per Trip</td>
-            <td>$<%= number_with_delimiter(@average_revenue.round) %></td>
+            <td><%= money(@average_revenue.round) %></td>
           </tr>
           <tr>
             <td>Average Expenses per Trip</td>
-            <td>$<%= number_with_delimiter(@average_expenses.round) %></td>
+            <td><%= money(@average_expenses.round) %></td>
           </tr>
         <% end %>
       </tbody>
@@ -282,15 +282,15 @@ body::before {
           <tbody>
             <tr>
               <td>Total Revenue</td>
-              <td>$<%= number_with_delimiter(summary.total_revenue) %></td>
+              <td><%= money(summary.total_revenue) %></td>
             </tr>
             <tr>
               <td>Total Expenses</td>
-              <td>$<%= number_with_delimiter(summary.total_expenses) %></td>
+              <td><%= money(summary.total_expenses) %></td>
             </tr>
             <tr class="balance-row">
               <td>Total Deficit</td>
-              <td>$<%= number_with_delimiter(summary.total_deficit) %></td>
+              <td><%= money(summary.total_deficit) %></td>
             </tr>
             <tr class="summary-section-header">
               <td colspan="2">Committee</td>
@@ -301,7 +301,7 @@ body::before {
             </tr>
             <tr>
               <td>Fair Share (per member)</td>
-              <td>$<%= number_with_delimiter(summary.fair_share) %></td>
+              <td><%= money(summary.fair_share) %></td>
             </tr>
           </tbody>
         </table>
@@ -320,12 +320,12 @@ body::before {
                   <%= expense.description %>
                   <span class="expense-meta"><%= expense.date&.strftime('%b %-d, %Y') %><%= " - paid by #{expense.golfer.nickname.strip.titleize}" if expense.golfer %></span>
                 </td>
-                <td>$<%= number_with_delimiter(expense.amount) %></td>
+                <td><%= money(expense.amount) %></td>
               </tr>
             <% end %>
             <tr class="balance-row">
               <td>Listed expenses total</td>
-              <td>$<%= number_with_delimiter(expenses.sum(&:amount)) %></td>
+              <td><%= money(expenses.sum(&:amount)) %></td>
             </tr>
           </tbody>
         </table>

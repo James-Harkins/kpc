@@ -70,4 +70,18 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(helper.next_trip_number('I')).to eq('II')
     end
   end
+
+  describe '#money' do
+    it 'formats positive amounts with a dollar sign and delimiter' do
+      expect(helper.money(1234)).to eq('$1,234')
+      expect(helper.money(0)).to eq('$0')
+    end
+
+    it 'puts the minus sign before the dollar sign, in red, for negative amounts' do
+      html = helper.money(-1832)
+      expect(html).to include('-$1,832')
+      expect(html).not_to include('$-')
+      expect(html).to include('color: #c0392b')
+    end
+  end
 end

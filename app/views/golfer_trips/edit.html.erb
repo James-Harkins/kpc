@@ -92,16 +92,16 @@ body::before {
     <% end %>
 
     <div class="cost-summary">
-        <h3>Current Cost: $<%= number_with_delimiter(@golfer_trip.cost) %></h3>
-        <h3>Total Paid: $<%= number_with_delimiter(@total_paid) %></h3>
-        <h3>Current Balance: $<%= number_with_delimiter(@golfer_trip.balance) %></h3>
+        <h3>Current Cost: <%= money(@golfer_trip.cost) %></h3>
+        <h3>Total Paid: <%= money(@total_paid) %></h3>
+        <h3>Current Balance: <%= money(@golfer_trip.balance) %></h3>
         <h3>Projected Cost: $<span id="projected-cost">0</span></h3>
     </div>
 
     <% if @overpayment_warning %>
     <div class="overpayment-warning">
         <strong>Warning: Overpayment</strong><br>
-        The new cost ($<%= number_with_delimiter(@trip.nights.where(id: @selected_night_ids).sum(:cost) + @trip.rounds.where(id: @selected_round_ids).sum(:cost)) %>) is less than the total paid ($<%= number_with_delimiter(@total_paid) %>).
+        The new cost (<%= money(@trip.nights.where(id: @selected_night_ids).sum(:cost) + @trip.rounds.where(id: @selected_round_ids).sum(:cost)) %>) is less than the total paid (<%= money(@total_paid) %>).
         The balance will be set to $0.<br><br>
         <label>
             <input type="checkbox" id="confirm-overpayment-check" onchange="updateSubmitState()">
@@ -127,7 +127,7 @@ body::before {
                    <%= 'checked' if (@selected_night_ids || []).include?(night.id) %>
                    onchange="updateProjectedCost()">
             <label for="night-<%= night.id %>">
-                <%= night.date.strftime('%A, %B %d, %Y') %> - $<%= number_with_delimiter(night.cost) %>
+                <%= night.date.strftime('%A, %B %d, %Y') %> - <%= money(night.cost) %>
             </label>
         </div>
         <% end %>
@@ -147,7 +147,7 @@ body::before {
                 <%= round.date.strftime('%A, %B %d, %Y') %>
                 <% if round.tee_time.present? %> - <%= round.tee_time %><% end %>
                 <% if round.course.present? %> @ <%= round.course.name %><% end %>
-                - $<%= number_with_delimiter(round.cost) %>
+                - <%= money(round.cost) %>
             </label>
         </div>
         <% end %>

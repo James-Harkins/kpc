@@ -606,27 +606,27 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         </tr>
         <tr>
           <td>Projected Revenue</td>
-          <td>$<%= number_with_delimiter(@next_trip.total_projected_revenue) %></td>
+          <td><%= money(@next_trip.total_projected_revenue) %></td>
         </tr>
         <tr>
           <td>Total Expenses</td>
-          <td>$<%= number_with_delimiter(@next_trip.total_expenses) %></td>
+          <td><%= money(@next_trip.total_expenses) %></td>
         </tr>
         <tr class="balance-row">
           <td>Balance</td>
           <% trip_balance = @next_trip.balance %>
-          <td><%= '-' if trip_balance < 0 %>$<%= number_with_delimiter(trip_balance.abs) %></td>
+          <td><%= money(trip_balance) %></td>
         </tr>
         <tr class="summary-section-header">
           <td colspan="2">Payment Status</td>
         </tr>
         <tr>
           <td>Collected</td>
-          <td>$<%= number_with_delimiter(@next_trip.total_collected_revenue) %></td>
+          <td><%= money(@next_trip.total_collected_revenue) %></td>
         </tr>
         <tr>
           <td>Uncollected</td>
-          <td>$<%= number_with_delimiter(@next_trip.total_uncollected_revenue) %></td>
+          <td><%= money(@next_trip.total_uncollected_revenue) %></td>
         </tr>
         <tr>
           <td>Man-Nights</td>
@@ -649,15 +649,15 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <tbody>
           <tr>
             <td>Total Revenue</td>
-            <td>$<%= number_with_delimiter(@summary.total_revenue) %></td>
+            <td><%= money(@summary.total_revenue) %></td>
           </tr>
           <tr>
             <td>Total Expenses</td>
-            <td>$<%= number_with_delimiter(@summary.total_expenses) %></td>
+            <td><%= money(@summary.total_expenses) %></td>
           </tr>
           <tr class="balance-row">
             <td>Total Deficit</td>
-            <td>$<%= number_with_delimiter(@summary.total_deficit) %></td>
+            <td><%= money(@summary.total_deficit) %></td>
           </tr>
           <tr class="summary-section-header">
             <td colspan="2">Committee</td>
@@ -668,7 +668,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           </tr>
           <tr>
             <td>Fair Share (per member)</td>
-            <td>$<%= number_with_delimiter(@summary.fair_share) %></td>
+            <td><%= money(@summary.fair_share) %></td>
           </tr>
         </tbody>
       </table>
@@ -683,17 +683,17 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
               <% end %>
             </h4>
             <% if b[:is_treasurer] %>
-              <h5>Expenses Paid: <strong>$<%= number_with_delimiter(b[:expenses_paid]) %></strong></h5>
-              <h5>Revenue Collected: <strong>$<%= number_with_delimiter(b[:revenue_collected]) %></strong></h5>
-              <h5>Net Out of Pocket: <strong>$<%= number_with_delimiter(b[:paid]) %></strong></h5>
+              <h5>Expenses Paid: <strong><%= money(b[:expenses_paid]) %></strong></h5>
+              <h5>Revenue Collected: <strong><%= money(b[:revenue_collected]) %></strong></h5>
+              <h5>Net Out of Pocket: <strong><%= money(b[:paid]) %></strong></h5>
             <% else %>
-              <h5>Paid: <strong>$<%= number_with_delimiter(b[:paid]) %></strong></h5>
+              <h5>Paid: <strong><%= money(b[:paid]) %></strong></h5>
             <% end %>
-            <h5>Fair Share: <strong>$<%= number_with_delimiter(b[:fair_share].round) %></strong></h5>
+            <h5>Fair Share: <strong><%= money(b[:fair_share].round) %></strong></h5>
             <% if b[:balance].round >= 0 %>
-              <h5 style="color: green; font-weight: bold;">Owed back: $<%= number_with_delimiter(b[:balance].round) %></h5>
+              <h5 style="color: green; font-weight: bold;">Owed back: <%= money(b[:balance].round) %></h5>
             <% else %>
-              <h5 style="color: #c0392b; font-weight: bold;">Owes: $<%= number_with_delimiter(b[:balance].abs.round) %></h5>
+              <h5 style="color: #c0392b; font-weight: bold;">Owes: <%= money(b[:balance].abs.round) %></h5>
             <% end %>
           </div>
         <% end %>
@@ -703,7 +703,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <div class="golfer-card">
               <h5>
                 <%= s[:payer].nickname.titleize %> pays <%= s[:payee].nickname.titleize %>
-                - <strong>$<%= number_with_delimiter(s[:amount]) %></strong>
+                - <strong><%= money(s[:amount]) %></strong>
               </h5>
             </div>
           <% end %>
@@ -735,7 +735,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <% golfer_night_ids = golfer.nights.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <% golfer_round_ids = golfer.rounds.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <div class="golfer-card">
-          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> - $<%= number_with_delimiter(golfer_trip.cost) %></h4>
+          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> - <%= money(golfer_trip.cost) %></h4>
           <div class="trip-calendar">
             <div class="cal-dates">
               <% trip_nights.each do |night| %>
@@ -766,9 +766,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% end %>
           <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
             <div class="card-summary">
-              <h5>Net Paid: $<%= number_with_delimiter(net_paid) %></h5>
+              <h5>Net Paid: <%= money(net_paid) %></h5>
               <% if net_paid > golfer_trip.cost %>
-                <h5 class="overpaid-warning">Overpaid by $<%= number_with_delimiter(net_paid - golfer_trip.cost) %>, return needed</h5>
+                <h5 class="overpaid-warning">Overpaid by <%= money(net_paid - golfer_trip.cost) %>, return needed</h5>
               <% end %>
             </div>
             <div class="card-actions">
@@ -804,7 +804,7 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         <% golfer_night_ids = golfer.nights.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <% golfer_round_ids = golfer.rounds.where(trip_id: @next_trip.id).pluck(:id).to_set %>
         <div class="golfer-card">
-          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> - $<%= number_with_delimiter(golfer_trip.cost) %></h4>
+          <h4><%= golfer.nickname == "Walnuts" ? golfer.first_name.strip : golfer.first_name.capitalize.strip %> "<%= golfer.nickname.titleize.strip %>" <%= golfer.last_name.capitalize.strip %> - <%= money(golfer_trip.cost) %></h4>
           <div class="trip-calendar">
             <div class="cal-dates">
               <% trip_nights.each do |night| %>
@@ -835,9 +835,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <% end %>
           <div class="card-summary">
             <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
-              <h5>Net Paid: $<%= number_with_delimiter(net_paid) %></h5>
+              <h5>Net Paid: <%= money(net_paid) %></h5>
             <% end %>
-            <h5>Outstanding Balance: $<%= number_with_delimiter(golfer_trip.balance) %></h5>
+            <h5>Outstanding Balance: <%= money(golfer_trip.balance) %></h5>
           </div>
           <div class="card-actions">
             <div class="action-block">

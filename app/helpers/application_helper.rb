@@ -29,6 +29,12 @@ module ApplicationHelper
     result
   end
 
+  # "$1,234", or "-$832" in red when negative.
+  def money(amount)
+    return "$#{number_with_delimiter(amount)}" unless amount.to_f.negative?
+    content_tag(:span, "-$#{number_with_delimiter(amount.abs)}", style: 'color: #c0392b;')
+  end
+
   def next_trip_number(roman)
     int_to_roman(roman_to_int(roman) + 1)
   end

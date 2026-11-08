@@ -538,9 +538,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
           <hr class="line">
           <h3>Your Balance</h3>
           <div class="date-card">
-            <h4>Trip Cost: $<%= number_with_delimiter(@golfer_next_trip.cost) %></h4>
-            <h4>Amount Paid: $<%= number_with_delimiter(net_paid) %></h4>
-            <h4>Outstanding Balance: $<%= number_with_delimiter(@golfer_next_trip.balance) %></h4>
+            <h4>Trip Cost: <%= money(@golfer_next_trip.cost) %></h4>
+            <h4>Amount Paid: <%= money(net_paid) %></h4>
+            <h4>Outstanding Balance: <%= money(@golfer_next_trip.balance) %></h4>
             <% if @golfer_next_trip.is_paid %>
               <h5 style="color: green; font-weight: bold;">PAID IN FULL</h5>
             <% end %>
