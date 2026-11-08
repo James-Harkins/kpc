@@ -432,6 +432,16 @@ body::before {
   gap: 6px;
 }
 
+.golfer-card .money-row.stacked {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.golfer-card .mark-paid-note {
+  font-size: 14px;
+  color: #555;
+}
+
 .golfer-card .money-row input {
   width: 110px;
   padding: 6px 8px;
@@ -603,7 +613,8 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
         </tr>
         <tr class="balance-row">
           <td>Balance</td>
-          <td>$<%= number_with_delimiter(@next_trip.balance) %></td>
+          <% trip_balance = @next_trip.balance %>
+          <td><%= '-' if trip_balance < 0 %>$<%= number_with_delimiter(trip_balance.abs) %></td>
         </tr>
         <tr class="summary-section-header">
           <td colspan="2">Payment Status</td>
@@ -831,12 +842,13 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <div class="action-block">
               <%= form_with url: "/payments", method: :post, local: true, html: { class: 'money-form' } do |form| %>
                 <%= form.label :amount, 'Add a Payment' %>
-                <div class="money-row">
+                <div class="money-row stacked">
                   <%= form.number_field :amount %>
                   <%= form.button "Add Payment", name: :golfer_trip_id, value: golfer_trip.id %>
                 </div>
               <% end %>
-              <%= button_to "Mark as Paid", "/update_golfer_payment", method: :put, class: 'btn btn-outline-primary', params: { golfer_trip_id: golfer_trip.id, paid: true } %>
+              <%= button_to "Mark as Paid", "/update_golfer_payment", method: :put, class: 'btn btn-outline-primary-green', params: { golfer_trip_id: golfer_trip.id, paid: true } %>
+              <em class="mark-paid-note">Mark this golfer as paid in full.</em>
             </div>
             <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] %>
               <% return_form_options = @next_trip.deposit_due_date.present? ? { onsubmit: "return checkDepositDip(this, #{[net_paid - golfer_trip.deposit_amount, 0].max});" } : {} %>
