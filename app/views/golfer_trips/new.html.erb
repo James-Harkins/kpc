@@ -160,12 +160,33 @@ body::before {
 </style>
 
 <div class='trip-register-container'>
-    <h1>REGISTER FOR KPC <%= @next_trip.number %></h1>
+    <% if @proxy && @registrant %>
+        <h1>REGISTER <%= @registrant.first_name.upcase %> <%= @registrant.last_name.upcase %> FOR KPC <%= @next_trip.number %></h1>
+    <% elsif @proxy %>
+        <h1>REGISTER A GOLFER FOR KPC <%= @next_trip.number %></h1>
+    <% else %>
+        <h1>REGISTER FOR KPC <%= @next_trip.number %></h1>
+    <% end %>
 
     <% flash.each do |name, msg| %>
         <div class="alert" role="alert">
             <%= content_tag :div, msg, class: name %>
         </div>
+    <% end %>
+
+    <% if @proxy && @registrant.nil? %>
+    <div class="info-box">
+        Pick a golfer who hasn't signed up for KPC <%= @next_trip.number %>. You'll choose their nights and rounds on the next page.
+    </div>
+    <%= form_with url: @form_path, method: :get, local: true do |form| %>
+        <%= select_tag :golfer_id, options_for_select(@eligible_golfers.map { |g| ["#{g.first_name} #{g.last_name} (#{g.nickname.titleize.strip})", g.id] }), prompt: "Choose a golfer", required: true, style: "width: 100%; padding: 10px; font-size: 18px; margin: 12px 0;" %>
+        <%= form.submit "Continue", class: 'btn-outline-primary' %>
+    <% end %>
+    <% else %>
+    <% if @proxy %>
+    <div class="info-box">
+        Registering on behalf of <strong><%= @registrant.first_name %> <%= @registrant.last_name %></strong>. The signup confirmation goes to <%= @registrant.email %>.
+    </div>
     <% end %>
 
     <div class="info-box">
@@ -182,15 +203,15 @@ body::before {
         </ul>
     </div>
 
-    <% deposit_policy_required = @next_trip.deposit_due_date.present? && !current_user.admin? %>
+    <% deposit_policy_required = @next_trip.deposit_due_date.present? && !@registrant.admin? %>
     <% if deposit_policy_required %>
         <div class="info-box" id="deposit-policy-box">
-            <strong>Deposit policy:</strong><br> Your 50% deposit is due by
+            <strong>Deposit policy:</strong><br> <%= @proxy ? 'Their' : 'Your' %> 50% deposit is due by
             <strong><%= @next_trip.deposit_due_date.strftime('%B %-d, %Y') %></strong>.
             The best beds go to the guys who stay the most nights and pay their deposit earliest.
             <div class="checkbox-item">
                 <input type="checkbox" id="deposit-ack" onchange="updateDepositAck()">
-                <span>I understand and accept the deposit policy.</span>
+                <span><%= @proxy ? "#{@registrant.first_name} understands and accepts the deposit policy." : 'I understand and accept the deposit policy.' %></span>
             </div>
             <div id="deposit-ack-error" style="display: none; color: rgb(222, 74, 72); font-weight: bold; margin-top: 8px;">
                 You must check the box to acknowledge the deposit policy before signing up.
@@ -202,17 +223,18 @@ body::before {
         <% if @full_night_ids.any? %>
             <p><strong>The house is full on some nights, so the full trip can't be booked.</strong> Pick the nights below that still have room.</p>
         <% else %>
-            <%= button_to "Give me the whole enchilada, bud!", "/register_trip", params: {full_trip: true, trip_id: @next_trip.id, deposit_policy_acknowledged: '0'}, class: 'btn-outline-primary' %>
+            <%= button_to "Give me the whole enchilada, bud!", @form_path, params: {full_trip: true, trip_id: @next_trip.id, deposit_policy_acknowledged: '0'}.merge(@proxy ? { golfer_id: @registrant.id } : {}), class: 'btn-outline-primary' %>
         <% end %>
     </div>
 
     <hr class="line">
 
-    <%= form_with url: "/register_trip", method: :post, params: {trip_id: @next_trip.id}, local: true do |form| %>
+    <%= form_with url: @form_path, method: :post, params: {trip_id: @next_trip.id}, local: true do |form| %>
         <%= hidden_field_tag 'deposit_policy_acknowledged', '0', id: nil %>
+        <%= hidden_field_tag 'golfer_id', @registrant.id, id: nil if @proxy %>
         <div class="cost-summary">
             <strong>Your total: $<span id="running-total">0</span></strong>
-            <% if current_user.admin? %>
+            <% if @registrant.admin? %>
                 <div class="discount-note" style="display: block;">Committee registration: no cost, and your bed is reserved all week. Check only the nights and rounds you'll actually attend so the headcount is accurate.</div>
             <% end %>
             <div class="discount-note" id="discount-note">Full trip discount applied. Saturday night is free!</div>
@@ -247,10 +269,11 @@ body::before {
         </div>
         <%= form.submit "Sign me up, motherfucker!", class: 'btn-outline-primary' %>
     <% end %>
+    <% end %>
 </div>
 
 <script>
-var isAdmin = <%= current_user.admin? %>;
+var isAdmin = <%= @registrant ? @registrant.admin? : false %>;
 var firstNightCost = <%= @next_trip.nights.order(:date).first&.cost || 0 %>;
 var totalNights = <%= @next_trip.nights.count %>;   // every night on the trip, including ones with no checkbox because the house is full
 

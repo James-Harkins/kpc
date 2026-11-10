@@ -90,6 +90,10 @@ Rails.application.routes.draw do
   patch '/golfer_trips/:id',      to: 'golfer_trips#admin_update', as: :golfer_trip
   delete '/golfer_trips/:id',     to: 'golfer_trips#destroy'
 
+  # Site admin registers a golfer who doesn't use the site
+  get  '/admin/register_golfer', to: 'golfer_trips#admin_new',    as: :admin_register_golfer
+  post '/admin/register_golfer', to: 'golfer_trips#admin_create'
+
   # Tournament
   get   '/tournament',          to: 'tournaments#index',       as: :tournament
   post  '/tournament/generate', to: 'tournaments#generate',    as: :generate_tournament

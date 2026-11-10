@@ -1,10 +1,13 @@
 class GolferTripsController < ApplicationController
   before_action :require_login, only: [:new, :create]
   before_action :require_admin,  only: [:update]
-  before_action :require_site_admin, only: [:edit, :admin_update, :destroy]
+  before_action :require_site_admin, only: [:edit, :admin_update, :destroy, :admin_new, :admin_create]
 
   def new
     @next_trip = Trip.current
+    @proxy = false
+    @registrant = current_user
+    @form_path = "/register_trip"
     if @next_trip.nil?
       flash[:login] = "No trip is currently open for registration."
       redirect_to '/dashboard' and return
@@ -22,52 +25,36 @@ class GolferTripsController < ApplicationController
   end
 
   def create
-    golfer = current_user
-    trip = Trip.current
-    if trip.nil?
-      redirect_to '/dashboard' and return
-    end
-    if !trip.registration_open? && !golfer.admin?
-      flash[:login] = "Registration for KPC #{trip.number} isn't open yet."
-      redirect_to '/dashboard' and return
-    end
-    if trip.deposit_due_date.present? && !golfer.admin? && params[:deposit_policy_acknowledged] != "1"
-      flash[:error] = "You must acknowledge the deposit policy."
-      redirect_to "/register_trip" and return
-    end
-    if !params[:full_trip] && requested_night_ids(trip).empty? && Array(params[:rounds]).empty?
-      flash[:error] = "Pick at least one night or round to sign up."
-      redirect_to "/register_trip" and return
-    end
-    unless golfer.admin?
-      full_nights = trip.nights.where(id: trip.full_night_ids & requested_night_ids(trip)).order(:date)
-      if full_nights.any?
-        flash[:error] = "The house is already full on #{full_nights.map { |n| n.date.strftime('%a %-m/%-d') }.to_sentence}. Uncheck #{full_nights.one? ? 'that night' : 'those nights'} to sign up, or contact the committee."
-        redirect_to "/register_trip" and return
-      end
-    end
-    had_open_spots = trip.open_bed_spots > 0
-    golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
+    register_golfer_for_trip(current_user, "/register_trip")
+  end
 
-    if golfer_trip.save
-      if golfer.admin?
-        golfer_trip.cost    = 0
-        golfer_trip.balance = 0
-        golfer_trip.is_paid = true
-        golfer_trip.reserved_all_week = true
-      else
-        golfer_trip.cost    = golfer.trip_net_total_cost(trip.id)
-        golfer_trip.balance = golfer_trip.cost
-        golfer_trip.deposit_policy_acknowledged_at = Time.current if trip.deposit_due_date.present?
-      end
-      golfer_trip.save
-      GolferMailer.trip_signup(golfer, golfer_trip).deliver_now unless golfer.admin?
-      trip.send_bed_alerts(had_open_spots)
-      redirect_to "/dashboard"
-    else
-      flash[:error] = golfer.errors.full_messages.to_sentence + "."
-      redirect_to "/register_trip"
+  def admin_new
+    @next_trip = Trip.current
+    if @next_trip.nil? || !@next_trip.registration_open?
+      flash[:login] = "There's no current trip open for registration."
+      redirect_to '/dashboard' and return
     end
+    @proxy = true
+    @form_path = "/admin/register_golfer"
+    unregistered = Golfer.where(role: :default).where.not(id: @next_trip.golfer_trips.select(:golfer_id))
+    @registrant = unregistered.find_by(id: params[:golfer_id])
+    if @registrant
+      @trip = @next_trip.sort_by_calendar
+      @full_night_ids = @next_trip.full_night_ids
+    else
+      flash.now[:error] = "That golfer can't be registered." if params[:golfer_id].present?
+      @eligible_golfers = unregistered.order(:last_name, :first_name)
+    end
+    render :new
+  end
+
+  def admin_create
+    golfer = Golfer.where(role: :default).find_by(id: params[:golfer_id])
+    if golfer.nil?
+      flash[:error] = "Pick a golfer to register."
+      redirect_to "/admin/register_golfer" and return
+    end
+    register_golfer_for_trip(golfer, "/admin/register_golfer?golfer_id=#{golfer.id}")
   end
 
   def update
@@ -190,6 +177,55 @@ class GolferTripsController < ApplicationController
   end
 
   private
+
+  def register_golfer_for_trip(golfer, retry_path)
+    trip = Trip.current
+    if trip.nil?
+      redirect_to '/dashboard' and return
+    end
+    if !trip.registration_open? && !golfer.admin?
+      flash[:login] = "Registration for KPC #{trip.number} isn't open yet."
+      redirect_to '/dashboard' and return
+    end
+    if trip.deposit_due_date.present? && !golfer.admin? && params[:deposit_policy_acknowledged] != "1"
+      flash[:error] = "You must acknowledge the deposit policy."
+      redirect_to retry_path and return
+    end
+    if !params[:full_trip] && requested_night_ids(trip).empty? && Array(params[:rounds]).empty?
+      flash[:error] = "Pick at least one night or round to sign up."
+      redirect_to retry_path and return
+    end
+    unless golfer.admin?
+      full_nights = trip.nights.where(id: trip.full_night_ids & requested_night_ids(trip)).order(:date)
+      if full_nights.any?
+        flash[:error] = "The house is already full on #{full_nights.map { |n| n.date.strftime('%a %-m/%-d') }.to_sentence}. Uncheck #{full_nights.one? ? 'that night' : 'those nights'} to sign up, or contact the committee."
+        redirect_to retry_path and return
+      end
+    end
+    had_open_spots = trip.open_bed_spots > 0
+    golfer_trip = GolferTripFacade.create_new_golfer_trip(golfer, trip, params)
+
+    if golfer_trip.save
+      if golfer.admin?
+        golfer_trip.cost    = 0
+        golfer_trip.balance = 0
+        golfer_trip.is_paid = true
+        golfer_trip.reserved_all_week = true
+      else
+        golfer_trip.cost    = golfer.trip_net_total_cost(trip.id)
+        golfer_trip.balance = golfer_trip.cost
+        golfer_trip.deposit_policy_acknowledged_at = Time.current if trip.deposit_due_date.present?
+      end
+      golfer_trip.save
+      GolferMailer.trip_signup(golfer, golfer_trip).deliver_now unless golfer.admin?
+      trip.send_bed_alerts(had_open_spots)
+      flash[:notice] = "Registered #{golfer.first_name} #{golfer.last_name} for KPC #{trip.number}." if golfer != current_user
+      redirect_to "/dashboard"
+    else
+      flash[:error] = golfer.errors.full_messages.to_sentence + "."
+      redirect_to retry_path
+    end
+  end
 
   def requested_night_ids(trip)
     return trip.nights.pluck(:id) if params[:full_trip]

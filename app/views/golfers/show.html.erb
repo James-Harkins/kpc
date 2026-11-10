@@ -461,6 +461,9 @@ button:focus, button:active:focus, .btn.active-outline-primary-paid:focus {
             <% unless @golfer_next_trip %>
               <%= button_to "Register for KPC #{@next_trip.number}", "/register_trip", method: :get, class: 'btn btn-outline-primary-finances' %>
             <% end %>
+            <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] && @next_trip.registration_open? %>
+              <%= button_to "Register a Golfer", admin_register_golfer_path, method: :get, class: 'btn btn-outline-primary-finances' %>
+            <% end %>
           </div>
           <% if current_user.email == ENV["SITE_ADMIN_EMAIL"] && !@next_trip.registration_open? %>
             <div class="button-row">

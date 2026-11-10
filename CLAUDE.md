@@ -154,6 +154,7 @@ DELETE /logout                sessions
 
 GET/POST /register_trip       golfer_trips#new/create
 GET/PATCH /golfer_trips/:id   golfer_trips#edit/admin_update (site admin only)
+GET/POST /admin/register_golfer  golfer_trips#admin_new/admin_create (site admin only; "Register a Golfer" button on the dashboard, shown when Trip.current is open for registration; registers an existing default golfer who hasn't signed up, with normal pricing and the usual signup email - for attendees who don't use the site)
 DELETE /golfer_trips/:id      golfer_trips#destroy (site admin only; "Delete Reservation" button on /finances; clears that trip's golfer_nights, golfer_rounds and golfer_trip; refused if net payments > 0 or the trip is completed)
 PUT /update_golfer_payment    golfer_trips#update
 
